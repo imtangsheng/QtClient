@@ -26,6 +26,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QtClient
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
+        resource.qrc
+        ui/VideoPlayback.h ui/VideopPayback.cpp ui/VideoPlayback.ui
+        public/AppData.h
+        public/AppOS.h
+        config.json
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QtClient APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
