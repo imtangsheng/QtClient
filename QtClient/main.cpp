@@ -7,8 +7,9 @@
 #include "public/AppData.h"
 #include <QMessageBox>
 #include <QDir>
+#include <QJsonDocument>
 
-QJsonDocument EXE_CONFIG;
+QJsonObject EXE_CONFIG;
 
 int main(int argc, char *argv[])
 {
@@ -18,8 +19,8 @@ int main(int argc, char *argv[])
         QMessageBox::critical(nullptr, "Error", "Config file not found");
         return -1;
     }
-    EXE_CONFIG = QJsonDocument::fromJson(file.readAll());
-    if(EXE_CONFIG.isNull()) {
+    EXE_CONFIG = QJsonDocument::fromJson(file.readAll()).object();
+    if(EXE_CONFIG.isEmpty()) {
         QMessageBox::critical(nullptr, "Error", "Config file is not valid JSON");
         file.close();
         return -1;

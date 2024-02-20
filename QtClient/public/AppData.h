@@ -50,9 +50,9 @@ public:
     ~MapAtomicEnumValue() = default;
 };
 
-#include <QJsonDocument>
+#include <QJsonObject>
 
-extern QJsonDocument EXE_CONFIG;
+extern QJsonObject EXE_CONFIG;
 
 
 #endif // APPDATA_H

@@ -1,5 +1,15 @@
 <RCC>
     <qresource prefix="/">
         <file>asset/logo.ico</file>
+        <file>asset/video_playback/Default_CoverArt.svg</file>
+        <file>asset/video_playback/Movie_Active.svg</file>
+        <file>asset/video_playback/Movie_Icon.svg</file>
+        <file>asset/video_playback/Movie_Icon_Dark.svg</file>
+        <file>asset/video_playback/Music_Active.svg</file>
+        <file>asset/video_playback/Music_Icon.svg</file>
+        <file>asset/video_playback/Music_Icon_Dark.svg</file>
+        <file>asset/video_playback/Shadow.png</file>
+        <file>asset/video_playback/Shadow@2x.png</file>
+        <file>asset/video_playback/Warning_Icon.svg</file>
     </qresource>
 </RCC>
