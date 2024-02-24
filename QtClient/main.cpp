@@ -4,15 +4,27 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QFile>
-#include "public/AppData.h"
 #include <QMessageBox>
 #include <QDir>
 #include <QJsonDocument>
 
+#include "public/AppData.h"
 QJsonObject EXE_CONFIG;
 
 int main(int argc, char *argv[])
 {
+    QApplication a(argc, argv);
+
+    QTranslator translator;
+    const QStringList uiLanguages = QLocale::system().uiLanguages();
+    for (const QString &locale : uiLanguages) {
+        const QString baseName = "QtClient_" + QLocale(locale).name();
+        if (translator.load(":/i18n/" + baseName)) {
+            a.installTranslator(&translator);
+            break;
+        }
+    }
+
     qDebug()<<"当前工作目录："<<QDir::currentPath();
         QFile file("config.json");
     if(!file.open(QIODevice::ReadOnly)) {
@@ -28,20 +40,7 @@ int main(int argc, char *argv[])
     file.close();
     qDebug()<<"当前软件版本："<<EXE_CONFIG["version"].toString();
 
-    QApplication a(argc, argv);
-
-    QTranslator translator;
-    const QStringList uiLanguages = QLocale::system().uiLanguages();
-    for (const QString &locale : uiLanguages) {
-        const QString baseName = "QtClient_" + QLocale(locale).name();
-        if (translator.load(":/i18n/" + baseName)) {
-            a.installTranslator(&translator);
-            break;
-        }
-    }
-
     MainWindow w;
     w.show();
-
     return a.exec();
 }
