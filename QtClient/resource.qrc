@@ -31,5 +31,7 @@
         <file>asset/dataview/pressure.svg</file>
         <file>asset/dataview/Temperature.svg</file>
         <file>asset/dataview/voltage.svg</file>
+        <file>asset/dataview/ZoomReset.svg</file>
+        <file>asset/Home/More.svg</file>
     </qresource>
 </RCC>

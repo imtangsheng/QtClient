@@ -19,7 +19,7 @@
      <x>10</x>
      <y>20</y>
      <width>621</width>
-     <height>321</height>
+     <height>401</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -66,7 +66,21 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="themeComboBox"/>
+       <widget class="QComboBox" name="themeComboBox">
+        <item>
+         <property name="text">
+          <string>浅色主题</string>
+         </property>
+         <property name="icon">
+          <iconset theme="zoom-in"/>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>黑色主题</string>
+         </property>
+        </item>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="animatedLabel">
@@ -85,7 +99,28 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="animatedComboBox"/>
+       <widget class="QComboBox" name="animatedComboBox">
+        <item>
+         <property name="text">
+          <string>禁用动画效果</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>网格轴动画</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>系列动画</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>所有动画</string>
+         </property>
+        </item>
+       </widget>
       </item>
       <item>
        <widget class="QLabel" name="legendLabel">
@@ -104,7 +139,36 @@
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="legendComboBox"/>
+       <widget class="QComboBox" name="legendComboBox">
+        <property name="currentIndex">
+         <number>1</number>
+        </property>
+        <item>
+         <property name="text">
+          <string>不显示</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>顶部</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>底部</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>左侧</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>右侧</string>
+         </property>
+        </item>
+       </widget>
       </item>
       <item>
        <widget class="QCheckBox" name="antialiasCheckBox">
@@ -122,13 +186,6 @@
         </property>
         <property name="checked">
          <bool>false</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="pushButton_test">
-        <property name="text">
-         <string>test1</string>
         </property>
        </widget>
       </item>
@@ -161,141 +218,39 @@
       </item>
       <item>
        <widget class="QTabWidget" name="tabWidget">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="maximumSize">
          <size>
-          <width>150</width>
+          <width>300</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
+        <property name="tabletTracking">
+         <bool>true</bool>
+        </property>
+        <property name="acceptDrops">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>设置和其他</string>
+        </property>
+        <property name="autoFillBackground">
+         <bool>true</bool>
         </property>
         <property name="currentIndex">
          <number>0</number>
         </property>
-        <widget class="QWidget" name="tab_view">
-         <attribute name="icon">
-          <iconset resource="../resource.qrc">
-           <normaloff>:/asset/dataview/MoreFilled.svg</normaloff>:/asset/dataview/MoreFilled.svg</iconset>
-         </attribute>
-         <attribute name="title">
-          <string>选项</string>
-         </attribute>
-         <widget class="QWidget" name="verticalLayoutWidget">
-          <property name="geometry">
-           <rect>
-            <x>0</x>
-            <y>0</y>
-            <width>91</width>
-            <height>201</height>
-           </rect>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_chart">
-           <item>
-            <widget class="QCheckBox" name="checkBox_current">
-             <property name="mouseTracking">
-              <bool>true</bool>
-             </property>
-             <property name="toolTip">
-              <string>电流选择是否显示</string>
-             </property>
-             <property name="autoFillBackground">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>电流</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../resource.qrc">
-               <normaloff>:/asset/dataview/current.svg</normaloff>:/asset/dataview/current.svg</iconset>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_voltage">
-             <property name="mouseTracking">
-              <bool>true</bool>
-             </property>
-             <property name="toolTip">
-              <string>电流选择是否显示</string>
-             </property>
-             <property name="autoFillBackground">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>电压</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../resource.qrc">
-               <normaloff>:/asset/dataview/voltage.svg</normaloff>:/asset/dataview/voltage.svg</iconset>
-             </property>
-             <property name="checked">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_pressure">
-             <property name="mouseTracking">
-              <bool>true</bool>
-             </property>
-             <property name="toolTip">
-              <string>电流选择是否显示</string>
-             </property>
-             <property name="autoFillBackground">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>气压</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../resource.qrc">
-               <normaloff>:/asset/dataview/pressure.svg</normaloff>:/asset/dataview/pressure.svg</iconset>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QCheckBox" name="checkBox_temperature">
-             <property name="mouseTracking">
-              <bool>true</bool>
-             </property>
-             <property name="toolTip">
-              <string>电流选择是否显示</string>
-             </property>
-             <property name="autoFillBackground">
-              <bool>true</bool>
-             </property>
-             <property name="text">
-              <string>温度</string>
-             </property>
-             <property name="icon">
-              <iconset resource="../resource.qrc">
-               <normaloff>:/asset/dataview/Temperature.svg</normaloff>:/asset/dataview/Temperature.svg</iconset>
-             </property>
-             <property name="checked">
-              <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="verticalSpacer">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>40</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </widget>
+        <property name="movable">
+         <bool>true</bool>
+        </property>
         <widget class="QWidget" name="tab_setting">
          <attribute name="icon">
           <iconset resource="../resource.qrc">
@@ -304,19 +259,178 @@
          <attribute name="title">
           <string>设置</string>
          </attribute>
-         <widget class="QPushButton" name="pushButton_view">
-          <property name="geometry">
-           <rect>
-            <x>50</x>
-            <y>40</y>
-            <width>81</width>
-            <height>23</height>
-           </rect>
-          </property>
-          <property name="text">
-           <string>test</string>
-          </property>
-         </widget>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <item>
+           <widget class="QLineEdit" name="lineEdit_rootPath">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_test">
+            <property name="text">
+             <string>test1</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTreeView" name="treeView_files"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_view">
+         <attribute name="icon">
+          <iconset resource="../resource.qrc">
+           <normaloff>:/asset/dataview/MoreFilled.svg</normaloff>:/asset/dataview/MoreFilled.svg</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>选项</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout">
+          <item row="0" column="0">
+           <layout class="QVBoxLayout" name="verticalLayout_chart">
+            <item>
+             <widget class="QCheckBox" name="checkBox_current">
+              <property name="mouseTracking">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>电流选择是否显示</string>
+              </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>电流</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resource.qrc">
+                <normaloff>:/asset/dataview/current.svg</normaloff>:/asset/dataview/current.svg</iconset>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_voltage">
+              <property name="mouseTracking">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>电流选择是否显示</string>
+              </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>电压</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resource.qrc">
+                <normaloff>:/asset/dataview/voltage.svg</normaloff>:/asset/dataview/voltage.svg</iconset>
+              </property>
+              <property name="checked">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_pressure">
+              <property name="mouseTracking">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>电流选择是否显示</string>
+              </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>气压</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resource.qrc">
+                <normaloff>:/asset/dataview/pressure.svg</normaloff>:/asset/dataview/pressure.svg</iconset>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBox_temperature">
+              <property name="mouseTracking">
+               <bool>true</bool>
+              </property>
+              <property name="toolTip">
+               <string>电流选择是否显示</string>
+              </property>
+              <property name="autoFillBackground">
+               <bool>true</bool>
+              </property>
+              <property name="text">
+               <string>温度</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resource.qrc">
+                <normaloff>:/asset/dataview/Temperature.svg</normaloff>:/asset/dataview/Temperature.svg</iconset>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>40</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_zoomOut">
+              <property name="text">
+               <string>缩小</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resource.qrc">
+                <normaloff>:/asset/dataview/ZoomOut.svg</normaloff>:/asset/dataview/ZoomOut.svg</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_zoomIn">
+              <property name="text">
+               <string>放大</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resource.qrc">
+                <normaloff>:/asset/dataview/ZoomIn.svg</normaloff>:/asset/dataview/ZoomIn.svg</iconset>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_zoomReset">
+              <property name="text">
+               <string>缩放重置</string>
+              </property>
+              <property name="icon">
+               <iconset resource="../resource.qrc">
+                <normaloff>:/asset/dataview/ZoomReset.svg</normaloff>:/asset/dataview/ZoomReset.svg</iconset>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
        </widget>
       </item>

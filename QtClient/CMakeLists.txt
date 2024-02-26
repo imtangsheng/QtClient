@@ -27,10 +27,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         resource.qrc
-        ui/VideoPlayback.h ui/VideopPayback.cpp ui/VideoPlayback.ui
         public/AppData.h
         public/AppOS.h
         config.json
+        ui/VideoPlayback.h ui/VideopPayback.cpp ui/VideoPlayback.ui
         ui/DataView.h ui/DataView.cpp ui/DataView.ui
     )
 # Define target properties for Android with Qt 6 as:

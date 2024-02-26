@@ -5,9 +5,16 @@
 #include <QRegularExpressionMatch>
 #include <QFile>
 #include <QTextStream>
+#include <QFileSystemModel>
+#include <QFileDialog>
+#include <QMessageBox>
 
 QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d+)℃$");
 #include <QRandomGenerator>
+
+#include "../public/AppData.h"
+
+//#include "public/AppData.h"
 
 DataView::DataView(QWidget *parent) :
     QWidget(parent),
@@ -25,106 +32,60 @@ DataView::~DataView()
 }
 
 
-void DataView::parseDataFromFile(const QString filePath)
+QWidget *DataView::getDataView()
 {
-    qDebug() << "parseDataFromFile文件：" <<filePath;
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug() << "无法打开文件：" <<filePath<< file.errorString();
-        return ;
-    }
-
-    QTextStream in(&file);
-//    QList<DataPoint> dataPoints;
-    QVector<DataPoint> dataPoints;
-    QDateTime startTime = QDateTime::currentDateTime();
-
-    m_lineSeries_current->clear();
-    m_lineSeries_voltage->clear();
-    m_lineSeries_pressure->clear();
-    m_lineSeries_temperature->clear();
-
-    while (!in.atEnd()) {
-        QString line = in.readLine();
-        QRegularExpressionMatch match = REGEX_DATA.match(line);
-        if (match.hasMatch()) {
-            m_dataTime_lineSeries = QDateTime::fromString(match.captured(1), "yyyy-MM-dd hh:mm:ss");
-            m_lineSeries_current->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(3).toDouble());
-            m_lineSeries_voltage->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(4).toDouble());
-            m_lineSeries_pressure->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(5).toDouble());
-            m_lineSeries_temperature->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(6).toDouble());
-//            qDebug() << "日期和时间：" << m_dataTime_lineSeries.toString("yyyy-MM-dd hh:mm:ss");
-//            qDebug() << "电流：" << match.captured(3).toDouble() << "安培";
-//            qDebug() << "电压：" << match.captured(4).toDouble() << "伏特";
-//            qDebug() << "压力：" << match.captured(5).toDouble() << "兆帕（MPa）";
-//            qDebug() << "温度：" << match.captured(6).toDouble() << "摄氏度";
-//            qDebug() << "------------------------";
-        }else {
-            qDebug()<<"match.hasMatch() error:"<<in.pos()<<"-line:"<<line;
-        }
-    }
-    file.close();
-    QDateTime endTime = QDateTime::currentDateTime();
-    qint64 elapsedTime = startTime.secsTo(endTime);
-    qDebug() << "解析时间：" << elapsedTime << "秒";
-    // 创建图表和曲线
-    // 创建图表视图并显示
-
-    m_axisTime->setRange(
-        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(0).x()),
-        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(m_lineSeries_temperature->count() -1 ).x()));
-    m_axisY->setRange(-20,50);
-    m_chartView->update();
-
+    return ui->widget_dataView;
 }
 
 void DataView::init()
 {
     qDebug()<<"DataView::init()";
     init_chartView();
+    init_filesView();
 //    test();
 
 }
 
 void DataView::test()
 {
-    QString line = "2024-01-15 09:09:22 Monday, time:1705280962.602193S, I:0.000000A, V:3.061000V, P:0.000000MPa, C:-14.836364℃";
-    QRegularExpression regex("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d+)℃$");
-    QRegularExpressionMatch match = regex.match(line);
-    qDebug() << match.hasMatch();
-    if (match.hasMatch()) {
-        DataPoint dataPoint;
-        dataPoint.dataTime = QDateTime::fromString(match.captured(1), "yyyy-MM-dd hh:mm:ss");
-        dataPoint.current = match.captured(3).toDouble();
-        dataPoint.voltage = match.captured(4).toDouble();
-        dataPoint.pressure = match.captured(5).toDouble();
-        dataPoint.temperature = match.captured(6).toDouble();
+//    QString line = "2024-01-15 09:09:22 Monday, time:1705280962.602193S, I:0.000000A, V:3.061000V, P:0.000000MPa, C:-14.836364℃";
+//    QRegularExpression regex("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d+)℃$");
+//    QRegularExpressionMatch match = regex.match(line);
+//    qDebug() << match.hasMatch();
+//    if (match.hasMatch()) {
+//        DataPoint dataPoint;
+//        dataPoint.dataTime = QDateTime::fromString(match.captured(1), "yyyy-MM-dd hh:mm:ss");
+//        dataPoint.current = match.captured(3).toDouble();
+//        dataPoint.voltage = match.captured(4).toDouble();
+//        dataPoint.pressure = match.captured(5).toDouble();
+//        dataPoint.temperature = match.captured(6).toDouble();
 
-        qDebug() << "日期和时间：" << dataPoint.dataTime.toString("yyyy-MM-dd hh:mm:ss");
-        qDebug() << "电流：" << dataPoint.current << "安培";
-        qDebug() << "电压：" << dataPoint.voltage << "伏特";
-        qDebug() << "压力：" << dataPoint.pressure << "兆帕（MPa）";
-        qDebug() << "温度：" << dataPoint.temperature << "摄氏度";
+//        qDebug() << "日期和时间：" << dataPoint.dataTime.toString("yyyy-MM-dd hh:mm:ss");
+//        qDebug() << "电流：" << dataPoint.current << "安培";
+//        qDebug() << "电压：" << dataPoint.voltage << "伏特";
+//        qDebug() << "压力：" << dataPoint.pressure << "兆帕（MPa）";
+//        qDebug() << "温度：" << dataPoint.temperature << "摄氏度";
+//    }
+
+    // 创建打开文件对话框
+    QFileDialog fileDialog(this);
+    fileDialog.setFileMode(QFileDialog::ExistingFile); // 设置对话框模式为选择已存在的文件
+
+    QString filePath = fileDialog.getOpenFileName(this, "Open File"); // 获取选择的文件路径
+    if (!filePath.isEmpty()) {
+        // 在这里处理打开文件的逻辑
+        qDebug() << "Selected file: " << filePath;
     }
 
-}
-
-QWidget *DataView::getDataView()
-{
-    return ui->widget_dataView;
-}
-
-void DataView::on_pushButton_test_clicked()
-{
-    qDebug()<<"test()";
-    parseDataFromFile("dataView.txt");
 
 }
+
 
 void DataView::init_chartView()
 {
     m_chart = new QChart();
     m_chart->setTitle("数据曲线图示");
+//    m_chart->setMargins(0,0,0,0);
     // 创建X轴和Y轴
 //    QDateTimeAxis *m_axisTime = new QDateTimeAxis();
     m_axisTime = new QDateTimeAxis();
@@ -151,7 +112,7 @@ void DataView::init_chartView()
     m_lineSeries_voltage->setVisible(ui->checkBox_voltage->checkState()== Qt::Checked);
 
     m_lineSeries_pressure = new QLineSeries();
-    m_lineSeries_pressure->setName("压强数据曲线(兆帕MPa)");
+    m_lineSeries_pressure->setName("气压数据曲线(兆帕MPa)");
     m_lineSeries_pressure->setColor(Qt::blue);
     m_lineSeries_pressure->setVisible(ui->checkBox_pressure->checkState()== Qt::Checked);
 
@@ -209,81 +170,118 @@ void DataView::init_chartView()
 
 }
 
-
-QChart *DataView::createLineChart() const
+void DataView::init_filesView()
 {
-    QChart *chart = new QChart();
-    chart->setTitle("Line chart数据曲线");
-    QString name("Series ");
+    qDebug()<<"init_filesView()";
+    // 目录树模型
+    m_fileModel_dataView = new QFileSystemModel;
+    QStringList filters;
+    filters << "*.txt";
+    m_fileModel_dataView->setNameFilters(filters);
+    m_fileModel_dataView->setNameFilterDisables(false);
 
-    // 设置线条颜色
-    QPen pen(Qt::red); // 设置为红色
+    m_fileModel_dataView->setRootPath(QDir::rootPath());
+    m_fileModel_dataView->setFilter(QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot);
 
-    // 创建X轴和Y轴
-    QDateTimeAxis *axisX = new QDateTimeAxis();
-    axisX->setTitleText("X轴时间");
-    axisX->setFormat("hh:mm:ss"); // 设置时间格式
-//    axisX->setTitleVisible(true);
-//    axisX->setLineVisible(true);
-//    axisX->setLinePen(pen);
+    // 目录树视图
+    ui->treeView_files->setModel(m_fileModel_dataView);
 
-
-
-    QValueAxis *axisY = new QValueAxis();
-    axisY->setTitleText("Y轴数值");
-
-
-    QLineSeries *series = new QLineSeries();
-    series->setName("随机温度数据曲线");
-    QLineSeries *series2 = new QLineSeries();
-    series2->setName("数据曲线2");
+    ui->treeView_files->setWindowTitle("Directories");
+    // 设置文件浏览视图的根目录
+    ui->lineEdit_rootPath->setText(EXE_CONFIG["pathDataView"].toString());
+    ui->treeView_files->setRootIndex(m_fileModel_dataView->index(ui->lineEdit_rootPath->text()));
+    // 当前目录变化信号
+    connect(ui->treeView_files->selectionModel(),&QItemSelectionModel::currentChanged,this,&DataView::fileModelSelection);
+    connect(ui->treeView_files, &QTreeView::doubleClicked,this, &DataView::fileBrowserDoubleClicked);
+//    connect(ui->treeView_files->selectionModel(), &QTreeView::doubleClicked,this, &DataView::fileBrowserDoubleClicked);
 
 
-    QDateTime currentTime = QDateTime::currentDateTime();
-    for(int i=0;i<100;i++){
+}
 
-//        series->append(i,20);
-        currentTime = currentTime.addSecs(1);
 
-        series->append(currentTime.toMSecsSinceEpoch(), 30);
-        series2->append(currentTime.toMSecsSinceEpoch(),QRandomGenerator::global()->bounded(10, 50));
-
-        qDebug()<<i<<currentTime;
+bool DataView::parseDataFromFile(const QString filePath)
+{
+    qDebug() << "parseDataFromFile文件：" <<filePath;
+            QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug() << "无法打开文件：" <<filePath<< file.errorString();
+        return false;
     }
 
-    chart->addSeries(series);
-    chart->addSeries(series2);
-    chart->addAxis(axisX, Qt::AlignBottom);
-    chart->addAxis(axisY, Qt::AlignLeft);
-    series->setPen(QPen(Qt::yellow));
-    series->setPointLabelsColor(Qt::black);
-    // 将数据曲线与轴关联
-    series->attachAxis(axisX);
-    series->attachAxis(axisY);
-    series->setName("数据曲线");
-    series->setPointLabelsVisible(true);
+    QTextStream in(&file);
+    //    QList<DataPoint> dataPoints;
+    QDateTime startTime = QDateTime::currentDateTime();
 
-//    series->setPointLabelsFormat("@yName");
+    m_lineSeries_current->clear();
+    m_lineSeries_voltage->clear();
+    m_lineSeries_pressure->clear();
+    m_lineSeries_temperature->clear();
 
-    series2->setName("test2");
-    series2->setColor(Qt::green);
+    while (!in.atEnd()) {
+        QString line = in.readLine();
+        QRegularExpressionMatch match = REGEX_DATA.match(line);
+        if (match.hasMatch()) {
+            m_dataTime_lineSeries = QDateTime::fromString(match.captured(1), "yyyy-MM-dd hh:mm:ss");
+            m_lineSeries_current->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(3).toDouble());
+            m_lineSeries_voltage->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(4).toDouble());
+            m_lineSeries_pressure->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(5).toDouble());
+            m_lineSeries_temperature->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(6).toDouble());
+            //            qDebug() << "日期和时间：" << m_dataTime_lineSeries.toString("yyyy-MM-dd hh:mm:ss");
+            //            qDebug() << "电流：" << match.captured(3).toDouble() << "安培";
+            //            qDebug() << "电压：" << match.captured(4).toDouble() << "伏特";
+            //            qDebug() << "压力：" << match.captured(5).toDouble() << "兆帕（MPa）";
+            //            qDebug() << "温度：" << match.captured(6).toDouble() << "摄氏度";
+            //            qDebug() << "------------------------";
+        }else {
+            qDebug()<<"match.hasMatch() error:"<<in.pos()<<"-line:"<<line;
+        }
+    }
+    file.close();
+    QDateTime endTime = QDateTime::currentDateTime();
+    qint64 elapsedTime = startTime.secsTo(endTime);
+    qDebug() << "解析时间：" << elapsedTime << "秒";
+    // 创建图表和曲线
+    // 创建图表视图并显示
+    m_axisTime->setRange(
+        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(0).x()),
+        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(m_lineSeries_temperature->count() -1 ).x()));
+    m_axisY->setRange(-20,50);
+    m_chartView->update();
 
-//    series2->setPointLabelsColor(Qt::red);
-    series2->attachAxis(axisX);
-    series2->attachAxis(axisY);
+    return true;
+
+}
 
 
-    qDebug()<<"chart:"<<chart;
-    axisX->setRange(
-        QDateTime::fromMSecsSinceEpoch(series->at(0).x()),
-        QDateTime::fromMSecsSinceEpoch(series->at(series->count() -1 ).x()));
-    axisY->setRange(0,50);
+void DataView::fileModelSelection(QModelIndex index)
+{
+    qDebug()<<"fileModelSelection(QModelIndex index)"<<index;
+    qDebug()<<index.data(QFileSystemModel::FilePathRole).toString();
+    m_currentFilePathDir = index.data(QFileSystemModel::FilePathRole).toString();
+}
+#include<QTimer>
+void DataView::fileBrowserDoubleClicked(QModelIndex index)
+{
+    qDebug()<<"fileBrowserDoubleClicked(QModelIndex index)"<<index;
+    qDebug()<<index.data(QFileSystemModel::FilePathRole).toString();
+    m_currentFilePathDir = index.data(QFileSystemModel::FilePathRole).toString();
 
-//    chart->createDefaultAxes();
-//    chart->legend()->setVisible(true);
 
-
-    return chart;
+    // 提示窗口
+    QMessageBox msgBox(this);
+    msgBox.setText("等待数据解析完成");
+    if(!parseDataFromFile(m_currentFilePathDir)){
+        // 路径不存在
+        QMessageBox::warning(this, "数据解析", "数据解析失败文件路径不存在!");
+        msgBox.exec();
+        return;
+    }
+    // 3秒后自动关闭
+//    QTimer::singleShot(3000, &msgBox, &QMessageBox::close);
+    msgBox.exec();
+    ui->tabWidget->setCurrentWidget(ui->tab_view);
+//    QTabBar *tabBar = ui->tabWidget->tabBar();
+//    ui->tabWidget->setMaximumWidth(200);
 }
 
 
@@ -350,5 +348,127 @@ void DataView::on_checkBox_pressure_stateChanged(int arg1)
 void DataView::on_checkBox_temperature_stateChanged(int arg1)
 {
     m_lineSeries_temperature->setVisible(arg1);
+}
+
+
+void DataView::on_themeComboBox_currentIndexChanged(int index)
+{
+//    Constant	 值	描述
+//    QChart::ChartThemeLight	0	浅色主题，这是默认主题。
+//    QChart::ChartThemeBlueCerulean	1	蔚蓝主题。
+//    QChart::ChartThemeDark	2	黑暗主题。
+//    QChart::ChartThemeBrownSand	3	沙褐色主题。
+//    QChart::ChartThemeBlueNcs	4	自然色系 （NCS） 蓝色主题。
+//    QChart::ChartThemeHighContrast	5	高对比度主题。
+//    QChart::ChartThemeBlueIcy	6	冰蓝色的主题。
+//    QChart::ChartThemeQt	7	Qt 主题。
+
+    qDebug()<<"on_themeComboBox_currentIndexChanged int:"<< index;
+    QString theme = ui->themeComboBox->itemText(index);
+    if (theme == "默认主题") {
+        // 设置默认主题的样式或设置
+        // ...
+    } else if (theme == "黑色主题") {
+        // 设置黑色主题的样式或设置
+        m_chart->setTheme(QChart::ChartThemeDark);
+    } else if (theme == "浅色主题") {
+        // 设置浅色主题的样式或设置
+        m_chart->setTheme(QChart::ChartThemeLight);
+    }
+}
+
+
+void DataView::on_animatedComboBox_currentIndexChanged(int index)
+{
+    qDebug()<<"on_animatedComboBox_currentIndexChanged int:"<< index;
+    //QChart::NoAnimation	0x0	动画在图表中被禁用。这是默认值。
+    //QChart::GridAxisAnimations	0x1	在图表中启用网格轴动画。
+    //QChart::SeriesAnimations	0x2	在图表中启用系列动画。
+    //QChart::AllAnimations	0x3	图表中启用了所有动画类型。
+    m_chart->setAnimationOptions(QChart::AnimationOptions(index));
+}
+
+
+void DataView::on_legendComboBox_currentIndexChanged(int index)
+{
+    Qt::Alignment alignment;
+    qDebug()<<"on_legendComboBox_currentIndexChanged int:"<< index;
+//    qDebug()<<int(Qt::AlignTop) <<int(Qt::AlignBottom)<<int(Qt::AlignLeft)<<int(Qt::AlignRight);
+//    Qt::Alignment alignment(ui->legendComboBox->itemData(index).toInt());
+//    qDebug()<<alignment<<int(alignment);
+//    m_chart->legend()->setAlignment(Qt::Alignment(index));
+    switch (index) {
+    //
+    case 0:
+        m_chart->legend()->hide();
+        return;
+        break;
+    case 1:
+        alignment = Qt::AlignTop;
+        break;
+    case 2:
+        alignment = Qt::AlignBottom;
+        break;
+    case 3:
+        alignment = Qt::AlignLeft;
+        break;
+    case 4:
+        alignment = Qt::AlignRight;
+        break;
+    default:
+        return;
+        break;
+    }
+    m_chart->legend()->setAlignment(alignment);
+    m_chart->legend()->show();
+
+}
+
+
+void DataView::on_antialiasCheckBox_stateChanged(int arg1)
+{
+    qDebug()<<"on_antialiasComboBox_currentIndexChanged int:"<< arg1;
+//    m_chart->setRenderHint(QPainter::Antialiasing,  arg1);
+    m_chartView->setRenderHint(QPainter::Antialiasing,arg1);
+}
+
+
+void DataView::on_pushButton_zoomOut_clicked()
+{
+    m_chart->zoomOut();
+}
+
+
+void DataView::on_pushButton_zoomIn_clicked()
+{
+    m_chart->zoomIn();
+}
+
+
+void DataView::on_pushButton_zoomReset_clicked()
+{
+    m_chart->zoomReset();
+}
+
+
+void DataView::on_pushButton_test_clicked()
+{
+    qDebug()<<"test()";
+    //    parseDataFromFile("dataView.txt");
+
+
+//    test();
+}
+
+void DataView::on_lineEdit_rootPath_editingFinished()
+{
+    qDebug()<<"on_lineEdit_rootPath_editingFinished()";
+    qDebug()<<ui->lineEdit_rootPath->text()<<EXE_CONFIG["pathDataView"].toString();
+    if(!QDir(ui->lineEdit_rootPath->text()).exists()){
+        // 路径不存在
+        QMessageBox::warning(this, "路径验证", "文件路径不存在!");
+    }
+    EXE_CONFIG["pathDataView"] = ui->lineEdit_rootPath->text();
+    ui->treeView_files->setRootIndex(m_fileModel_dataView->index(ui->lineEdit_rootPath->text()));
 }
 

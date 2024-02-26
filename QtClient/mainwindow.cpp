@@ -47,13 +47,15 @@ void MainWindow::init()
 void MainWindow::test()
 {
     qDebug()<<"MainWindow::test000000";
+//    setCentralWidget(ui->tabWidget_mainWindow);
     //#include <QThread>
     // 下载结束后延迟1秒
     //    QThread::msleep(5000);
-//    addTabWidget(TabWindow_VideoPlayback);
-//    ui->tabWidget_mainWindow->setCurrentIndex(m_tabWidget_mainWindow["VideoPlayback"].toInt());
+    addTabWidget(TabWindow_VideoPlayback);
+
     addTabWidget(TabWindow_DataView);
-    ui->tabWidget_mainWindow->setCurrentIndex(m_tabWidget_mainWindow["DataView"].toInt());
+//    ui->tabWidget_mainWindow->setCurrentIndex(m_tabWidget_mainWindow["DataView"].toInt());
+    ui->tabWidget_mainWindow->setCurrentIndex(m_tabWidget_mainWindow["VideoPlayback"].toInt());
 //    QCoreApplication::processEvents(); // 处理界面事件
 
     setCentralWidget(ui->tabWidget_mainWindow);
