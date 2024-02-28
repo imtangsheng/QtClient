@@ -83,6 +83,8 @@ private:
     bool mediaControls(int control);
 
     void init_filesView();
+    QStringList fileExtensions = QString(".mp4,.avi").split(',');
+
     QFileSystemModel *m_fileModel_videoPlayback;
     QString m_currentFilePathDir;
     void fileModelSelection(QModelIndex index);

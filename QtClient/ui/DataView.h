@@ -2,13 +2,16 @@
 #define DATAVIEW_H
 
 #include <QWidget>
-#include<QDateTime>
+#include <QDateTime>
 #include <QFile>
 #include <QChartView>
 #include <QLineSeries>
 #include <QDateTimeAxis>
 #include <QValueAxis>
 #include <QFileSystemModel>
+#include <QStringListModel>
+
+#include "modules/FilesUtil.h"
 
 namespace Ui {
 class DataView;
@@ -34,12 +37,13 @@ public:
     void parseData(const QString &line);
     bool parseDataFromFile(const QString filePath);
 
-
     void init();
     void test();
 
-
     QWidget *getDataView();
+
+public slots:
+    void on_lineEdit_rootPath_editingFinished();
 
 private slots:
     void on_pushButton_test_clicked();
@@ -68,7 +72,27 @@ private slots:
 
     void on_pushButton_zoomReset_clicked();
 
-    void on_lineEdit_rootPath_editingFinished();
+    void on_pushButton_filesNetwork_test_clicked();
+
+    void on_pushButton_downloadNetworkFile_clicked();
+
+    void on_pushButton_axisYsetRange_clicked();
+
+    void on_pushButton_updateNetworkFiles_clicked();
+
+    void on_lineEdit_rootPath_filesNetwork_editingFinished();
+
+    void on_pushButton_updateLocalFiles_clicked();
+
+    void on_pushButton_parseData_clicked();
+
+    void on_listView_filesNetwork_clicked(const QModelIndex &index);
+
+    void on_listView_filesNetwork_doubleClicked(const QModelIndex &index);
+
+    void on_pushButton_downloadedFiles_clicked();
+
+    void on_pushButton_notDownloadedFiles_clicked();
 
 private:
     Ui::DataView *ui;
@@ -88,10 +112,21 @@ private:
 
     //
     void init_filesView();
+    QStringList fileExtensions = QString(".txt,.csv").split(',');
+
+    QStringListModel *m_filesListModelNetwork;
+
     QFileSystemModel *m_fileModel_dataView;
     QString m_currentFilePathDir;
     void fileModelSelection(QModelIndex index);
     void fileBrowserDoubleClicked(QModelIndex index);
+
+    FilesUtil *m_filesUtil;
+    QStringList filesListLocal;
+    QStringList filesListNetwork;
+    QStringList filesListDownloaded;
+    QStringList filesListNotDownloaded;
+
 
 };
 

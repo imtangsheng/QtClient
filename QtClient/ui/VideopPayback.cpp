@@ -1,7 +1,7 @@
 #include "VideoPlayback.h"
 #include "ui_VideoPlayback.h"
 
-#include "../public/AppData.h"
+#include "public/AppData.h"
 
 VideoPlayback::VideoPlayback(QWidget *parent) :
     QWidget(parent),
@@ -95,14 +95,22 @@ void VideoPlayback::updataMoreWidgetGeometry()
     qDebug()<<"showVideoPlaybacckOperationWidget()"<<ui->dockWidget_videoPlayback->geometry();
     QPoint videoPos = videoWidget->mapFromGlobal(QPoint(0,0));
     qDebug()<<"videoWidget:"<<videoWidget->x()<<videoWidget->y()<<videoWidget->width()<<videoWidget->height();
+    qDebug()<<"layout_videoplay"<<ui->layout_videoplay->geometry().x()<<ui->layout_videoplay->geometry().y()<<ui->layout_videoplay->geometry().width()<<ui->layout_videoplay->geometry().height();
+    qDebug()<<"label_videoBackground:pos"<<ui->label_videoBackground->pos();
     qDebug()<<"this:"<<this->x()<<this->y()<<this->width()<<this->height();
     qDebug()<<"parentWidget:"<<this->parentWidget()->x()<<this->parentWidget()->y()<<this->parentWidget()->width()<<this->parentWidget()->height();
     qDebug()<<"videoPos:"<<videoPos.x()<<videoPos.y();
-    ui->dockWidget_videoPlayback->setGeometry(0, 30,ui->dockWidget_videoPlayback->width(),videoWidget->height());
+//    ui->dockWidget_videoPlayback->setGeometry(0, 30,ui->dockWidget_videoPlayback->width(),videoWidget->height());
+//    跟随视频播放窗口的比例
+    ui->dockWidget_videoPlayback->setGeometry(videoWidget->width() - videoPos.x() - ui->dockWidget_videoPlayback->width(),
+        - videoPos.y(),
+        ui->dockWidget_videoPlayback->width(),
+        ui->layout_videoplay->geometry().height());
 
 //    ui->dockWidget_videoPlayback->setGeometry(videoWidget->width() - videoPos.x() - ui->dockWidget_videoPlayback->width(), - videoPos.y(),ui->dockWidget_videoPlayback->width(),videoWidget->height());
 //        ui->dockWidget_videoPlayback->setGeometry(videoWidget->width() - videoPos.x() - ui->dockWidget_videoPlayback->width(), -videoPos.y(),ui->dockWidget_videoPlayback->width(),videoWidget->height());
 
+//    ui->dockWidget_videoPlayback->move(videoPos);
     qDebug()<<ui->dockWidget_videoPlayback->geometry();
 
 }
@@ -188,7 +196,7 @@ void VideoPlayback::on_pushButton_openFile_clicked()
     QFileDialog fileDialog(this);
     fileDialog.setFileMode(QFileDialog::ExistingFile); // 设置对话框模式为选择已存在的文件
 
-    QString filePath = fileDialog.getOpenFileName(this, "Open File"); // 获取选择的文件路径
+    QString filePath = fileDialog.getOpenFileName(this, "Open File",nullptr,"Mp4 Files (*.mp4)"); // 获取选择的文件路径
     if (!filePath.isEmpty()) {
         // 在这里处理打开文件的逻辑
         qDebug() << "Selected file: " << filePath;
@@ -323,7 +331,9 @@ void VideoPlayback::initSettingPlayback()
     audioOutput = new QAudioOutput;
     m_player->setVideoOutput(videoWidget);
     m_player->setAudioOutput(audioOutput);
-    m_player->setSource(QUrl::fromLocalFile("test.mp4"));
+
+    //预先加载播放视频文件
+//    m_player->setSource(QUrl::fromLocalFile("test.mp4"));
     //    m_player->play();
     //    videoWidget->show();
     qDebug()<<"play_clicked"<<m_player->isAvailable()<<m_player->hasVideo();

@@ -8,13 +8,15 @@
 #include <QFileSystemModel>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QStringListModel>
+#include <QJsonDocument>
+#include <QJsonArray>
 
 QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d+)℃$");
 #include <QRandomGenerator>
 
-#include "../public/AppData.h"
-
-//#include "public/AppData.h"
+//#include "../public/AppData.h"
+#include "public/AppData.h"
 
 DataView::DataView(QWidget *parent) :
     QWidget(parent),
@@ -175,25 +177,57 @@ void DataView::init_filesView()
     qDebug()<<"init_filesView()";
     // 目录树模型
     m_fileModel_dataView = new QFileSystemModel;
-    QStringList filters;
-    filters << "*.txt";
-    m_fileModel_dataView->setNameFilters(filters);
-    m_fileModel_dataView->setNameFilterDisables(false);
+//    QStringList filters;
+//    filters << "*.txt";
+//    m_fileModel_dataView->setNameFilters(filters);
+//    m_fileModel_dataView->setNameFilterDisables(false);
+//    m_fileModel_dataView->setRootPath(QDir::rootPath());
+//    m_fileModel_dataView->setRootPath("http://192.168.1.15:8071");
 
-    m_fileModel_dataView->setRootPath(QDir::rootPath());
     m_fileModel_dataView->setFilter(QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot);
-
     // 目录树视图
     ui->treeView_files->setModel(m_fileModel_dataView);
 
     ui->treeView_files->setWindowTitle("Directories");
     // 设置文件浏览视图的根目录
     ui->lineEdit_rootPath->setText(EXE_CONFIG["pathDataView"].toString());
+
+//    m_fileModel_dataView->setRootPath(m_fileModel_dataView->myComputer().toString());
+    m_fileModel_dataView->setRootPath(ui->lineEdit_rootPath->text());
     ui->treeView_files->setRootIndex(m_fileModel_dataView->index(ui->lineEdit_rootPath->text()));
     // 当前目录变化信号
     connect(ui->treeView_files->selectionModel(),&QItemSelectionModel::currentChanged,this,&DataView::fileModelSelection);
     connect(ui->treeView_files, &QTreeView::doubleClicked,this, &DataView::fileBrowserDoubleClicked);
 //    connect(ui->treeView_files->selectionModel(), &QTreeView::doubleClicked,this, &DataView::fileBrowserDoubleClicked);
+
+    // 设置网络浏览视图的根目录
+    m_filesUtil = new FilesUtil;
+    ui->listView_filesNetwork->setWindowTitle("Directories Network");
+
+
+    ui->lineEdit_rootPath_filesNetwork->setText(EXE_CONFIG["networkPathDataView"].toString());
+
+//    m_networkFileModel->setRootPath(ui->lineEdit_rootPath_filesNetwork->text());
+//    m_networkFileModel->setRootUrl(ui->lineEdit_rootPath_filesNetwork->text());
+
+    // 假设你有一个名为fileList的QStringList，其中包含了要显示的文件列表数据
+    QString json = "{\"filesList\":[\"1.txt\", \"2/2.txt\", \"3/3/3.txt\"]}";
+//    QString json = "";
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(json.toUtf8());
+    QJsonValue filesListValue = jsonDoc.object().value("filesList");
+    QJsonArray filesArray = filesListValue.toArray();
+    QStringList fileList;
+    for (const QJsonValue& value : filesArray) {
+        fileList.append(value.toString());
+    }
+
+//    QStringList fileList = {"1.txt", "2/2.txt", "3/3/3.txt"};
+    // 创建一个QStringListModel，并将fileList作为构造函数的参数
+    m_filesListModelNetwork = new QStringListModel(fileList, this);
+    ui->listView_filesNetwork->setModel(m_filesListModelNetwork);
+//    ui->listView_filesNetwork->setModel(m_networkFileModel);
+//    ui->listView_filesNetwork->setRootIndex(m_networkFileModel->index(ui->lineEdit_rootPath_filesNetwork->text()));
+
 
 
 }
@@ -204,6 +238,7 @@ bool DataView::parseDataFromFile(const QString filePath)
     qDebug() << "parseDataFromFile文件：" <<filePath;
             QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, "无法打开文件", "文件:"+filePath+"读取失败，报错："+ file.errorString());
         qDebug() << "无法打开文件：" <<filePath<< file.errorString();
         return false;
     }
@@ -470,5 +505,150 @@ void DataView::on_lineEdit_rootPath_editingFinished()
     }
     EXE_CONFIG["pathDataView"] = ui->lineEdit_rootPath->text();
     ui->treeView_files->setRootIndex(m_fileModel_dataView->index(ui->lineEdit_rootPath->text()));
+}
+
+
+void DataView::on_pushButton_filesNetwork_test_clicked()
+{
+    qDebug()<<"on_pushButton_filesNetwork_test_clicked()";
+//    m_networkFileModel->setRootPath(ui->lineEdit_rootPath_filesNetwork->text());
+//    ui->listView_filesNetwork->setRootIndex(m_networkFileModel->index(ui->lineEdit_rootPath_filesNetwork->text()));
+    m_filesUtil->startRequest(ui->lineEdit_rootPath_filesNetwork->text());
+
+}
+
+
+void DataView::on_pushButton_downloadNetworkFile_clicked()
+{
+    qDebug()<<"on_pushButton_downloadNetworkFile_clicked()"<<ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
+    // 获取选中的项
+    QItemSelectionModel *selectionModel = ui->listView_filesNetwork->selectionModel();
+    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+    for (const QModelIndex &index : selectedIndexes) {
+        qDebug() << "Selected item:" << index.data(Qt::DisplayRole).toString();
+    }
+
+    QString selectedText = ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
+
+
+//    lineEdit_rootPath_filesNetwork
+
+}
+
+
+void DataView::on_pushButton_axisYsetRange_clicked()
+{
+    qDebug()<<"on_pushButton_axisYsetRange_clicked():";
+    qDebug()<<ui->spinBox_axisYRangeMin->value();
+    qDebug()<<ui->spinBox_axisYRangeMax->value();
+    m_axisY->setRange(ui->spinBox_axisYRangeMin->value(),ui->spinBox_axisYRangeMax->value());
+}
+
+
+void DataView::on_pushButton_updateNetworkFiles_clicked()
+{
+    qDebug()<<"on_pushButton_updateNetworkFiles_clicked():"<<ui->lineEdit_rootPath_filesNetwork->text();
+
+    filesListNetwork = m_filesUtil->getFilesListNetworkPath(ui->lineEdit_rootPath_filesNetwork->text());
+    qDebug()<<"filesListNetwork:"<<filesListNetwork<<filesListNetwork.filter(ui->lineEdit_rootPath_filesNetwork->text());
+    // 创建QStringListModel对象，并设置字符串列表作为数据
+    m_filesListModelNetwork->setStringList(filesListNetwork.replaceInStrings(ui->lineEdit_rootPath_filesNetwork->text(),""));
+//    QStringListModel model(filesListNetwork);
+//    ui->listView_filesNetwork->setModel(&model);
+//    QStringListModel *fileModel = new QStringListModel(filesListNetwork, this);
+//    ui->listView_filesNetwork->setModel(fileModel);
+
+
+}
+
+
+void DataView::on_lineEdit_rootPath_filesNetwork_editingFinished()
+{
+
+}
+
+
+void DataView::on_pushButton_updateLocalFiles_clicked()
+{
+    qDebug()<<"on_pushButton_updateNetworkFiles_clicked():"<<EXE_CONFIG["pathDataView"].toString();
+
+//    qDebug()<<QRegularExpression(".*(" + fileExtensions.join("|") + ")");
+    filesListLocal = m_filesUtil->getFilesListLocalPath(EXE_CONFIG["pathDataView"].toString()).filter(QRegularExpression(".*(" + fileExtensions.join("|") + ")"));;
+    m_filesListModelNetwork->setStringList(filesListLocal.replaceInStrings(EXE_CONFIG["pathDataView"].toString(),""));
+}
+
+
+void DataView::on_pushButton_parseData_clicked()
+{
+    qDebug()<<"on_pushButton_parseData_clicked()";
+//    m_currentFilePathDir = index.data(QFileSystemModel::FilePathRole).toString();
+    if(m_currentFilePathDir.isEmpty()){
+        // 提示窗口
+        QMessageBox msgBox(this);
+        msgBox.setText("当前路径为空，请在本地文件中选中一个文件");
+        // 3秒后自动关闭
+        QTimer::singleShot(3000, &msgBox, &QMessageBox::close);
+//        msgBox.exec();
+    }
+    QDateTime startTime = QDateTime::currentDateTime();
+
+    if(!parseDataFromFile(m_currentFilePathDir)){
+        // 路径不存在
+        return;
+    }
+
+    QDateTime endTime = QDateTime::currentDateTime();
+    qint64 elapsedTime = startTime.secsTo(endTime);
+    qDebug() << "解析时间：" << elapsedTime << "秒";
+    // 提示窗口
+    QMessageBox msgBox(this);
+    msgBox.setText("数据解析完成花费时间：" + QString::number(elapsedTime) + "秒");
+//     3秒后自动关闭
+    QTimer::singleShot(3000, &msgBox, &QMessageBox::close);
+    msgBox.exec();
+}
+
+
+void DataView::on_listView_filesNetwork_clicked(const QModelIndex &index)
+{
+    qDebug()<<"on_listView_filesNetwork_clicked(QModelIndex index)"<<index<<index.row();
+    qDebug()<<index.data(Qt::DisplayRole).toString();
+    m_currentFilePathDir = EXE_CONFIG["pathDataView"].toString() + index.data(Qt::DisplayRole).toString();
+}
+
+
+void DataView::on_listView_filesNetwork_doubleClicked(const QModelIndex &index)
+{
+    qDebug()<<"on_listView_filesNetwork_doubleClicked(QModelIndex index)"<<index<<index.row();
+    qDebug()<<index.data(Qt::DisplayRole).toString();
+    m_currentFilePathDir = EXE_CONFIG["pathDataView"].toString() + index.data(Qt::DisplayRole).toString();
+}
+
+
+void DataView::on_pushButton_downloadedFiles_clicked()
+{
+    filesListDownloaded.clear();
+    // 获取a中存在但b中不存在的元素（不区分大小写）
+    for (const QString& element : filesListLocal) {
+        if(filesListNetwork.contains(element, Qt::CaseInsensitive)){
+            filesListDownloaded.append(element);
+        }
+    }
+    m_filesListModelNetwork->setStringList(filesListDownloaded.replaceInStrings(EXE_CONFIG["pathDataView"].toString(),""));
+
+}
+
+
+void DataView::on_pushButton_notDownloadedFiles_clicked()
+{
+    filesListNotDownloaded.clear();
+    // 获取a中存在但b中不存在的元素（不区分大小写）
+    for (const QString& element : filesListNetwork) {
+        if(!filesListLocal.contains(element, Qt::CaseInsensitive)){
+            filesListNotDownloaded.append(element);
+        }
+    }
+    // 创建QStringListModel对象，并设置字符串列表作为数据
+    m_filesListModelNetwork->setStringList(filesListNotDownloaded.replaceInStrings(ui->lineEdit_rootPath_filesNetwork->text(),""));
 }
 

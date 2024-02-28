@@ -54,8 +54,8 @@ void MainWindow::test()
     addTabWidget(TabWindow_VideoPlayback);
 
     addTabWidget(TabWindow_DataView);
-//    ui->tabWidget_mainWindow->setCurrentIndex(m_tabWidget_mainWindow["DataView"].toInt());
-    ui->tabWidget_mainWindow->setCurrentIndex(m_tabWidget_mainWindow["VideoPlayback"].toInt());
+    ui->tabWidget_mainWindow->setCurrentIndex(m_tabWidget_mainWindow["DataView"].toInt());
+//    ui->tabWidget_mainWindow->setCurrentIndex(m_tabWidget_mainWindow["VideoPlayback"].toInt());
 //    QCoreApplication::processEvents(); // 处理界面事件
 
     setCentralWidget(ui->tabWidget_mainWindow);
