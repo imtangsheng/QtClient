@@ -28,6 +28,9 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
+
+    void closeEvent(QCloseEvent *event) override;
+
     QJsonObject m_tabWidget_mainWindow;
 
     enum TabWindow {

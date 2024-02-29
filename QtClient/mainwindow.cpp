@@ -14,16 +14,26 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
+    test();
     init();
+//    QWidget *centerWidget = centralWidget();
+
+//    centerWidget->layout()->addWidget(ui->tabWidget_mainWindow);
 
 
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    qDebug()<<"MainWindow::closeEvent(QCloseEvent *event)"<<event;
+    qApp->quit(); //重载主程序点击退出事件，软件退出
+}
+
 MainWindow::~MainWindow()
 {
-    delete ui;
     qDebug()<<"~MainWindow()";
+    delete ui;
+//    qApp->quit();
 }
 
 void MainWindow::init()
@@ -41,7 +51,7 @@ void MainWindow::init()
     // 连接删除请求的槽函数
     connect(ui->tabWidget_mainWindow, &QTabWidget::tabCloseRequested, this, &MainWindow::TabCloseRequested);
     connect(ui->tabWidget_mainWindow, &QTabWidget::currentChanged, this, &MainWindow::TabCurrentChanged);
-    test();
+
 }
 
 void MainWindow::test()
@@ -58,7 +68,9 @@ void MainWindow::test()
 //    ui->tabWidget_mainWindow->setCurrentIndex(m_tabWidget_mainWindow["VideoPlayback"].toInt());
 //    QCoreApplication::processEvents(); // 处理界面事件
 
-    setCentralWidget(ui->tabWidget_mainWindow);
+//    setCentralWidget(ui->tabWidget_mainWindow); //添加主界面，会导致重合，两个界面布局重叠。取消thsi父窗口设置可以解决
+//    setCentralWidget(ui->centralwidget);
+
 
     qDebug()<<"MainWindow::test111111";
 }
@@ -95,6 +107,8 @@ void MainWindow::on_pushButton_dataView_clicked()
     qDebug()<<m_tabWidget_mainWindow["DataView"];
 }
 
+
+
 void MainWindow::addTabWidget(TabWindow window)
 {
     switch (window)
@@ -102,7 +116,7 @@ void MainWindow::addTabWidget(TabWindow window)
     case TabWindow_VideoPlayback:
         if (m_tabWidget_mainWindow["VideoPlayback"].isNull()){
             m_tabWidget_mainWindow["VideoPlayback"] = ui->tabWidget_mainWindow->count();
-            VideoPlayback *ui_VideoPlayback = new VideoPlayback(this);
+            VideoPlayback *ui_VideoPlayback = new VideoPlayback();
             //    QIcon icon_videoPlayback = QIcon::fromTheme("media-playback-start");//系统主题不能用
             QIcon icon_videoPlayback(":/asset/video_playback/Movie_Active.svg");
             ui->tabWidget_mainWindow->insertTab(m_tabWidget_mainWindow["VideoPlayback"].toInt(),ui_VideoPlayback->getVideoPaly(),icon_videoPlayback,"视频回放");
@@ -111,7 +125,7 @@ void MainWindow::addTabWidget(TabWindow window)
         break;
     case TabWindow_DataView:
         if (m_tabWidget_mainWindow["DataView"].isNull()){
-            DataView *ui_DataView = new DataView(this);
+            DataView *ui_DataView = new DataView();
             QIcon icon_dataView(":/asset/dataview/DataAnalysis.svg");
             m_tabWidget_mainWindow["DataView"] = ui->tabWidget_mainWindow->insertTab(ui->tabWidget_mainWindow->count(),ui_DataView->getDataView(),icon_dataView,"数据图表");
 
@@ -140,7 +154,7 @@ void MainWindow::TabCloseRequested(int index)
 void MainWindow::TabCurrentChanged(int index)
 {
     qDebug()<<"TabCurrentChanged(int index):"<<index;
-    QTabBar *tabBar = ui->tabWidget_mainWindow->tabBar();
+//    QTabBar *tabBar = ui->tabWidget_mainWindow->tabBar();
 //    tabBar->setTabsClosable(false);
 //    ui->tabWidget_mainWindow->setTabBar(tabBar);
 
