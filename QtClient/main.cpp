@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
@@ -10,6 +9,10 @@
 
 #include "public/AppData.h"
 QJsonObject EXE_CONFIG;
+
+#include "ui/subwindow.h"
+
+SubWindow *subWindow;
 
 int main(int argc, char *argv[])
 {
@@ -42,5 +45,6 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
+    subWindow = new SubWindow;
     return a.exec();
 }

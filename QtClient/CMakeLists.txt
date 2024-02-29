@@ -35,6 +35,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         modules/FilesUtil.h modules/FilesUtil.cpp modules/FilesUtil.ui
         readme.md
         doc/dev.md
+        ui/subwindow.h ui/subwindow.cpp ui/subwindow.ui
+
 
     )
 # Define target properties for Android with Qt 6 as:

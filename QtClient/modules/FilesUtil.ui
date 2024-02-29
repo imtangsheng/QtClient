@@ -13,27 +13,55 @@
   <property name="windowTitle">
    <string>下载</string>
   </property>
+  <widget class="QPushButton" name="pushButton_retryDownload">
+   <property name="geometry">
+    <rect>
+     <x>610</x>
+     <y>230</y>
+     <width>80</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>PushButton</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="gridLayoutWidget">
+   <property name="geometry">
+    <rect>
+     <x>60</x>
+     <y>190</y>
+     <width>492</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="0" column="0">
+     <widget class="QPushButton" name="pushButton">
+      <property name="text">
+       <string>PushButton</string>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
   <widget class="QWidget" name="horizontalLayoutWidget">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>70</y>
-     <width>631</width>
-     <height>41</height>
+     <x>49</x>
+     <y>10</y>
+     <width>661</width>
+     <height>71</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_DownloadFiles">
     <item>
      <widget class="QLabel" name="label_fileName">
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
       <property name="text">
        <string>文件名</string>
-      </property>
-     </widget>
-    </item>
-    <item>
-     <widget class="QProgressBar" name="progressBar_Download">
-      <property name="value">
-       <number>24</number>
       </property>
      </widget>
     </item>
@@ -49,6 +77,13 @@
        </size>
       </property>
      </spacer>
+    </item>
+    <item>
+     <widget class="QProgressBar" name="progressBar_Download">
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
     </item>
     <item>
      <widget class="QPushButton" name="pushButton_cancelDownload">
@@ -79,19 +114,6 @@
      </widget>
     </item>
    </layout>
-  </widget>
-  <widget class="QPushButton" name="pushButton_retryDownload">
-   <property name="geometry">
-    <rect>
-     <x>580</x>
-     <y>160</y>
-     <width>80</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>PushButton</string>
-   </property>
   </widget>
  </widget>
  <resources/>

@@ -20,6 +20,7 @@ public:
     explicit FilesUtil(QWidget *parent = nullptr);
     ~FilesUtil();
 
+    void init();
     void setRootUrl(const QString &url);
 
     void startRequest(const QUrl &requestedUrl);
@@ -36,6 +37,7 @@ public:
     QStringList getFilesListNetworkPath(const QString &url);
 
     void parseFilesListNetworkPath(const QString &url);
+    void downloadFilesListFromNetworkLinks(const QStringList &links);
 
 public slots:
 //    void downloadFileFinished();

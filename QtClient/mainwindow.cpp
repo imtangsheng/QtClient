@@ -1,6 +1,5 @@
 #include "mainwindow.h"
-#include "./ui_mainwindow.h"
-
+#include "ui_mainwindow.h"
 #include "ui/VideoPlayback.h"
 #include "ui/DataView.h"
 #include "public/AppData.h"
@@ -9,6 +8,11 @@
 #include <QFile>
 #include <QIcon>
 
+//#include "ui_SubWindow.h"
+//Ui::SubWindow *ui_SubWindow;
+//DataView *ui_DataView1;
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -16,9 +20,9 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     test();
     init();
-//    QWidget *centerWidget = centralWidget();
-
-//    centerWidget->layout()->addWidget(ui->tabWidget_mainWindow);
+//     = new Ui::SubWindow;
+//    SubWindow subWindow;
+//    subWindow.show();
 
 
 }
@@ -106,8 +110,6 @@ void MainWindow::on_pushButton_dataView_clicked()
     ui->tabWidget_mainWindow->setCurrentIndex(index);
     qDebug()<<m_tabWidget_mainWindow["DataView"];
 }
-
-
 
 void MainWindow::addTabWidget(TabWindow window)
 {

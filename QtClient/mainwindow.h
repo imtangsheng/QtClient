@@ -4,6 +4,10 @@
 #include <QMainWindow>
 #include <QJsonObject>
 
+//#include "ui_SubWindow.h"
+
+//extern Ui::SubWindow *ui_SubWindow;
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE

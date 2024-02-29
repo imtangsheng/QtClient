@@ -17,6 +17,7 @@ QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*tim
 
 //#include "../public/AppData.h"
 #include "public/AppData.h"
+//#include "ui_SubWindow.h"
 
 DataView::DataView(QWidget *parent) :
     QWidget(parent),
@@ -529,9 +530,10 @@ void DataView::on_pushButton_downloadNetworkFile_clicked()
 //    for (const QModelIndex &index : selectedIndexes) {
 //        qDebug() << "Selected item:" << index.data(Qt::DisplayRole).toString();
 //    }
-    QString selectedText = ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
+    QString selectedText = ui->lineEdit_rootPath_filesNetwork->text() + \
+                           ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
 
-    m_filesUtil->show();
+    m_filesUtil->downloadFilesListFromNetworkLinks(QStringList(selectedText));
 
 
 //    lineEdit_rootPath_filesNetwork
