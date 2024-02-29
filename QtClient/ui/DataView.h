@@ -111,6 +111,8 @@ private:
     QDateTime m_dataTime_lineSeries;
 
     //
+    FilesUtil *m_filesUtil;
+
     void init_filesView();
     QStringList fileExtensions = QString(".txt,.csv").split(',');
 
@@ -121,7 +123,6 @@ private:
     void fileModelSelection(QModelIndex index);
     void fileBrowserDoubleClicked(QModelIndex index);
 
-    FilesUtil *m_filesUtil;
     QStringList filesListLocal;
     QStringList filesListNetwork;
     QStringList filesListDownloaded;

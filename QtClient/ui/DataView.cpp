@@ -31,6 +31,7 @@ DataView::~DataView()
 {
     qDebug()<<"~DataView()";
     delete ui;
+//    delete m_filesUtil;
 }
 
 
@@ -175,6 +176,8 @@ void DataView::init_chartView()
 void DataView::init_filesView()
 {
     qDebug()<<"init_filesView()";
+//    m_filesUtil = new FilesUtil(this->parentWidget());
+    m_filesUtil = new FilesUtil();
     // 目录树模型
     m_fileModel_dataView = new QFileSystemModel;
 //    QStringList filters;
@@ -183,11 +186,9 @@ void DataView::init_filesView()
 //    m_fileModel_dataView->setNameFilterDisables(false);
 //    m_fileModel_dataView->setRootPath(QDir::rootPath());
 //    m_fileModel_dataView->setRootPath("http://192.168.1.15:8071");
-
     m_fileModel_dataView->setFilter(QDir::Files | QDir::AllDirs | QDir::NoDotAndDotDot);
     // 目录树视图
     ui->treeView_files->setModel(m_fileModel_dataView);
-
     ui->treeView_files->setWindowTitle("Directories");
     // 设置文件浏览视图的根目录
     ui->lineEdit_rootPath->setText(EXE_CONFIG["pathDataView"].toString());
@@ -201,7 +202,7 @@ void DataView::init_filesView()
 //    connect(ui->treeView_files->selectionModel(), &QTreeView::doubleClicked,this, &DataView::fileBrowserDoubleClicked);
 
     // 设置网络浏览视图的根目录
-    m_filesUtil = new FilesUtil;
+
     ui->listView_filesNetwork->setWindowTitle("Directories Network");
 
 
@@ -522,13 +523,15 @@ void DataView::on_pushButton_downloadNetworkFile_clicked()
 {
     qDebug()<<"on_pushButton_downloadNetworkFile_clicked()"<<ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
     // 获取选中的项
-    QItemSelectionModel *selectionModel = ui->listView_filesNetwork->selectionModel();
-    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
-    for (const QModelIndex &index : selectedIndexes) {
-        qDebug() << "Selected item:" << index.data(Qt::DisplayRole).toString();
-    }
-
+    //方法1
+//    QItemSelectionModel *selectionModel = ui->listView_filesNetwork->selectionModel();
+//    QModelIndexList selectedIndexes = selectionModel->selectedIndexes();
+//    for (const QModelIndex &index : selectedIndexes) {
+//        qDebug() << "Selected item:" << index.data(Qt::DisplayRole).toString();
+//    }
     QString selectedText = ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
+
+    m_filesUtil->show();
 
 
 //    lineEdit_rootPath_filesNetwork

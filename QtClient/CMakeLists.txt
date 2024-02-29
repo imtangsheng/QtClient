@@ -32,9 +32,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         config.json
         ui/VideoPlayback.h ui/VideopPayback.cpp ui/VideoPlayback.ui
         ui/DataView.h ui/DataView.cpp ui/DataView.ui
-        modules/FilesUtil.h modules/FilesUtil.cpp
+        modules/FilesUtil.h modules/FilesUtil.cpp modules/FilesUtil.ui
         readme.md
         doc/dev.md
+
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QtClient APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

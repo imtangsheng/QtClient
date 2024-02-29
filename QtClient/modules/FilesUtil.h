@@ -1,6 +1,7 @@
 #ifndef FILESUTIL_H
 #define FILESUTIL_H
 
+#include <QWidget>
 #include <QFileInfo>
 #include <QList>
 #include <QNetworkAccessManager>
@@ -8,11 +9,15 @@
 #include <QNetworkReply>
 #include <QStringList>
 
-class FilesUtil : public QObject
+namespace Ui {
+class FilesUtil;
+}
+
+class FilesUtil : public QWidget
 {
     Q_OBJECT
 public:
-    explicit FilesUtil(QObject *parent = nullptr);
+    explicit FilesUtil(QWidget *parent = nullptr);
     ~FilesUtil();
 
     void setRootUrl(const QString &url);
@@ -38,7 +43,10 @@ public slots:
 private slots:
     void downloadFile(const QString &url);
 
+    void on_checkBox_downloadFinished_stateChanged(int arg1);
+
 private:
+    Ui::FilesUtil *ui;
 
     void initNetwork();
     // 创建一个 QNetworkAccessManager

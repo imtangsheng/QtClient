@@ -1,4 +1,5 @@
 #include "FilesUtil.h"
+#include "ui_FilesUtil.h"
 
 #include <QDir>
 #include <QEventLoop>
@@ -10,16 +11,18 @@
 QRegularExpression REGEX_LINKS("<a[^>]+href=['\"]([^'\"]+)['\"][^>]*>");
 
 
-FilesUtil::FilesUtil(QObject *parent)
-    : QObject(parent)
-{
 
-    initNetwork();
+FilesUtil::FilesUtil(QWidget *parent)
+    : QWidget(parent),
+    ui(new Ui::FilesUtil)
+{
+    ui->setupUi(this);
 }
 
 FilesUtil::~FilesUtil()
 {
-
+    qDebug()<<"~FilesUtil()";
+    delete ui;
 }
 
 
@@ -237,3 +240,9 @@ void FilesUtil::NetworkReplyDownloadProgress(int bytesReceived, int bytesTotal)
 {
     qDebug() << "Downloaded进度：" << bytesReceived << "of" << bytesTotal;
 }
+
+void FilesUtil::on_checkBox_downloadFinished_stateChanged(int arg1)
+{
+    qDebug() << "on_checkBox_downloadFinished_stateChanged(int arg1)" << arg1;
+}
+
