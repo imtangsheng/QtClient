@@ -88,6 +88,8 @@ private slots:
 
     void on_pushButton_notDownloadedFiles_clicked();
 
+    void on_pushButton_downloadFilesFronLinks_clicked();
+
 private:
     Ui::DataView *ui;
 
@@ -108,7 +110,7 @@ private:
     FilesUtil *m_filesUtil;
 
     void init_filesView();
-    QStringList fileExtensions = QString(".txt,.csv").split(',');
+    QStringList fileExtensions = QString(".txt,.TXT,.csv,.CSV").split(',');
 
     QStringListModel *m_filesListModelNetwork;
 

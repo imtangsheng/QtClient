@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
         }
     }
 
-    qDebug()<<"当前工作目录："<<QDir::currentPath();
+    qDebug()<<"当前软件版本号："<<APP_VERSION<<"当前工作目录："<<QDir::currentPath();
         QFile file("config.json");
     if(!file.open(QIODevice::ReadOnly)) {
         QMessageBox::critical(nullptr, "Error", "Config file not found");

@@ -92,3 +92,10 @@ endif()
 #by tang
 #添加当前项目目录到include头文件目录
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+#设置软件版本
+set(APP_VERSION_MAJOR 0)
+set(APP_VERSION_MINOR 0)
+set(APP_VERSION_PATCH 2)
+# 定义 SOFTWARE_VERSION 宏
+add_compile_definitions(APP_VERSION="${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_PATCH}")
+

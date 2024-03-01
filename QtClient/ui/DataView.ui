@@ -227,7 +227,11 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_axisYRangeMax"/>
+         <widget class="QSpinBox" name="spinBox_axisYRangeMax">
+          <property name="value">
+           <number>50</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_axisYsetRange">
@@ -293,7 +297,7 @@
            <normaloff>:/asset/dataview/Tools.svg</normaloff>:/asset/dataview/Tools.svg</iconset>
          </attribute>
          <attribute name="title">
-          <string>设置</string>
+          <string>系统文件</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -472,7 +476,19 @@
          <attribute name="title">
           <string>数据列表</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_3">
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,10,0,0">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
            <widget class="QLineEdit" name="lineEdit_rootPath_filesNetwork">
             <property name="text">
@@ -529,6 +545,13 @@
              </widget>
             </item>
             <item>
+             <widget class="QPushButton" name="pushButton_downloadFilesFronLinks">
+              <property name="text">
+               <string>一键下载</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="QPushButton" name="pushButton_filesNetwork_test">
               <property name="text">
                <string>test</string>
@@ -538,7 +561,31 @@
            </layout>
           </item>
           <item>
-           <widget class="QListView" name="listView_filesNetwork"/>
+           <widget class="QListView" name="listView_filesNetwork">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>36</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Minimum</enum>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_download">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+           </layout>
           </item>
          </layout>
         </widget>

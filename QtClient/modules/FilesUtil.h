@@ -2,7 +2,7 @@
 #define FILESUTIL_H
 
 #include <QWidget>
-#include <QFileInfo>
+#include <QFile>
 #include <QList>
 #include <QNetworkAccessManager>
 #include <QNetworkRequest>
@@ -23,7 +23,7 @@ public:
 
     void init();
     QWidget* getLayoutDownloadFile();
-    void setDownloadFileName(const QString &name);
+
     void setRootUrl(const QString &url);
 
     void startRequest(const QUrl &requestedUrl);
@@ -40,7 +40,8 @@ public:
     QStringList getFilesListNetworkPath(const QString &url);
 
     void parseFilesListNetworkPath(const QString &url);
-    bool downloadFileFromNetworkLink(const QString &link);
+    bool downloadFileFromNetworkLink(const QUrl &link);
+    void startDownloadFileFromLink(const QString &fileLink,const QString &filename);
 
 public slots:
 //    void downloadFileFinished();
@@ -58,6 +59,8 @@ private:
     QNetworkAccessManager *m_networkAccessManager;
     // 发送 GET 请求
     QUrl url;
+    std::unique_ptr<QFile> file;
+
     QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> networkReply;
     std::unique_ptr<QFile> fileNetwork; //被赋值或移动后,原有对象的智能指针管理将自动解除 自动管理QFile对象的内存
     bool httpRequestAborted = false;

@@ -54,13 +54,13 @@ QWidget *DataView::getDataView()
 void DataView::downloadFilesListFromNetworkLinks(QStringList linksFilesList)
 {
     qDebug()<<"downloadFilesListFromNetworkLinks(QStringList:"<< linksFilesList;
-    QStringList linkss = QString("1.txt,2.csv,3.txt").split(',');
-    int key = 0;
-    foreach (QString link,linkss) {
+//    QStringList linksFilesLists = QString("1.txt,2.csv,3.txt").split(',');
+//    int key = 0;
+    foreach (QString link,linksFilesList) {
         qDebug()<<"downloadFilesListFromNetworkLinks(QStringList:"<< link;
         // 定义一个正则表达式模式，用于匹配网络下载链接 Qt::CaseSensitive区分大小写
         FilesUtil *fileItem = new FilesUtil();
-        fileItem->setDownloadFileName(link);
+        fileItem->startDownloadFileFromLink(link,link.replace(EXE_CONFIG["pathDataView"].toString(),EXE_CONFIG["pathDataViewNetwork"].toString()));
         SUB_WINDOW->ui->verticalLayout_download->addWidget(fileItem->getLayoutDownloadFile());
 
 //        SUB_WINDOW->ui->gridLayout->addWidget(fileItem->getLayoutDownloadFile(),key,0);key++;
@@ -231,7 +231,7 @@ void DataView::init_filesView()
     ui->listView_filesNetwork->setWindowTitle("Directories Network");
 
 
-    ui->lineEdit_rootPath_filesNetwork->setText(EXE_CONFIG["networkPathDataView"].toString());
+    ui->lineEdit_rootPath_filesNetwork->setText(EXE_CONFIG["pathDataViewNetwork"].toString());
 
 //    m_networkFileModel->setRootPath(ui->lineEdit_rootPath_filesNetwork->text());
 //    m_networkFileModel->setRootUrl(ui->lineEdit_rootPath_filesNetwork->text());
@@ -254,6 +254,9 @@ void DataView::init_filesView()
 //    ui->listView_filesNetwork->setModel(m_networkFileModel);
 //    ui->listView_filesNetwork->setRootIndex(m_networkFileModel->index(ui->lineEdit_rootPath_filesNetwork->text()));
 
+    // 显示下载进度
+    ui->verticalLayout_download->addWidget(m_filesUtil->getLayoutDownloadFile());
+    m_filesUtil->getLayoutDownloadFile()->setVisible(false);
 
 
 }
@@ -262,7 +265,7 @@ void DataView::init_filesView()
 bool DataView::parseDataFromFile(const QString filePath)
 {
     qDebug() << "parseDataFromFile文件：" <<filePath;
-            QFile file(filePath);
+    QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         QMessageBox::warning(this, "无法打开文件", "文件:"+filePath+"读取失败，报错："+ file.errorString());
         qDebug() << "无法打开文件：" <<filePath<< file.errorString();
@@ -294,7 +297,7 @@ bool DataView::parseDataFromFile(const QString filePath)
             //            qDebug() << "温度：" << match.captured(6).toDouble() << "摄氏度";
             //            qDebug() << "------------------------";
         }else {
-            qDebug()<<"match.hasMatch() error:"<<in.pos()<<"-line:"<<line;
+            qDebug()<<"解析失败match.hasMatch() 错误行号:"<<in.pos()<<"-第"<<line<<"行;";
         }
     }
     file.close();
@@ -546,7 +549,7 @@ void DataView::on_pushButton_filesNetwork_test_clicked()
 
 void DataView::on_pushButton_downloadNetworkFile_clicked()
 {
-    qDebug()<<"on_pushButton_downloadNetworkFile_clicked()"<<ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
+    qDebug()<<"on_pushButton_downloadNetworkFile_clicked():"<<ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
     // 获取选中的项
     //方法1
 //    QItemSelectionModel *selectionModel = ui->listView_filesNetwork->selectionModel();
@@ -554,14 +557,16 @@ void DataView::on_pushButton_downloadNetworkFile_clicked()
 //    for (const QModelIndex &index : selectedIndexes) {
 //        qDebug() << "Selected item:" << index.data(Qt::DisplayRole).toString();
 //    }
-    QString selectedText = ui->lineEdit_rootPath_filesNetwork->text() + \
-                           ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
+    QString selectedText = ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
+    if(selectedText.isEmpty()){
+        QMessageBox::warning(this, "未选中文件", "文件为空!请先选中一个文件");
+        return;
+    }
 
-    downloadFilesListFromNetworkLinks(QStringList(selectedText));
-
-
-//    lineEdit_rootPath_filesNetwork
-
+    if(!m_filesUtil->getLayoutDownloadFile()->isVisible()){
+        m_filesUtil->getLayoutDownloadFile()->setVisible(true);
+    }
+    m_filesUtil->startDownloadFileFromLink(ui->lineEdit_rootPath_filesNetwork->text()+selectedText,ui->lineEdit_rootPath->text()+selectedText);
 }
 
 
@@ -602,7 +607,11 @@ void DataView::on_pushButton_updateLocalFiles_clicked()
     qDebug()<<"on_pushButton_updateNetworkFiles_clicked():"<<EXE_CONFIG["pathDataView"].toString();
 
 //    qDebug()<<QRegularExpression(".*(" + fileExtensions.join("|") + ")");
-    filesListLocal = m_filesUtil->getFilesListLocalPath(EXE_CONFIG["pathDataView"].toString()).filter(QRegularExpression(".*(" + fileExtensions.join("|") + ")"));;
+    filesListLocal = m_filesUtil->getFilesListLocalPath(EXE_CONFIG["pathDataView"].toString());
+    qDebug()<<"filesListLocal:"<<filesListLocal;
+    //使用规则表达式，区分大小，字符匹配
+    filesListLocal = filesListLocal.filter(QRegularExpression(".*(" + fileExtensions.join("|") + ")"));
+    qDebug()<<"filesListLocal:"<<filesListLocal;
     m_filesListModelNetwork->setStringList(filesListLocal.replaceInStrings(EXE_CONFIG["pathDataView"].toString(),""));
 }
 
@@ -679,5 +688,16 @@ void DataView::on_pushButton_notDownloadedFiles_clicked()
     }
     // 创建QStringListModel对象，并设置字符串列表作为数据
     m_filesListModelNetwork->setStringList(filesListNotDownloaded.replaceInStrings(ui->lineEdit_rootPath_filesNetwork->text(),""));
+}
+
+
+void DataView::on_pushButton_downloadFilesFronLinks_clicked()
+{
+    qDebug()<<"on_pushButton_downloadFilesFronLinks_clicked()"<<filesListNotDownloaded;
+    if(filesListNotDownloaded.isEmpty()){
+        QMessageBox::warning(this, "文件下载", "不存在未下载的文件");
+        return;
+    }
+    downloadFilesListFromNetworkLinks(filesListNotDownloaded);
 }
 

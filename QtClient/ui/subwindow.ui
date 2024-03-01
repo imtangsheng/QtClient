@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resource.qrc">
+    <normaloff>:/asset/logo.ico</normaloff>:/asset/logo.ico</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QWidget" name="widget_download" native="true">
     <property name="geometry">
@@ -36,7 +40,7 @@
         </size>
        </property>
        <property name="text">
-        <string>TextLabel</string>
+        <string>文件下载界面</string>
        </property>
       </widget>
      </item>
@@ -98,6 +102,8 @@
    </widget>
   </widget>
  </widget>
- <resources/>
+ <resources>
+  <include location="../resource.qrc"/>
+ </resources>
  <connections/>
 </ui>
