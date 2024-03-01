@@ -25,6 +25,6 @@ private:
 };
 
 
-extern SubWindow *subWindow;
+extern SubWindow *SUB_WINDOW;
 
 #endif // SUBWINDOW_H

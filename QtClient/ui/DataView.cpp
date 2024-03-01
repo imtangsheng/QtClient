@@ -17,7 +17,7 @@ QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*tim
 
 //#include "../public/AppData.h"
 #include "public/AppData.h"
-//#include "ui_SubWindow.h"
+#include "ui/subwindow.h"
 
 DataView::DataView(QWidget *parent) :
     QWidget(parent),
@@ -36,19 +36,43 @@ DataView::~DataView()
 }
 
 
-QWidget *DataView::getDataView()
-{
-    return ui->widget_dataView;
-}
-
 void DataView::init()
 {
     qDebug()<<"DataView::init()";
     init_chartView();
     init_filesView();
-//    test();
+    //    test();
 
 }
+
+
+QWidget *DataView::getDataView()
+{
+    return ui->widget_dataView;
+}
+
+void DataView::downloadFilesListFromNetworkLinks(QStringList linksFilesList)
+{
+    qDebug()<<"downloadFilesListFromNetworkLinks(QStringList:"<< linksFilesList;
+    QStringList linkss = QString("1.txt,2.csv,3.txt").split(',');
+    int key = 0;
+    foreach (QString link,linkss) {
+        qDebug()<<"downloadFilesListFromNetworkLinks(QStringList:"<< link;
+        // 定义一个正则表达式模式，用于匹配网络下载链接 Qt::CaseSensitive区分大小写
+        FilesUtil *fileItem = new FilesUtil();
+        fileItem->setDownloadFileName(link);
+        SUB_WINDOW->ui->verticalLayout_download->addWidget(fileItem->getLayoutDownloadFile());
+
+//        SUB_WINDOW->ui->gridLayout->addWidget(fileItem->getLayoutDownloadFile(),key,0);key++;
+//        SUB_WINDOW->ui->gridLayout->addWidget(fileItem->getLayoutDownloadFile());
+//        QHBoxLayout *layout = new QHBoxLayout;
+//        QPushButton *test = new QPushButton;
+    }
+    SUB_WINDOW->setWindowTitle("下载");
+    SUB_WINDOW->setCentralWidget(SUB_WINDOW->ui->widget_download);
+    SUB_WINDOW->show();
+}
+
 
 void DataView::test()
 {
@@ -533,7 +557,7 @@ void DataView::on_pushButton_downloadNetworkFile_clicked()
     QString selectedText = ui->lineEdit_rootPath_filesNetwork->text() + \
                            ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
 
-    m_filesUtil->downloadFilesListFromNetworkLinks(QStringList(selectedText));
+    downloadFilesListFromNetworkLinks(QStringList(selectedText));
 
 
 //    lineEdit_rootPath_filesNetwork

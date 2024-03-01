@@ -8,10 +8,6 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 
-
-//不能直接包含subwindow.ui 文件，不知道为何
-#include "ui/subwindow.h"
-
 QRegularExpression REGEX_LINKS("<a[^>]+href=['\"]([^'\"]+)['\"][^>]*>");
 
 // 定义一个正则表达式模式，用于匹配网络下载链接
@@ -22,6 +18,7 @@ FilesUtil::FilesUtil(QWidget *parent)
     ui(new Ui::FilesUtil)
 {
     ui->setupUi(this);
+    init();
 }
 
 FilesUtil::~FilesUtil()
@@ -33,6 +30,17 @@ FilesUtil::~FilesUtil()
 void FilesUtil::init()
 {
 
+}
+
+QWidget *FilesUtil::getLayoutDownloadFile()
+{
+//    QHBoxLayout *layout = ui->horizontalLayout_DownloadFiles;
+    return ui->widget_downloadFile;
+}
+
+void FilesUtil::setDownloadFileName(const QString &name)
+{
+    ui->label_fileName->setText(name);
 }
 
 
@@ -48,7 +56,6 @@ void FilesUtil::startRequest(const QUrl &requestedUrl)
     httpRequestAborted = false;
 
     networkReply.reset(m_networkAccessManager->get(QNetworkRequest(url)));
-
     //! [connecting-reply-to-slots]
     connect(networkReply.get(),&QNetworkReply::finished,this,&FilesUtil::NetworkReplyFinished);
     connect(networkReply.get(), &QIODevice::readyRead, this, &FilesUtil::NetworkReplyReadyRead);
@@ -137,46 +144,17 @@ void FilesUtil::parseFilesListNetworkPath(const QString &url)
     }
 
 }
-#include <QtCore>
-void FilesUtil::downloadFilesListFromNetworkLinks(const QStringList &links)
+
+bool FilesUtil::downloadFileFromNetworkLink(const QString &link)
 {
-    qDebug()<<"downloadFilesListFromNetworkLinks(const QStringList &links)"<<links;
-//    QStringList fileExtensions = QString(".txt,.csv").split(',');
-    QStringList linkss = QString("1.txt,2.csv,3.txt").split(',');
-
-    int i = 0;
-    foreach (QString link,linkss) {
-        // 定义一个正则表达式模式，用于匹配网络下载链接 Qt::CaseSensitive区分大小写
-         qDebug() << REGEX_IS_LINK.match(link).hasMatch()<<link.endsWith(".txt");
-        if(!REGEX_IS_LINK.match(link).hasMatch()){
-            qDebug() << "This is not a isSymLink()"<<link;
-//            continue;
-        }
-        // 获取模板元对象
-//        const QMetaObject* mo =ui->horizontalLayout_DownloadFiles->metaObject();
-
-        QHBoxLayout *layout = new QHBoxLayout;
-        QPushButton *test = new QPushButton;
-//        test->MetaObject()
-        ui->label_fileName->setText(link);
-
-
-        ui->gridLayout->addLayout(layout,i,0);i++;
-        ui->gridLayout->addWidget(test,i,0);i++;
-
+    qDebug()<<"downloadFilesListFromNetworkLinks(const QStringList &links)"<<link;
+    // 定义一个正则表达式模式，用于匹配网络下载链接 Qt::CaseSensitive区分大小写
+    qDebug() << REGEX_IS_LINK.match(link).hasMatch()<<link.endsWith(".txt");
+    if(!REGEX_IS_LINK.match(link).hasMatch()){
+        qDebug() << "This is not a isSymLink()"<<link;
+        return false;
     }
-    //    QWidget *centerWidget = centralWidget();
 
-    //    centerWidget->layout()->addWidget(ui->tabWidget_mainWindow);
-//    setCentralWidget(ui->gridLayout);
-//    ui->gridLayout->show();
-    this->setLayout(ui->gridLayout);
-//    show();
-//    SubWindow *subWindow = new SubWindow;
-//    setCentralWidget(ui->centralwidget);
-
-    subWindow->setCentralWidget(subWindow->ui->gridLayoutWidget);
-    subWindow->show();
 }
 
 void FilesUtil::downloadFile(const QString &url)

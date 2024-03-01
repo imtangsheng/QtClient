@@ -13,19 +13,6 @@
   <property name="windowTitle">
    <string>下载</string>
   </property>
-  <widget class="QPushButton" name="pushButton_retryDownload">
-   <property name="geometry">
-    <rect>
-     <x>610</x>
-     <y>230</y>
-     <width>80</width>
-     <height>23</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>PushButton</string>
-   </property>
-  </widget>
   <widget class="QWidget" name="gridLayoutWidget">
    <property name="geometry">
     <rect>
@@ -45,13 +32,13 @@
     </item>
    </layout>
   </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget">
+  <widget class="QWidget" name="widget_downloadFile" native="true">
    <property name="geometry">
     <rect>
-     <x>49</x>
-     <y>10</y>
+     <x>40</x>
+     <y>50</y>
      <width>661</width>
-     <height>71</height>
+     <height>31</height>
     </rect>
    </property>
    <layout class="QHBoxLayout" name="horizontalLayout_DownloadFiles">
@@ -84,6 +71,19 @@
        <number>24</number>
       </property>
      </widget>
+    </item>
+    <item>
+     <spacer name="horizontalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
     </item>
     <item>
      <widget class="QPushButton" name="pushButton_cancelDownload">

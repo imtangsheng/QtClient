@@ -25,22 +25,16 @@ public:
     explicit DataView(QWidget *parent = nullptr);
     ~DataView();
 
-    struct DataPoint
-    {
-        //    DataPoint() {}
-        QDateTime dataTime;
-        double current, voltage,pressure,temperature;
-    };
-
-    QVector<DataPoint> dataPoints;
+    void init();
+    void test();
 
     void parseData(const QString &line);
     bool parseDataFromFile(const QString filePath);
 
-    void init();
-    void test();
+
 
     QWidget *getDataView();
+    void downloadFilesListFromNetworkLinks(QStringList linksFilesList);
 
 public slots:
     void on_lineEdit_rootPath_editingFinished();

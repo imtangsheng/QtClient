@@ -12,7 +12,7 @@ QJsonObject EXE_CONFIG;
 
 #include "ui/subwindow.h"
 
-SubWindow *subWindow;
+SubWindow *SUB_WINDOW;
 
 int main(int argc, char *argv[])
 {
@@ -45,6 +45,6 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
-    subWindow = new SubWindow;
+    SUB_WINDOW = new SubWindow;
     return a.exec();
 }

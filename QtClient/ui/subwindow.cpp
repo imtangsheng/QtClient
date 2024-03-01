@@ -17,5 +17,6 @@ SubWindow::~SubWindow()
 
 void SubWindow::showFiles()
 {
-    setCentralWidget(ui->gridLayoutWidget);
+    setCentralWidget(ui->widget_download);
+//    show();
 }

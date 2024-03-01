@@ -8,6 +8,7 @@
 #include <QNetworkRequest>
 #include <QNetworkReply>
 #include <QStringList>
+#include <QHBoxLayout>
 
 namespace Ui {
 class FilesUtil;
@@ -21,6 +22,8 @@ public:
     ~FilesUtil();
 
     void init();
+    QWidget* getLayoutDownloadFile();
+    void setDownloadFileName(const QString &name);
     void setRootUrl(const QString &url);
 
     void startRequest(const QUrl &requestedUrl);
@@ -37,7 +40,7 @@ public:
     QStringList getFilesListNetworkPath(const QString &url);
 
     void parseFilesListNetworkPath(const QString &url);
-    void downloadFilesListFromNetworkLinks(const QStringList &links);
+    bool downloadFileFromNetworkLink(const QString &link);
 
 public slots:
 //    void downloadFileFinished();
