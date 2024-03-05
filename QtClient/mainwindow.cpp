@@ -31,6 +31,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     qDebug()<<"MainWindow::closeEvent(QCloseEvent *event)"<<event;
 //    qApp->quit(); //重载主程序点击退出事件，软件退出
+    APP_SETTINGS.beginGroup("MainWindow");
+    APP_SETTINGS.setValue("geometry", saveGeometry());
+    APP_SETTINGS.endGroup();
 }
 
 MainWindow::~MainWindow()
@@ -55,6 +58,15 @@ void MainWindow::init()
     // 连接删除请求的槽函数
     connect(ui->tabWidget_mainWindow, &QTabWidget::tabCloseRequested, this, &MainWindow::TabCloseRequested);
     connect(ui->tabWidget_mainWindow, &QTabWidget::currentChanged, this, &MainWindow::TabCurrentChanged);
+
+    APP_SETTINGS.beginGroup("MainWindow");
+    const auto geometry = APP_SETTINGS.value("geometry", QByteArray()).toByteArray();
+    if (geometry.isEmpty())
+        setGeometry(200, 200, 800, 600);
+    else
+        restoreGeometry(geometry);
+    APP_SETTINGS.endGroup();
+
 
 }
 
@@ -161,3 +173,10 @@ void MainWindow::TabCurrentChanged(int index)
 //    ui->tabWidget_mainWindow->setTabBar(tabBar);
 
 }
+
+void MainWindow::on_pushButton_test_clicked()
+{
+    qDebug()<<"MainWindow::on_pushButton_test_clicked()";
+
+}
+

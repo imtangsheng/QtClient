@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>800</width>
-    <height>632</height>
+    <height>608</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -44,6 +44,9 @@
        </widget>
       </item>
       <item>
+       <widget class="QDateTimeEdit" name="dateTimeEdit"/>
+      </item>
+      <item>
        <spacer name="horizontalSpacer_4">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -57,7 +60,25 @@
        </spacer>
       </item>
       <item>
-       <widget class="QDateTimeEdit" name="dateTimeEdit"/>
+       <widget class="QPushButton" name="pushButton_test">
+        <property name="text">
+         <string>test</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QMenuBar" name="menuBar">
+        <property name="layoutDirection">
+         <enum>Qt::RightToLeft</enum>
+        </property>
+        <widget class="QMenu" name="menutest1">
+         <property name="title">
+          <string>test1</string>
+         </property>
+         <addaction name="actiontest"/>
+        </widget>
+        <addaction name="menutest1"/>
+       </widget>
       </item>
       <item>
        <widget class="QPushButton" name="pushButton_minimizedMainWindow">
@@ -275,6 +296,11 @@
     </item>
    </layout>
   </widget>
+  <action name="actiontest">
+   <property name="text">
+    <string>test</string>
+   </property>
+  </action>
  </widget>
  <resources>
   <include location="resource.qrc"/>

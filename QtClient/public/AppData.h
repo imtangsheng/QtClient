@@ -53,6 +53,8 @@ public:
 #include <QJsonObject>
 
 extern QJsonObject EXE_CONFIG;
+#include <QSettings>
 
+extern QSettings APP_SETTINGS;
 
 #endif // APPDATA_H

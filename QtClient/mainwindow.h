@@ -30,6 +30,8 @@ private slots:
 
     void on_pushButton_dataView_clicked();
 
+    void on_pushButton_test_clicked();
+
 private:
     Ui::MainWindow *ui;
 

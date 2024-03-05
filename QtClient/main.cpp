@@ -9,6 +9,8 @@
 
 #include "public/AppData.h"
 QJsonObject EXE_CONFIG;
+//QSettings APP_SETTINGS;
+QSettings APP_SETTINGS("./config/config.ini",QSettings::IniFormat);
 
 #include "ui/SubMain.h"
 
@@ -29,9 +31,9 @@ int main(int argc, char *argv[])
             break;
         }
     }
-
+    //初始化配置 EXE_CONFIG
     qDebug()<<"当前软件版本号："<<APP_VERSION<<"当前工作目录："<<QDir::currentPath();
-        QFile file("config.json");
+    QFile file("config.json");
     if(!file.open(QIODevice::ReadOnly)) {
         QMessageBox::critical(nullptr, "Error", "Config file not found");
         return -1;
