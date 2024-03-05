@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1005</width>
-    <height>498</height>
+    <height>579</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -27,8 +27,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>613</width>
-     <height>451</height>
+     <width>571</width>
+     <height>531</height>
     </rect>
    </property>
    <property name="layoutDirection">
@@ -59,15 +59,18 @@
        <widget class="QLabel" name="label_videoBackground">
         <property name="minimumSize">
          <size>
-          <width>100</width>
-          <height>100</height>
+          <width>50</width>
+          <height>50</height>
          </size>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">image: url(:/asset/video_playback/Movie_Active.svg);</string>
         </property>
         <property name="text">
          <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap resource="../resource.qrc">:/asset/media/VideoWidget_backgroundImage.jpeg</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
@@ -845,7 +848,7 @@ QSlider::sub-page:horizontal{
        <string notr="true">background-color:transparent;</string>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab">
        <property name="styleSheet">

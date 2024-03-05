@@ -19,7 +19,6 @@ FilesUtil::FilesUtil(QWidget *parent)
 {
     ui->setupUi(this);
     init();
-    initNetwork();
 }
 
 FilesUtil::~FilesUtil()
@@ -30,7 +29,7 @@ FilesUtil::~FilesUtil()
 
 void FilesUtil::init()
 {
-
+    updateDownloadState(DownloadState::Download_Init);
 }
 
 QWidget *FilesUtil::getLayoutDownloadFile()
@@ -39,16 +38,17 @@ QWidget *FilesUtil::getLayoutDownloadFile()
     return ui->widget_downloadFile;
 }
 
-void FilesUtil::startDownloadFileFromLink(const QString &fileLink,const QString &filename)
+bool FilesUtil::startDownloadFileFromLink(const QString &fileLink,const QString &filename)
 {
     qDebug()<<"startDownloadFileFromLink(const QString &fileLink,const QString &filename):"<<fileLink <<filename;
+
 //    QString fileLink = name.trimmed();
     const QUrl fileUrl = QUrl::fromUserInput(fileLink);//处理用户输入的 URL 字符串,做一些标准化和错误检查的工作:
     qDebug() << !fileUrl.isValid() <<!REGEX_IS_LINK.match(fileLink).hasMatch();
     // 定义一个正则表达式模式，用于匹配网络下载链接 Qt::CaseSensitive区分大小写
     if(!fileUrl.isValid() || !REGEX_IS_LINK.match(fileLink).hasMatch()){
         QMessageBox::information(nullptr,tr("Error"),tr("Invalid URL: %1 :%2").arg(fileLink,fileUrl.errorString()));
-        return;
+        return false;
     }
 
     if(QFile::exists(filename)){
@@ -61,7 +61,7 @@ void FilesUtil::startDownloadFileFromLink(const QString &fileLink,const QString 
                                                                      alreadyExists.arg(QDir::toNativeSeparators(filename)),
                                                                      QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
         if (response == QMessageBox::No)
-            return;
+            return false;
         QFile::remove(filename);
     }
     // 检查路径是否存在
@@ -72,39 +72,29 @@ void FilesUtil::startDownloadFileFromLink(const QString &fileLink,const QString 
     file = std::make_unique<QFile>(filename);
     if(!file->open(QIODevice::WriteOnly)){
         QMessageBox::information(nullptr,tr("错误"),tr("不支持保存操作，文件: %1 :%2").arg(QDir::toNativeSeparators(filename),file->errorString()));
-        return;
+       return false;
     }
 
-    ui->label_fileName->setText(fileLink);
-
+    // 开始下载，设置显示更新等
+    currentFilePath = filename;
+    currentFileLink = fileLink;
     startRequest(fileUrl);
-}
 
-
-void FilesUtil::setRootUrl(const QString &url)
-{
-    qDebug()<<"NetworkFileModel::setRootUrl:"<<url;
-
+    return true;
 }
 
 void FilesUtil::startRequest(const QUrl &requestedUrl)
 {
     qDebug()<<"startRequest(const QUrl &"<< requestedUrl;
-    url = requestedUrl;
-    httpRequestAborted = false;
-    networkReply.reset(m_networkAccessManager->get(QNetworkRequest(url)));
+    hasHttpRequest = true;
+    networkReply.reset(networkAccessManager.get(QNetworkRequest(requestedUrl)));
     //! [connecting-reply-to-slots]
     connect(networkReply.get(),&QNetworkReply::finished,this,&FilesUtil::NetworkReplyFinished);
-    connect(networkReply.get(), &QIODevice::readyRead, this, &FilesUtil::NetworkReplyReadyRead);
+    connect(networkReply.get(), &QNetworkReply::readyRead, this, &FilesUtil::NetworkReplyReadyRead);
     connect(networkReply.get(),&QNetworkReply::downloadProgress,this,&FilesUtil::NetworkReplyDownloadProgress);
     //! [networkreply-readyread-1]
-}
-
-void FilesUtil::cancelRequest()
-{
-    qDebug()<<"NetworkFileModel::cancelRequest()";
-    httpRequestAborted = true;
-    networkReply->abort();
+    //!
+    updateDownloadState(DownloadState::Download_Start);
 }
 
 void FilesUtil::readAllFilesFromLocalPath(const QString &directory)
@@ -198,57 +188,6 @@ bool FilesUtil::downloadFileFromNetworkLink(const QUrl &link)
 
 }
 
-void FilesUtil::downloadFile(const QString &url)
-{
-    qDebug()<<"NetworkFileModel::downloadFile"<<url<<this->url;
-    if(url.isEmpty()){return;}
-
-    const QUrl fileUrl = QUrl::fromUserInput(url);
-    if(!fileUrl.isValid()){
-        QMessageBox::information(nullptr,tr("Error"),tr("Invalid URL: %1 :%2").arg(url,fileUrl.errorString()));
-        return;
-    }
-
-    QString fileName = fileUrl.fileName();
-    if (fileName.isEmpty()){
-        fileName = "";
-
-    }
-    if (QFile::exists(fileName)) {
-        QString alreadyExists = "/data/"
-                ? tr("There already exists a file called %1. Overwrite?")
-                : tr("There already exists a file called %1 in the current directory. "
-                     "Overwrite?");
-        QMessageBox::StandardButton response = QMessageBox::question(nullptr,
-                tr("Overwrite Existing File"),
-                alreadyExists.arg(QDir::toNativeSeparators(fileName)),
-                QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
-        if (response == QMessageBox::No)
-            return;
-        QFile::remove(fileName);
-    }
-
-    // file = openFileForWrite(fileName);
-    // if (!file)
-        // return;
-
-    // downloadButton->setEnabled(false);
-
-    // schedule the request
-    startRequest(fileUrl);
-
-}
-
-void FilesUtil::initNetwork()
-{
-    qDebug()<<"NetworkFileModel::initNetwork()";
-
-    m_networkAccessManager = new QNetworkAccessManager;
-
-//    m_networkReply = new QNetworkReply;
-
-}
-
 void FilesUtil::NetworkReplyFinished()
 {
     qDebug()<<"NetworkReplyFinished()";
@@ -268,19 +207,21 @@ void FilesUtil::NetworkReplyFinished()
     if(error != QNetworkReply::NoError){
         QFile::remove(fi.absoluteFilePath());
         // For "request aborted" we handle the label and button in cancelDownload()
-        if(!httpRequestAborted){
-            qDebug()<<tr("Download failed:\n%1.").arg(errorString);
-            ui->label_fileName->setText(tr("文件：%1 下载失败:\n%2.").arg(fi.fileName()).arg(errorString));
+        if(hasHttpRequest){
+            qDebug()<<tr("下载失败:\n%1.").arg(errorString);
+            updateDownloadState(DownloadState::Download_Error);
+            ui->label_fileNameLocal->setText(tr("文件：%1 下载失败:\n%2.").arg(fi.fileName()).arg(errorString));
             //下载开放按钮
             ui->checkBox_downloadFinished->setCheckState(Qt::Unchecked);
         }
         return;
     }
     //! [networkreply-error-handling-2]
-
-    ui->label_fileName->setText(tr("Downloaded %1 bytes to %2\nin\n%3")
-                                 .arg(fi.size())
-                                 .arg(fi.fileName(), QDir::toNativeSeparators(fi.absolutePath())));
+    //QDir::toNativeSeparators()  跨平台显示路径
+    updateDownloadState(DownloadState::Download_Finished);
+    ui->label_fileNameLocal->setText(tr("%1  %2 KB to \n")
+                                    .arg(fi.fileName())
+                                    .arg(fi.size()/1000.0));
     //下载完成
     ui->checkBox_downloadFinished->setCheckState(Qt::Checked);
 }
@@ -288,7 +229,7 @@ void FilesUtil::NetworkReplyFinished()
 //! [networkreply-readyread-2]
 void FilesUtil::NetworkReplyReadyRead()
 {
-    qDebug()<<"NetworkReplyReadyRead()";
+    qDebug()<<"--------NetworkReplyReadyRead-------";
     // 打印响应头
     QList<QNetworkReply::RawHeaderPair> headers = networkReply->rawHeaderPairs();
     qDebug() << "Ready Read:" <<headers;
@@ -302,10 +243,9 @@ void FilesUtil::NetworkReplyReadyRead()
     // 读取响应数据
     QString contentType = networkReply->header(QNetworkRequest::ContentTypeHeader).toString();
 
-    QByteArray responseData = networkReply->readAll();
-
     if(contentType.contains("text/plain")) {
-        qDebug() << "普通纯文本数据,没有任何格式信息,可以直接显示或保存";
+        qDebug() << "普通纯文本数据,没有任何格式信息,可以直接显示或保存:"<<currentFileLink;
+        QByteArray responseData = networkReply->readAll();
         file->write(responseData);
         file->flush();
         qDebug()<<"file->write(networkReply->readAll())";
@@ -336,6 +276,89 @@ void FilesUtil::on_checkBox_downloadFinished_stateChanged(int arg1)
     bool flag = arg1 == Qt::Checked;
     ui->pushButton_openFromLocalFile->setVisible(flag);
     ui->pushButton_cancelDownload->setVisible(!flag);
-    ui->pushButton_pauseDownload->setVisible(!flag);
+    ui->pushButton_resetDownload->setVisible(!flag);
+    ui->progressBar_Download->setVisible(!flag);
+    if(flag){
+        updateDownloadState(DownloadState::Download_Finished);
+    }
+
 }
 
+void FilesUtil::on_pushButton_cancelDownload_clicked()
+{
+    updateDownloadState(DownloadState::Download_Cancel);
+    if(hasHttpRequest){
+        hasHttpRequest = false;
+        networkReply->abort();
+    }
+}
+
+//#include <QDesktopServices>
+#include <QProcess>
+void FilesUtil::on_pushButton_openFromLocalFile_clicked()
+{
+    qDebug() << "on_pushButton_openFromLocalFile_clicked()";
+    //打开文件
+//    if(!QDesktopServices::openUrl(QUrl::fromLocalFile(currentFilePath))){
+//        QMessageBox::warning(this, "打开文件", "在文件夹中显示错误，文件:"+currentFilePath);
+//        return;
+//    }
+    // 打开文件位置
+    #ifdef Q_OS_WIN
+    QProcess::startDetached("explorer.exe", {"/select,", QDir::toNativeSeparators(currentFilePath)});
+    #elif Q_OS_MAC
+    QProcess::execute("osascript", {"-e", QString("tell application \"Finder\" to reveal POSIX file \"%1\" activating").arg(currentFilePath)});
+    #elif Q_OS_LINUX
+    QString cmd = "xdg-open \"" + QFileInfo(currentFilePath).path() + "\" --select " + QFileInfo(currentFilePath).fileName();
+    QProcess::startDetached(cmd);
+    #else
+        QProcess::startDetached("explorer.exe /select," + QDir::toNativeSeparators(currentFilePath));
+    #endif
+
+}
+
+void FilesUtil::on_pushButton_resetDownload_clicked()
+{
+//    删除之前的QNetworkReply对象,重新创建新的请求:
+    updateDownloadState(DownloadState::Download_Reset);
+    if(hasHttpRequest){
+        networkReply->abort();
+    }
+    networkReply->deleteLater();
+    startDownloadFileFromLink(currentFileLink,currentFilePath);
+//    第二种重用之前的reply,但内容可能已经丢失,等同于重新开始
+
+}
+
+void FilesUtil::updateDownloadState(DownloadState state)
+{
+    switch (state) {
+    case DownloadState::Download_Init:
+        currentFilePath = ui->label_fileNameLocal->text().trimmed();
+        currentFileLink = ui->label_fileNetworkLink->text().trimmed();
+        break;
+    case DownloadState::Download_Start:
+        ui->label_fileNameLocal->setText(QFileInfo(currentFilePath).fileName());
+        ui->label_fileNetworkLink->setText(currentFileLink);
+        break;
+    case DownloadState::Download_Downloading:
+        break;
+    case DownloadState::Download_Finished:
+         ui->label_fileNetworkLink->setStyleSheet("color:gray;");
+        break;
+    case DownloadState::Download_Cancel:
+//        ui->label_fileNetworkLink->setText();
+        ui->label_fileNetworkLink->setStyleSheet("border-bottom: 1px solid gray;");
+        ui->checkBox_downloadFinished->setCheckState(Qt::Unchecked);
+        ui->pushButton_cancelDownload->setVisible(false);
+
+        break;
+    case DownloadState::Download_Reset:
+        break;
+
+    case DownloadState::Download_Error:
+        break;
+    default:
+        break;
+    }
+}

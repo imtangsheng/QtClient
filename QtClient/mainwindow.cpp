@@ -30,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     qDebug()<<"MainWindow::closeEvent(QCloseEvent *event)"<<event;
-    qApp->quit(); //重载主程序点击退出事件，软件退出
+//    qApp->quit(); //重载主程序点击退出事件，软件退出
 }
 
 MainWindow::~MainWindow()

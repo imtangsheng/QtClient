@@ -66,8 +66,6 @@ private slots:
 
     void on_pushButton_zoomReset_clicked();
 
-    void on_pushButton_filesNetwork_test_clicked();
-
     void on_pushButton_downloadNetworkFile_clicked();
 
     void on_pushButton_axisYsetRange_clicked();
@@ -89,6 +87,8 @@ private slots:
     void on_pushButton_notDownloadedFiles_clicked();
 
     void on_pushButton_downloadFilesFronLinks_clicked();
+
+    void on_pushButton_fileDelete_clicked();
 
 private:
     Ui::DataView *ui;

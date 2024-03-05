@@ -18,9 +18,12 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>771</width>
-     <height>421</height>
+     <width>601</width>
+     <height>411</height>
     </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">background-color:transparent;</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
@@ -245,15 +248,36 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout">
+     <layout class="QHBoxLayout" name="horizontalLayout_dataView">
       <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
        <layout class="QGridLayout" name="gridLayout_chartView">
+        <property name="sizeConstraint">
+         <enum>QLayout::SetMaximumSize</enum>
+        </property>
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
+         <number>0</number>
+        </property>
         <property name="spacing">
          <number>0</number>
         </property>
+        <item row="0" column="0">
+         <widget class="QChartView" name="widget_test" native="true"/>
+        </item>
        </layout>
       </item>
       <item>
@@ -283,10 +307,10 @@
          <string>设置和其他</string>
         </property>
         <property name="autoFillBackground">
-         <bool>true</bool>
+         <bool>false</bool>
         </property>
         <property name="currentIndex">
-         <number>2</number>
+         <number>1</number>
         </property>
         <property name="movable">
          <bool>true</bool>
@@ -297,20 +321,25 @@
            <normaloff>:/asset/dataview/Tools.svg</normaloff>:/asset/dataview/Tools.svg</iconset>
          </attribute>
          <attribute name="title">
-          <string>系统文件</string>
+          <string>文件</string>
          </attribute>
          <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item>
            <widget class="QLineEdit" name="lineEdit_rootPath">
             <property name="text">
              <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_test">
-            <property name="text">
-             <string>test1</string>
             </property>
            </widget>
           </item>
@@ -328,6 +357,21 @@
           <string>选项</string>
          </attribute>
          <layout class="QFormLayout" name="formLayout">
+          <property name="verticalSpacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
           <item row="0" column="0">
            <layout class="QVBoxLayout" name="verticalLayout_chart">
             <item>
@@ -339,7 +383,7 @@
                <string>电流选择是否显示</string>
               </property>
               <property name="autoFillBackground">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="text">
                <string>电流</string>
@@ -362,7 +406,7 @@
                <string>电流选择是否显示</string>
               </property>
               <property name="autoFillBackground">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="text">
                <string>电压</string>
@@ -385,7 +429,7 @@
                <string>电流选择是否显示</string>
               </property>
               <property name="autoFillBackground">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="text">
                <string>气压</string>
@@ -408,7 +452,7 @@
                <string>电流选择是否显示</string>
               </property>
               <property name="autoFillBackground">
-               <bool>true</bool>
+               <bool>false</bool>
               </property>
               <property name="text">
                <string>温度</string>
@@ -474,9 +518,9 @@
         </widget>
         <widget class="QWidget" name="tab_filesOptions">
          <attribute name="title">
-          <string>数据列表</string>
+          <string>数据</string>
          </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,10,0,0">
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,10,0,0">
           <property name="leftMargin">
            <number>0</number>
           </property>
@@ -552,13 +596,20 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="pushButton_filesNetwork_test">
+             <widget class="QPushButton" name="pushButton_fileDelete">
               <property name="text">
-               <string>test</string>
+               <string>删除</string>
               </property>
              </widget>
             </item>
            </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_test">
+            <property name="text">
+             <string>test1</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QListView" name="listView_filesNetwork">
@@ -578,6 +629,12 @@
             <property name="sizeType">
              <enum>QSizePolicy::Minimum</enum>
             </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
            </spacer>
           </item>
           <item>
@@ -596,6 +653,14 @@
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QChartView</class>
+   <extends>QWidget</extends>
+   <header>qchartview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resource.qrc"/>
  </resources>

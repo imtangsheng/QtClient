@@ -12,7 +12,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
-QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d+)℃$");
+QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d+)℃.*");
 #include <QRandomGenerator>
 
 //#include "../public/AppData.h"
@@ -60,8 +60,10 @@ void DataView::downloadFilesListFromNetworkLinks(QStringList linksFilesList)
         qDebug()<<"downloadFilesListFromNetworkLinks(QStringList:"<< link;
         // 定义一个正则表达式模式，用于匹配网络下载链接 Qt::CaseSensitive区分大小写
         FilesUtil *fileItem = new FilesUtil();
-        fileItem->startDownloadFileFromLink(link,link.replace(EXE_CONFIG["pathDataView"].toString(),EXE_CONFIG["pathDataViewNetwork"].toString()));
-        SUB_WINDOW->ui->verticalLayout_download->addWidget(fileItem->getLayoutDownloadFile());
+        if(fileItem->startDownloadFileFromLink(EXE_CONFIG["pathDataViewNetwork"].toString() + link,\
+                                                EXE_CONFIG["pathDataView"].toString() +link)){
+            SUB_WINDOW->ui->verticalLayout_download->addWidget(fileItem->getLayoutDownloadFile());
+        }
 
 //        SUB_WINDOW->ui->gridLayout->addWidget(fileItem->getLayoutDownloadFile(),key,0);key++;
 //        SUB_WINDOW->ui->gridLayout->addWidget(fileItem->getLayoutDownloadFile());
@@ -113,18 +115,12 @@ void DataView::init_chartView()
 {
     m_chart = new QChart();
     m_chart->setTitle("数据曲线图示");
-//    m_chart->setMargins(0,0,0,0);
     // 创建X轴和Y轴
 //    QDateTimeAxis *m_axisTime = new QDateTimeAxis();
     m_axisTime = new QDateTimeAxis();
     m_axisTime->setTitleText("X轴时间");
 //    m_axisTime->setFormat("hh:mm:ss"); // 设置时间格式
     m_axisTime->setFormat("yyyy-MM-dd hh:mm:ss");
-    //    axisX->setTitleVisible(true);
-    //    axisX->setLineVisible(true);
-    //    axisX->setLinePen(pen);
-
-//    QValueAxis *m_axisY = new QValueAxis();
     m_axisY = new QValueAxis();
     m_axisY->setTitleText("Y轴数值");
 
@@ -161,7 +157,6 @@ void DataView::init_chartView()
 //        qDebug()<<i<<currentTime;
     }
     /**添加测试数据end**/
-
     m_chart->addSeries(m_lineSeries_current);
     m_chart->addSeries(m_lineSeries_voltage);
     m_chart->addSeries(m_lineSeries_pressure);
@@ -178,24 +173,26 @@ void DataView::init_chartView()
     m_lineSeries_temperature->attachAxis(m_axisTime);
     m_lineSeries_temperature->attachAxis(m_axisY);
 
-
     m_axisTime->setRange(
         QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(0).x()),
         QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(m_lineSeries_temperature->count() -1 ).x()));
     m_axisY->setRange(0,50);
-//    m_chart->createDefaultAxes();
+    //在QChartView中显示 设置外边距为 负数，减少空白
+    m_chart->setContentsMargins(-9,-9,-9,-9);
+//    m_chart->setMargins(QMargins(-6,-6,-6,-6));
+    m_chart->setBackgroundRoundness(0);
 
-    //在QChartView中显示
     m_chartView = new QChartView(m_chart);
-    m_chartView->setFrameShape(QFrame::NoFrame);
-    m_chartView->setFrameShadow(QFrame::Plain);
-    //    m_chartView->setRubberBand(QChartView::RectangleRubberBand); //水平方向缩   chart->zoomIn()
-    m_chartView->setRubberBand(QChartView::HorizontalRubberBand);
-    ui->gridLayout_chartView->addWidget(m_chartView,0,0);
-//    m_chart->setContentsMargins(0,0,0,0);
 //    m_chartView->setContentsMargins(0,0,0,0);
-//    ui->gridLayout_chartView->setContentsMargins(0, 0, 0, 0); // 设置布局的边距为0
-
+//    m_chartView->setFrameShape(QFrame::NoFrame);
+//    m_chartView->setFrameShadow(QFrame::Plain);
+    //    m_chartView->setRubberBand(QChartView::RectangleRubberBand); //水平方向缩   chart->zoomIn()
+//    m_chartView->setRubberBand(QChartView::HorizontalRubberBand);
+//    m_chartView->setStyleSheet("border: none;");
+//    ui->horizontalLayout_dataView->(m_chartView);
+    ui->widget_test->setChart(m_chart);
+//    ui->horizontalLayout_dataView->addWidget(m_chartView);
+//    ui->gridLayout_chartView->addWidget(m_chartView);
 }
 
 void DataView::init_filesView()
@@ -227,12 +224,8 @@ void DataView::init_filesView()
 //    connect(ui->treeView_files->selectionModel(), &QTreeView::doubleClicked,this, &DataView::fileBrowserDoubleClicked);
 
     // 设置网络浏览视图的根目录
-
     ui->listView_filesNetwork->setWindowTitle("Directories Network");
-
-
     ui->lineEdit_rootPath_filesNetwork->setText(EXE_CONFIG["pathDataViewNetwork"].toString());
-
 //    m_networkFileModel->setRootPath(ui->lineEdit_rootPath_filesNetwork->text());
 //    m_networkFileModel->setRootUrl(ui->lineEdit_rootPath_filesNetwork->text());
 
@@ -257,10 +250,7 @@ void DataView::init_filesView()
     // 显示下载进度
     ui->verticalLayout_download->addWidget(m_filesUtil->getLayoutDownloadFile());
     m_filesUtil->getLayoutDownloadFile()->setVisible(false);
-
-
 }
-
 
 bool DataView::parseDataFromFile(const QString filePath)
 {
@@ -316,7 +306,6 @@ bool DataView::parseDataFromFile(const QString filePath)
 
 }
 
-
 void DataView::fileModelSelection(QModelIndex index)
 {
     qDebug()<<"fileModelSelection(QModelIndex index)"<<index;
@@ -329,8 +318,6 @@ void DataView::fileBrowserDoubleClicked(QModelIndex index)
     qDebug()<<"fileBrowserDoubleClicked(QModelIndex index)"<<index;
     qDebug()<<index.data(QFileSystemModel::FilePathRole).toString();
     m_currentFilePathDir = index.data(QFileSystemModel::FilePathRole).toString();
-
-
     // 提示窗口
     QMessageBox msgBox(this);
     msgBox.setText("等待数据解析完成");
@@ -375,14 +362,12 @@ void DataView::on_pushButton_view_clicked()
     m_chartView->update();
 }
 
-
 void DataView::on_checkBox_current_stateChanged(int arg1)
 {
     qDebug()<<"on_checkBox_current_stateChanged int:"<< arg1;
     m_lineSeries_current->setVisible(arg1);
 
 }
-
 
 void DataView::on_checkBox_voltage_stateChanged(int arg1)
 {
@@ -452,7 +437,6 @@ void DataView::on_animatedComboBox_currentIndexChanged(int index)
     m_chart->setAnimationOptions(QChart::AnimationOptions(index));
 }
 
-
 void DataView::on_legendComboBox_currentIndexChanged(int index)
 {
     Qt::Alignment alignment;
@@ -488,7 +472,6 @@ void DataView::on_legendComboBox_currentIndexChanged(int index)
 
 }
 
-
 void DataView::on_antialiasCheckBox_stateChanged(int arg1)
 {
     qDebug()<<"on_antialiasComboBox_currentIndexChanged int:"<< arg1;
@@ -496,31 +479,37 @@ void DataView::on_antialiasCheckBox_stateChanged(int arg1)
     m_chartView->setRenderHint(QPainter::Antialiasing,arg1);
 }
 
-
 void DataView::on_pushButton_zoomOut_clicked()
 {
     m_chart->zoomOut();
 }
-
 
 void DataView::on_pushButton_zoomIn_clicked()
 {
     m_chart->zoomIn();
 }
 
-
 void DataView::on_pushButton_zoomReset_clicked()
 {
     m_chart->zoomReset();
 }
 
-
+#include <QProcess>
 void DataView::on_pushButton_test_clicked()
 {
     qDebug()<<"test()";
-    //    parseDataFromFile("dataView.txt");
-
-
+    //    parseDataFromFile("G:/data/雪花啤酒/dataView.txt");
+    // 打开文件位置
+    #ifdef Q_OS_WIN
+        QProcess::startDetached("explorer.exe", {"/select,", QDir::toNativeSeparators("G:/data/雪花啤酒/dataView.txt")});
+    #elif Q_OS_MAC
+        QProcess::execute("osascript", {"-e", QString("tell application \"Finder\" to reveal POSIX file \"%1\" activating").arg(currentFilePath)});
+    #elif Q_OS_LINUX
+        QString cmd = "xdg-open \"" + QFileInfo(currentFilePath).path() + "\" --select " + QFileInfo(currentFilePath).fileName();
+        QProcess::startDetached(cmd);
+    #else
+        QProcess::startDetached("explorer.exe /select," + QDir::toNativeSeparators(currentFilePath));
+    #endif
 //    test();
 }
 
@@ -535,17 +524,6 @@ void DataView::on_lineEdit_rootPath_editingFinished()
     EXE_CONFIG["pathDataView"] = ui->lineEdit_rootPath->text();
     ui->treeView_files->setRootIndex(m_fileModel_dataView->index(ui->lineEdit_rootPath->text()));
 }
-
-
-void DataView::on_pushButton_filesNetwork_test_clicked()
-{
-    qDebug()<<"on_pushButton_filesNetwork_test_clicked()";
-//    m_networkFileModel->setRootPath(ui->lineEdit_rootPath_filesNetwork->text());
-//    ui->listView_filesNetwork->setRootIndex(m_networkFileModel->index(ui->lineEdit_rootPath_filesNetwork->text()));
-    m_filesUtil->startRequest(ui->lineEdit_rootPath_filesNetwork->text());
-
-}
-
 
 void DataView::on_pushButton_downloadNetworkFile_clicked()
 {
@@ -569,6 +547,30 @@ void DataView::on_pushButton_downloadNetworkFile_clicked()
     m_filesUtil->startDownloadFileFromLink(ui->lineEdit_rootPath_filesNetwork->text()+selectedText,ui->lineEdit_rootPath->text()+selectedText);
 }
 
+void DataView::on_pushButton_fileDelete_clicked()
+{
+    QString selectedText = ui->listView_filesNetwork->currentIndex().data(Qt::DisplayRole).toString();
+    if(selectedText.isEmpty()){
+        QMessageBox::warning(this, "未选中文件", "文件为空!请先选中一个文件");
+        return;
+    }
+    QString filename = ui->lineEdit_rootPath->text()+selectedText;
+    if(QFile::exists(filename)){
+        QString alreadyExists =  ui->lineEdit_rootPath->text().isEmpty()
+                                    ? tr("There already exists a file called %1. 确定删除?")
+                                    : tr("There already exists a file called %1 in the current directory. "
+                                         "确定删除?");
+        QMessageBox::StandardButton response = QMessageBox::question(nullptr,
+                                                                     tr("确定删除 Existing File"),
+                                                                     alreadyExists.arg(QDir::toNativeSeparators(filename)),
+                                                                     QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+        if (response == QMessageBox::No)
+            return ;
+        QFile::remove(filename);
+    }else {
+        QMessageBox::warning(this, "文件不存在", "文件不存在!请选中一个存在的文件！");
+    }
+}
 
 void DataView::on_pushButton_axisYsetRange_clicked()
 {
@@ -577,7 +579,6 @@ void DataView::on_pushButton_axisYsetRange_clicked()
     qDebug()<<ui->spinBox_axisYRangeMax->value();
     m_axisY->setRange(ui->spinBox_axisYRangeMin->value(),ui->spinBox_axisYRangeMax->value());
 }
-
 
 void DataView::on_pushButton_updateNetworkFiles_clicked()
 {
@@ -595,12 +596,10 @@ void DataView::on_pushButton_updateNetworkFiles_clicked()
 
 }
 
-
 void DataView::on_lineEdit_rootPath_filesNetwork_editingFinished()
 {
 
 }
-
 
 void DataView::on_pushButton_updateLocalFiles_clicked()
 {
@@ -700,4 +699,3 @@ void DataView::on_pushButton_downloadFilesFronLinks_clicked()
     }
     downloadFilesListFromNetworkLinks(filesListNotDownloaded);
 }
-

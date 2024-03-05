@@ -33,5 +33,6 @@
         <file>asset/dataview/voltage.svg</file>
         <file>asset/dataview/ZoomReset.svg</file>
         <file>asset/Home/More.svg</file>
+        <file>asset/media/VideoWidget_backgroundImage.jpeg</file>
     </qresource>
 </RCC>

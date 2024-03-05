@@ -19,7 +19,7 @@
      <x>40</x>
      <y>110</y>
      <width>661</width>
-     <height>64</height>
+     <height>90</height>
     </rect>
    </property>
    <property name="minimumSize">
@@ -31,7 +31,7 @@
    <property name="maximumSize">
     <size>
      <width>16777215</width>
-     <height>64</height>
+     <height>90</height>
     </size>
    </property>
    <property name="styleSheet">
@@ -104,7 +104,38 @@
        <number>0</number>
       </property>
       <item>
-       <widget class="QLabel" name="label_fileName">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_fileNameLocal">
+          <property name="text">
+           <string>文件名称</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="checkBox_downloadFinished">
+          <property name="text">
+           <string>下载完成</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_fileNetworkLink">
         <property name="minimumSize">
          <size>
           <width>0</width>
@@ -121,14 +152,14 @@
          <number>1</number>
         </property>
         <property name="text">
-         <string>文件名</string>
+         <string>网络文件下载链接地址</string>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QProgressBar" name="progressBar_Download">
         <property name="value">
-         <number>50</number>
+         <number>0</number>
         </property>
        </widget>
       </item>
@@ -145,9 +176,9 @@
          </widget>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_pauseDownload">
+         <widget class="QPushButton" name="pushButton_resetDownload">
           <property name="text">
-           <string>暂停下载</string>
+           <string>重置下载</string>
           </property>
          </widget>
         </item>
@@ -168,13 +199,6 @@
          <widget class="QPushButton" name="pushButton_openFromLocalFile">
           <property name="text">
            <string>在文件夹中显示</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="checkBox_downloadFinished">
-          <property name="text">
-           <string>下载完成</string>
           </property>
          </widget>
         </item>

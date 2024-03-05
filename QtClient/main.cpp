@@ -22,8 +22,10 @@ int main(int argc, char *argv[])
     const QStringList uiLanguages = QLocale::system().uiLanguages();
     for (const QString &locale : uiLanguages) {
         const QString baseName = "QtClient_" + QLocale(locale).name();
+        qDebug()<<"当前软件uiLanguages："<<baseName;
         if (translator.load(":/i18n/" + baseName)) {
             a.installTranslator(&translator);
+            qDebug()<<"当前软件Languages"<<&translator;
             break;
         }
     }
