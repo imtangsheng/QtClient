@@ -10,15 +10,46 @@
 #include "public/AppData.h"
 QJsonObject EXE_CONFIG;
 //QSettings APP_SETTINGS;
-QSettings APP_SETTINGS("./config/config.ini",QSettings::IniFormat);
+QSettings APP_SETTINGS("./config/config.ini",QSettings::IniFormat); //无编码配置，已经移除，使用UTF-8
 
 #include "ui/SubMain.h"
 
 SubMain *SUB_MAIN;
 
+#include <QFile>
+#include <QTextStream>
+void logToFile(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    QFile file("log.txt");
+    if (file.open(QIODevice::WriteOnly | QIODevice::Append)) {
+        QTextStream stream(&file);
+        switch (type) {
+        case QtDebugMsg:
+            stream << "Debug: ";
+            break;
+        case QtInfoMsg:
+            stream << "Info: ";
+            break;
+        case QtWarningMsg:
+            stream << "Warning: ";
+            break;
+        case QtCriticalMsg:
+            stream << "Critical: ";
+            break;
+        case QtFatalMsg:
+            stream << "Fatal: ";
+            break;
+        }
+        stream << msg << Qt::endl;
+    }
+
+}
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
+    qInstallMessageHandler(logToFile);
 
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();

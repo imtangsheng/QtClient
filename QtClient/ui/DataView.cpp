@@ -330,7 +330,7 @@ void DataView::fileBrowserDoubleClicked(QModelIndex index)
     // 3秒后自动关闭
 //    QTimer::singleShot(3000, &msgBox, &QMessageBox::close);
     msgBox.exec();
-    ui->tabWidget->setCurrentWidget(ui->tab_view);
+//    ui->tabWidget->setCurrentWidget(ui->tab_view);
 //    QTabBar *tabBar = ui->tabWidget->tabBar();
 //    ui->tabWidget->setMaximumWidth(200);
 }

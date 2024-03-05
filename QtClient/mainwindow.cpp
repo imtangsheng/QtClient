@@ -60,7 +60,7 @@ void MainWindow::init()
     connect(ui->tabWidget_mainWindow, &QTabWidget::currentChanged, this, &MainWindow::TabCurrentChanged);
 
     APP_SETTINGS.beginGroup("MainWindow");
-    const auto geometry = APP_SETTINGS.value("geometry", QByteArray()).toByteArray();
+    const auto geometry = APP_SETTINGS.value("geometry", QByteArray()).toByteArray(); //QByteArray 类型
     if (geometry.isEmpty())
         setGeometry(200, 200, 800, 600);
     else

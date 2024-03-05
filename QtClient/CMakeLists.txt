@@ -98,3 +98,4 @@ set(APP_VERSION_PATCH 2)
 # 定义 SOFTWARE_VERSION 宏
 add_compile_definitions(APP_VERSION="${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_PATCH}")
 
+add_compile_definitions(QT_MESSAGE_PATTERN="[%{time yyyyMMdd h:mm:ss.zzz t} %{if-debug}D%{endif}%{if-info}I%{endif}%{if-warning}W%{endif}%{if-critical}C%{endif}%{if-fatal}F%{endif}] %{file}:%{line} - %{message}")
