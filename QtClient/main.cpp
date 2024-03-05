@@ -10,9 +10,9 @@
 #include "public/AppData.h"
 QJsonObject EXE_CONFIG;
 
-#include "ui/subwindow.h"
+#include "ui/SubMain.h"
 
-SubWindow *SUB_WINDOW;
+SubMain *SUB_MAIN;
 
 int main(int argc, char *argv[])
 {
@@ -47,6 +47,6 @@ int main(int argc, char *argv[])
 
     MainWindow w;
     w.show();
-    SUB_WINDOW = new SubWindow;
+    SUB_MAIN = new SubMain;
     return a.exec();
 }

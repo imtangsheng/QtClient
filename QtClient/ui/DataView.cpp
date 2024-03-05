@@ -17,7 +17,7 @@ QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*tim
 
 //#include "../public/AppData.h"
 #include "public/AppData.h"
-#include "ui/subwindow.h"
+#include "ui/SubMain.h"
 
 DataView::DataView(QWidget *parent) :
     QWidget(parent),
@@ -62,7 +62,7 @@ void DataView::downloadFilesListFromNetworkLinks(QStringList linksFilesList)
         FilesUtil *fileItem = new FilesUtil();
         if(fileItem->startDownloadFileFromLink(EXE_CONFIG["pathDataViewNetwork"].toString() + link,\
                                                 EXE_CONFIG["pathDataView"].toString() +link)){
-            SUB_WINDOW->ui->verticalLayout_download->addWidget(fileItem->getLayoutDownloadFile());
+            SUB_MAIN->ui->verticalLayout_download->addWidget(fileItem->getLayoutDownloadFile());
         }
 
 //        SUB_WINDOW->ui->gridLayout->addWidget(fileItem->getLayoutDownloadFile(),key,0);key++;
@@ -70,9 +70,9 @@ void DataView::downloadFilesListFromNetworkLinks(QStringList linksFilesList)
 //        QHBoxLayout *layout = new QHBoxLayout;
 //        QPushButton *test = new QPushButton;
     }
-    SUB_WINDOW->setWindowTitle("下载");
-    SUB_WINDOW->setCentralWidget(SUB_WINDOW->ui->widget_download);
-    SUB_WINDOW->show();
+    SUB_MAIN->setWindowTitle("下载");
+    SUB_MAIN->setCentralWidget(SUB_MAIN->ui->widget_download);
+    SUB_MAIN->show();
 }
 
 
@@ -176,7 +176,7 @@ void DataView::init_chartView()
     m_axisTime->setRange(
         QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(0).x()),
         QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(m_lineSeries_temperature->count() -1 ).x()));
-    m_axisY->setRange(0,50);
+    m_axisY->setRange(0.0,50.0);
     //在QChartView中显示 设置外边距为 负数，减少空白
     m_chart->setContentsMargins(-9,-9,-9,-9);
 //    m_chart->setMargins(QMargins(-6,-6,-6,-6));
