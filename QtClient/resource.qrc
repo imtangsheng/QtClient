@@ -34,5 +34,6 @@
         <file>asset/dataview/ZoomReset.svg</file>
         <file>asset/Home/More.svg</file>
         <file>asset/media/VideoWidget_backgroundImage.jpeg</file>
+        <file>i18n/QtClient_zh_CN.qm</file>
     </qresource>
 </RCC>
