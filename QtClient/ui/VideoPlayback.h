@@ -9,8 +9,9 @@
 #include <QResizeEvent>
 #include <QFileSystemModel>
 
-namespace Ui {
-class VideoPlayback;
+namespace Ui
+{
+    class VideoPlayback;
 }
 
 class VideoPlayback : public QWidget
@@ -32,7 +33,8 @@ public:
 
     void updataMoreWidgetGeometry();
 
-    enum MediaControls:int {
+    enum MediaControls : int
+    {
         Play,
         Pause,
         Stop
@@ -47,7 +49,6 @@ private slots:
 
     void on_pushButton_test_clicked();
 
-
     void on_horizontalSlider_playbackRate_valueChanged(int value);
 
     void on_horizontalSlider_playbackVolume_valueChanged(int value);
@@ -61,8 +62,6 @@ private slots:
     void on_comboBox_videoFiles_currentIndexChanged(int index);
 
     void on_comboBox_videoFiles_editTextChanged(const QString &arg1);
-
-
 
     void on_pushButton_settings_clicked();
 
@@ -89,8 +88,6 @@ private:
     QString m_currentFilePathDir;
     void fileModelSelection(QModelIndex index);
     void fileBrowserDoubleClicked(QModelIndex index);
-
-
 };
 
 #endif // VIDEOPLAYBACK_H

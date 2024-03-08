@@ -10,8 +10,9 @@
 #include <QStringList>
 #include <QHBoxLayout>
 
-namespace Ui {
-class FilesUtil;
+namespace Ui
+{
+    class FilesUtil;
 }
 
 class FilesUtil : public QWidget
@@ -22,15 +23,15 @@ public:
     ~FilesUtil();
 
     void init();
-    QWidget* getLayoutDownloadFile();
+    QWidget *getLayoutDownloadFile();
 
     void startRequest(const QUrl &requestedUrl);
-//    QUrl::fromLocalFile
+    //    QUrl::fromLocalFile
     void readAllFilesFromLocalPath(const QString &directory);
 
     QString currentFilePath;
     QString currentFileLink;
-//    不需要额外处理new/delete内存 数据量小,直接定义
+    //    不需要额外处理new/delete内存 数据量小,直接定义
     QStringList filesListLocal;
     QStringList filesListNetwork;
 
@@ -39,10 +40,11 @@ public:
 
     void parseFilesListNetworkPath(const QString &url);
     bool downloadFileFromNetworkLink(const QUrl &link);
-    bool startDownloadFileFromLink(const QString &fileLink,const QString &filename);
+    bool startDownloadFileFromLink(const QString &fileLink, const QString &filename);
 
-    enum class  DownloadState{
-        Download_Init,//
+    enum class DownloadState
+    {
+        Download_Init, //
         Download_Start,
         Download_Downloading,
         Download_Finished,
@@ -53,7 +55,7 @@ public:
     void updateDownloadState(DownloadState state);
 
 public slots:
-//    void downloadFileFinished();
+    //    void downloadFileFinished();
 
 private slots:
 
@@ -66,7 +68,6 @@ private slots:
     void on_pushButton_resetDownload_clicked();
 
 private:
-
     Ui::FilesUtil *ui;
     // 创建一个 QNetworkAccessManager
     QNetworkAccessManager networkAccessManager;
@@ -74,14 +75,12 @@ private:
     std::unique_ptr<QFile> file;
 
     QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> networkReply;
-    std::unique_ptr<QFile> fileNetwork; //被赋值或移动后,原有对象的智能指针管理将自动解除 自动管理QFile对象的内存
-    bool hasHttpRequest = false; //http 终止标志
-    
+    std::unique_ptr<QFile> fileNetwork; // 被赋值或移动后,原有对象的智能指针管理将自动解除 自动管理QFile对象的内存
+    bool hasHttpRequest = false;        // http 终止标志
+
     void NetworkReplyFinished();
     void NetworkReplyReadyRead();
     void NetworkReplyDownloadProgress(int bytesReceived, int bytesTotal);
-
-
 };
 
 #endif // FILESUTIL_H

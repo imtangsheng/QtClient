@@ -1,8 +1,7 @@
 #include "SubMain.h"
 
-SubMain::SubMain(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::SubMain)
+SubMain::SubMain(QWidget *parent) : QMainWindow(parent),
+                                    ui(new Ui::SubMain)
 {
     ui->setupUi(this);
 }
@@ -15,5 +14,5 @@ SubMain::~SubMain()
 void SubMain::showFiles()
 {
     setCentralWidget(ui->widget_download);
-//    show();
+    //    show();
 }

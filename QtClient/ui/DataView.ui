@@ -18,8 +18,8 @@
     <rect>
      <x>10</x>
      <y>20</y>
-     <width>601</width>
-     <height>411</height>
+     <width>811</width>
+     <height>471</height>
     </rect>
    </property>
    <property name="styleSheet">
@@ -248,7 +248,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_dataView" stretch="10,4,1">
+     <layout class="QHBoxLayout" name="Layout_dataViewSelect" stretch="10,0,3">
       <property name="spacing">
        <number>0</number>
       </property>
@@ -281,233 +281,7 @@
        </layout>
       </item>
       <item>
-       <widget class="QTabWidget" name="tabWidget">
-        <property name="minimumSize">
-         <size>
-          <width>200</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="maximumSize">
-         <size>
-          <width>300</width>
-          <height>16777215</height>
-         </size>
-        </property>
-        <property name="mouseTracking">
-         <bool>true</bool>
-        </property>
-        <property name="tabletTracking">
-         <bool>true</bool>
-        </property>
-        <property name="acceptDrops">
-         <bool>true</bool>
-        </property>
-        <property name="toolTip">
-         <string>设置和其他</string>
-        </property>
-        <property name="autoFillBackground">
-         <bool>true</bool>
-        </property>
-        <property name="currentIndex">
-         <number>0</number>
-        </property>
-        <property name="movable">
-         <bool>true</bool>
-        </property>
-        <widget class="QWidget" name="tab_filesOptions">
-         <attribute name="title">
-          <string>数据</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,10,0,0">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLineEdit" name="lineEdit_rootPath_filesNetwork">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
-            <item>
-             <widget class="QPushButton" name="pushButton_updateNetworkFiles">
-              <property name="text">
-               <string>网络文件</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_updateLocalFiles">
-              <property name="text">
-               <string>本地文件</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_downloadedFiles">
-              <property name="text">
-               <string>已下载</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_notDownloadedFiles">
-              <property name="text">
-               <string>未下载</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <widget class="QPushButton" name="pushButton_downloadNetworkFile">
-              <property name="text">
-               <string>下载</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_parseData">
-              <property name="text">
-               <string>解析本地</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_downloadFilesFronLinks">
-              <property name="text">
-               <string>一键下载</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QPushButton" name="pushButton_fileDelete">
-              <property name="text">
-               <string>删除</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_test">
-            <property name="text">
-             <string>test1</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QListView" name="listView_filesNetwork">
-            <property name="minimumSize">
-             <size>
-              <width>0</width>
-              <height>36</height>
-             </size>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <spacer name="verticalSpacer_2">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Minimum</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>0</width>
-              <height>0</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_download">
-            <property name="spacing">
-             <number>0</number>
-            </property>
-           </layout>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_filesLocal">
-         <attribute name="icon">
-          <iconset resource="../resource.qrc">
-           <normaloff>:/asset/dataview/Tools.svg</normaloff>:/asset/dataview/Tools.svg</iconset>
-         </attribute>
-         <attribute name="title">
-          <string>本地文件</string>
-         </attribute>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="QLineEdit" name="lineEdit_rootPath">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QTreeView" name="treeView_files"/>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="tab_dataViewSetting">
-         <attribute name="icon">
-          <iconset resource="../resource.qrc">
-           <normaloff>:/asset/dataview/MoreFilled.svg</normaloff>:/asset/dataview/MoreFilled.svg</iconset>
-         </attribute>
-         <attribute name="title">
-          <string>设置</string>
-         </attribute>
-         <layout class="QFormLayout" name="formLayout">
-          <property name="verticalSpacing">
-           <number>0</number>
-          </property>
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
-           <number>0</number>
-          </property>
-         </layout>
-        </widget>
-       </widget>
-      </item>
-      <item>
-       <layout class="QVBoxLayout" name="verticalLayout_chart">
+       <layout class="QVBoxLayout" name="Layout_chartSelect">
         <item>
          <widget class="QCheckBox" name="checkBox_current">
           <property name="mouseTracking">
@@ -647,6 +421,232 @@
          </widget>
         </item>
        </layout>
+      </item>
+      <item>
+       <widget class="QTabWidget" name="tabWidget">
+        <property name="minimumSize">
+         <size>
+          <width>200</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>300</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
+        <property name="tabletTracking">
+         <bool>true</bool>
+        </property>
+        <property name="acceptDrops">
+         <bool>true</bool>
+        </property>
+        <property name="toolTip">
+         <string>设置和其他</string>
+        </property>
+        <property name="autoFillBackground">
+         <bool>false</bool>
+        </property>
+        <property name="currentIndex">
+         <number>2</number>
+        </property>
+        <property name="movable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="tab_filesOptions">
+         <attribute name="title">
+          <string>数据</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,10,0,0">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_rootPath_filesNetwork">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3">
+            <item>
+             <widget class="QPushButton" name="pushButton_updateNetworkFiles">
+              <property name="text">
+               <string>网络文件</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_updateLocalFiles">
+              <property name="text">
+               <string>本地文件</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_downloadedFiles">
+              <property name="text">
+               <string>已下载</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_notDownloadedFiles">
+              <property name="text">
+               <string>未下载</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QPushButton" name="pushButton_downloadNetworkFile">
+              <property name="text">
+               <string>下载</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_parseData">
+              <property name="text">
+               <string>解析本地</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_downloadFilesFronLinks">
+              <property name="text">
+               <string>一键下载</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="pushButton_fileDelete">
+              <property name="text">
+               <string>删除</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <widget class="QPushButton" name="pushButton_test">
+            <property name="text">
+             <string>test</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QListView" name="listView_filesNetwork">
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>36</height>
+             </size>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="verticalSpacer_2">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Minimum</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>0</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_download">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+           </layout>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_filesLocal">
+         <attribute name="icon">
+          <iconset resource="../resource.qrc">
+           <normaloff>:/asset/dataview/Tools.svg</normaloff>:/asset/dataview/Tools.svg</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>本地</string>
+         </attribute>
+         <layout class="QVBoxLayout" name="verticalLayout_2">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QLineEdit" name="lineEdit_rootPath">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QTreeView" name="treeView_files"/>
+          </item>
+         </layout>
+        </widget>
+        <widget class="QWidget" name="tab_dataViewSetting">
+         <attribute name="icon">
+          <iconset resource="../resource.qrc">
+           <normaloff>:/asset/dataview/MoreFilled.svg</normaloff>:/asset/dataview/MoreFilled.svg</iconset>
+         </attribute>
+         <attribute name="title">
+          <string>设置</string>
+         </attribute>
+         <layout class="QFormLayout" name="formLayout">
+          <property name="verticalSpacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+         </layout>
+        </widget>
+       </widget>
       </item>
      </layout>
     </item>

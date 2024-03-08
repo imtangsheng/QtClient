@@ -35,5 +35,14 @@
         <file>asset/Home/More.svg</file>
         <file>asset/media/VideoWidget_backgroundImage.jpeg</file>
         <file>i18n/QtClient_zh_CN.qm</file>
+        <file>asset/Home/Close.svg</file>
+        <file>asset/Home/FullScreen.svg</file>
+        <file>asset/Home/Minus.svg</file>
+        <file>asset/Home/User.svg</file>
+        <file>asset/Home/window-maximize.svg</file>
+        <file>asset/Home/window-restore.svg</file>
+        <file>asset/Home/playback.svg</file>
+        <file>asset/Home/DataView.svg</file>
+        <file>asset/Home/Home.svg</file>
     </qresource>
 </RCC>

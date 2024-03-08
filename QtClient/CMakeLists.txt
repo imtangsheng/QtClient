@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools MultimediaWidgets Charts Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools MultimediaWidgets Charts Network)
 
-set(TS_FILES QtClient_zh_CN.ts)
+set(TS_FILES i18n/QtClient_zh_CN.ts)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -27,14 +27,16 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         resource.qrc
-        public/AppData.h
+        public/AppSystem.h public/AppSystem.cpp
         public/AppOS.h
+        ui/SubMain.h ui/SubMain.cpp ui/SubMain.ui
         ui/VideoPlayback.h ui/VideopPayback.cpp ui/VideoPlayback.ui
         ui/DataView.h ui/DataView.cpp ui/DataView.ui
         modules/FilesUtil.h modules/FilesUtil.cpp modules/FilesUtil.ui
         readme.md
         doc/dev.md
-        ui/SubMain.h ui/SubMain.cpp ui/SubMain.ui
+        FirstShowWidget.h FirstShowWidget.cpp FirstShowWidget.ui
+        ui/WidgetHeader.h ui/WidgetHeader.cpp ui/WidgetHeader.ui
 
 
     )
@@ -97,5 +99,3 @@ set(APP_VERSION_MINOR 0)
 set(APP_VERSION_PATCH 2)
 # 定义 SOFTWARE_VERSION 宏
 add_compile_definitions(APP_VERSION="${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_PATCH}")
-
-add_compile_definitions(QT_MESSAGE_PATTERN="[%{time yyyyMMdd h:mm:ss.zzz t} %{if-debug}D%{endif}%{if-info}I%{endif}%{if-warning}W%{endif}%{if-critical}C%{endif}%{if-fatal}F%{endif}] %{file}:%{line} - %{message}")

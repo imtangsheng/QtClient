@@ -1,6 +1,6 @@
 #include "DataView.h"
 #include "ui_DataView.h"
-
+#include<QTimer>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QFile>
@@ -16,7 +16,7 @@ QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*tim
 #include <QRandomGenerator>
 
 //#include "../public/AppData.h"
-#include "public/AppData.h"
+#include "public/AppSystem.h"
 #include "ui/SubMain.h"
 
 DataView::DataView(QWidget *parent) :
@@ -312,7 +312,7 @@ void DataView::fileModelSelection(QModelIndex index)
     qDebug()<<index.data(QFileSystemModel::FilePathRole).toString();
     m_currentFilePathDir = index.data(QFileSystemModel::FilePathRole).toString();
 }
-#include<QTimer>
+
 void DataView::fileBrowserDoubleClicked(QModelIndex index)
 {
     qDebug()<<"fileBrowserDoubleClicked(QModelIndex index)"<<index;
@@ -333,33 +333,6 @@ void DataView::fileBrowserDoubleClicked(QModelIndex index)
 //    ui->tabWidget->setCurrentWidget(ui->tab_view);
 //    QTabBar *tabBar = ui->tabWidget->tabBar();
 //    ui->tabWidget->setMaximumWidth(200);
-}
-
-
-void DataView::on_pushButton_view_clicked()
-{
-    qDebug()<<"on_pushButton_view_clicked:";
-    m_lineSeries_current->clear();
-    m_lineSeries_voltage->clear();
-    m_lineSeries_pressure->clear();
-    m_lineSeries_temperature->clear();
-    QDateTime currentTime = QDateTime::currentDateTime();
-    currentTime = currentTime.addSecs(1000000);
-    for(int i=0;i<100;i++){
-        //        series->append(i,20);
-        currentTime = currentTime.addSecs(1);
-        m_lineSeries_current->append(currentTime.toMSecsSinceEpoch(), 0.0);
-        m_lineSeries_voltage->append(currentTime.toMSecsSinceEpoch(),15.0);
-        m_lineSeries_pressure->append(currentTime.toMSecsSinceEpoch(),QRandomGenerator::global()->bounded(10, 20));
-        m_lineSeries_temperature->append(currentTime.toMSecsSinceEpoch(),QRandomGenerator::global()->bounded(0, 40));
-        qDebug()<<i<<currentTime;
-    }
-
-    m_axisTime->setRange(
-        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(0).x()),
-        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(m_lineSeries_temperature->count() -1 ).x()));
-//    m_chart->update();
-    m_chartView->update();
 }
 
 void DataView::on_checkBox_current_stateChanged(int arg1)

@@ -4,8 +4,9 @@
 #include <QMainWindow>
 #include "ui_SubMain.h"
 
-namespace Ui {
-class SubMain;
+namespace Ui
+{
+    class SubMain;
 }
 
 class SubMain : public QMainWindow
@@ -21,9 +22,7 @@ public:
     Ui::SubMain *ui;
 
 private:
-
 };
-
 
 extern SubMain *SUB_MAIN;
 

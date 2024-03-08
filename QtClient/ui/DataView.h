@@ -13,8 +13,9 @@
 
 #include "modules/FilesUtil.h"
 
-namespace Ui {
-class DataView;
+namespace Ui
+{
+    class DataView;
 }
 
 class DataView : public QWidget
@@ -31,8 +32,6 @@ public:
     void parseData(const QString &line);
     bool parseDataFromFile(const QString filePath);
 
-
-
     QWidget *getDataView();
     void downloadFilesListFromNetworkLinks(QStringList linksFilesList);
 
@@ -41,8 +40,6 @@ public slots:
 
 private slots:
     void on_pushButton_test_clicked();
-
-    void on_pushButton_view_clicked();
 
     void on_checkBox_current_stateChanged(int arg1);
 
@@ -97,13 +94,13 @@ private:
     void init_chartView();
     QChartView *m_chartView;
     QChart *m_chart;
-    QDateTimeAxis *m_axisTime; //时间轴
+    QDateTimeAxis *m_axisTime; // 时间轴
     QValueAxis *m_axisY;
-    QLineSeries *m_lineSeries_time; //时间
-    QLineSeries *m_lineSeries_current; //电流
-    QLineSeries *m_lineSeries_voltage; //电压
-    QLineSeries *m_lineSeries_pressure; //压强
-    QLineSeries *m_lineSeries_temperature; //温度
+    QLineSeries *m_lineSeries_time;        // 时间
+    QLineSeries *m_lineSeries_current;     // 电流
+    QLineSeries *m_lineSeries_voltage;     // 电压
+    QLineSeries *m_lineSeries_pressure;    // 压强
+    QLineSeries *m_lineSeries_temperature; // 温度
     QDateTime m_dataTime_lineSeries;
 
     //
@@ -123,8 +120,6 @@ private:
     QStringList filesListNetwork;
     QStringList filesListDownloaded;
     QStringList filesListNotDownloaded;
-
-
 };
 
 #endif // DATAVIEW_H
