@@ -7,7 +7,7 @@
 #include <Windows.h>
 #endif
 
-#include "ui/WidgetHeader.h"
+#include "ui/TitleBar.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -32,15 +32,14 @@ public:
 protected:
     void mousePressEvent(QMouseEvent *event) override;
 private slots:
-    void on_pushButton_video_playback_clicked();
+    void on_Button_videoPlayback_clicked();
 
-    void on_pushButton_dataView_clicked();
+    void on_Button_dataView_clicked();
 
     void on_pushButton_test_clicked();
 
 private:
-    WidgetHeader *ui_WidgetHeader;
-    Ui::WidgetHeader *ui_header;
+    TitleBar *ui_TitleBar;
     QWidget *ui_foot;
     Ui::MainWindow *ui;
 

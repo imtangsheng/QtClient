@@ -1,5 +1,6 @@
 #include "FirstShowWidget.h"
 #include "ui_FirstShowWidget.h"
+#include "public/AppSystem.h"
 
 FirstShowWidget::FirstShowWidget(QWidget *parent) :
     QWidget(parent),
@@ -14,96 +15,84 @@ FirstShowWidget::~FirstShowWidget()
     delete ui;
 }
 
-#ifdef Q_OS_WIN
-#include <qt_windows.h>
-#include <windowsx.h>
-#endif
-
-
-bool FirstShowWidget::nativeEvent(const QByteArray &eventType, void *message, qintptr *result)
-{
-//    qDebug() << "MainWidget::nativeEvent:"<<test1++<<eventType<<message<<result;
-#ifdef Q_OS_WIN
-    //Workaround for known bug -> check Qt forum : https://forum.qt.io/topic/93141/qtablewidget-itemselectionchanged/13
-    Q_UNUSED(eventType)
-    MSG *param = static_cast<MSG*> (message);
-    switch (param->message) {
-    case WM_NCHITTEST:
-    {
-        int nX = GET_X_LPARAM(param->lParam) - this->geometry().x();
-        int nY = GET_Y_LPARAM(param->lParam) - this->geometry().y();
-
-        //       位于子控件上，不处理
-        if(childAt(nX,nY) != nullptr){
-            qDebug() << "位于子控件上，不处理";
-            return QWidget::nativeEvent(eventType,message,result);
-        }
-        *result = HTCAPTION;
-        //        鼠标位于窗体边框，进行缩放
-        if((nX>0)&&(nX<m_nBorderWidth)){
-            *result = HTLEFT;
-        }
-        if((nX > this->width() - m_nBorderWidth) && (nX<this->width())){
-            *result = HTRIGHT;
-        }
-
-        if((nY>0)&&(nY<m_nBorderWidth)){
-            *result = HTTOP;
-        }
-        if((nY > this->height() - m_nBorderWidth) && (nX<this->height())){
-            *result = HTBOTTOM;
-        }
-
-        if((nX>0)&& (nX <m_nBorderWidth) && (nY>0) && (nY<m_nBorderWidth)){
-            *result = HTTOPLEFT;
-        }
-
-        if((nX>this->width()-m_nBorderWidth)&& (nX <this->width()) && (nY>0) && (nY<m_nBorderWidth)){
-            *result = HTTOPRIGHT;
-        }
-
-        if((nX>0)&& (nX <m_nBorderWidth) && (nY>this->height() - m_nBorderWidth) && (nY<this->height())){
-            *result = HTBOTTOMLEFT;
-        }
-
-        if((nX>this->width()-m_nBorderWidth)&& (nX <this->width()) && (nY>this->height() - m_nBorderWidth) && (nY<this->height())){
-            *result = HTBOTTOMRIGHT;
-        }
-        qDebug() << "位于控件上，处理11111111111111111111111111";
-        return true;
-    }
-    }
-#endif
-//    qDebug() << "非处理事件";
-    return QWidget::nativeEvent(eventType, message, result);
-}
-
-void FirstShowWidget::on_pushButton_isShowFootMain_clicked()
-{
-
-}
-
 void FirstShowWidget::init()
 {
-    this->setWindowFlags(Qt::Widget | Qt::CustomizeWindowHint | Qt::FramelessWindowHint);//Qt::FramelessWindowHint
-    //    this->setContentsMargins(2,2,2,2); //设置QWidget内部内容的边距
-//    this->setAttribute(Qt::WA_TranslucentBackground);窗体透明
-//    ui->tabWidget_main->setStyleSheet(" background-color:transparent;background-color: rgb(0, 0, 255);QTabWidget::pane{border:none}QTabWidget::pane { border: 0; }");
-//    ui->tabWidget_main->setF
-//    ui->tabWidget_main->setStyleSheet("QTabWidget::pane { border: 0; }");
-//    this->setStyleSheet("QMainWindow::separator {width: 1px; border: none;} ;\n background-color: rgb(170, 0, 0);");
+    setWindowFlags( Qt::FramelessWindowHint);
+
+    APP_SETTINGS.beginGroup("FirstShowWidget");
+    username = APP_SETTINGS.value("username", "").toString();
+    password =  APP_SETTINGS.value("password", "").toString();
+    isAutoLogin = APP_SETTINGS.value("isAutoLogin", false).toBool();
+    isSavaPassword = APP_SETTINGS.value("isSavaPassword", false).toBool();
+    APP_SETTINGS.endGroup();
+
+    ui->lineEdit_username->setText(username);
+    ui->checkBox_savaPassword->setCheckState(isSavaPassword ? Qt::Checked : Qt::Unchecked);
+    ui->checkBox_autoLogin->setCheckState(isAutoLogin ? Qt::Checked : Qt::Unchecked);
 }
 
-void FirstShowWidget::on_pushButton_test_clicked()
+bool FirstShowWidget::startAutoLogin()
 {
-//    ui->dockWidget->setWindowFlags(Qt::FramelessWindowHint);
+    qDebug()<<"FirstShowWidget::startAutoLogin()"<<isAutoLogin<<isAutoLogin;
+    if(isSavaPassword){
+        ui->lineEdit_password->setText(password);
+        if(isAutoLogin){
+            if(start()){return true;}
+        }
+    }
+    return false;
+}
 
-//    ui->dockWidget->layout()->setOccupiedSpace(ui->dockWidget->widget());
-//    if(ui->dockWidget->isFloating()){
-//        ui->dockWidget->setFloating(false);
-//    }else{
-//        ui->dockWidget->setFloating(true);
-//    }
+bool FirstShowWidget::start()
+{
+    qDebug()<<"FirstShowWidget::start()";
+    if("admin" != ui->lineEdit_username->text()){
+        qDebug()<<"username error"<<username<<ui->lineEdit_username->text();
+        QMessageBox::warning(this, "警告", "username error");
+        return false;
+    }else if("12345" != ui->lineEdit_password->text()){
+        qDebug()<<"password error"<<password << ui->lineEdit_password->text();
+        QMessageBox::warning(this, "警告", "password error");
+        return false;
+    }
+    qDebug()<<"FirstShowWidget::start() loginSuccess";
+
+    APP_SETTINGS.beginGroup("FirstShowWidget");
+    if(ui->checkBox_savaPassword->isChecked()){
+        APP_SETTINGS.setValue("username", ui->lineEdit_username->text());
+        APP_SETTINGS.setValue("password", ui->lineEdit_password->text());
+        //        APP_SETTINGS.setValue("isAutoLogin", true);
+        APP_SETTINGS.setValue("isSavaPassword", true);
+    }
+    else {
+//        APP_SETTINGS.setValue("username", "");
+        APP_SETTINGS.setValue("password", "");
+        //        APP_SETTINGS.setValue("isAutoLogin", false);
+        APP_SETTINGS.setValue("isSavaPassword", false);
+        }
+    if(ui->checkBox_autoLogin->isChecked()){
+//        APP_SETTINGS.setValue("username", ui->lineEdit_username->text());
+//        APP_SETTINGS.setValue("password", ui->lineEdit_password->text());
+//        APP_SETTINGS.setValue("isSavaPassword", true);
+        APP_SETTINGS.setValue("isAutoLogin", true);
+    }
+    else {
+    //        APP_SETTINGS.setValue("username", "");
+    //        APP_SETTINGS.setValue("password", "");
+    //        APP_SETTINGS.setValue("isAutoLogin", false);
+    //        APP_SETTINGS.setValue("isSavaPassword", false);
+    APP_SETTINGS.setValue("isAutoLogin", false);
+    }
+    APP_SETTINGS.endGroup();
+    return true;
 
 }
 
+
+void FirstShowWidget::on_pushButton_login_clicked()
+{
+    if(start()){
+        emit loginSuccess();
+        close();
+    }
+}

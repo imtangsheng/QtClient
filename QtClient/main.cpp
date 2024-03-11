@@ -3,7 +3,7 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QMessageBox>
-#include <QJsonDocument>
+
 
 #include "public/AppSystem.h"
 QJsonObject EXE_CONFIG;
@@ -33,29 +33,23 @@ int main(int argc, char *argv[])
         }
     }
 
-    //初始化配置 EXE_CONFIG
-    qDebug()<<"当前软件版本号："<<APP_VERSION<<"当前工作目录："<<QDir::currentPath();
-    QFile file(PATH_EXE_CONFIG);
-    if(!file.open(QIODevice::ReadOnly)) {
-        qFatal("Config file not found");
-        QMessageBox::critical(nullptr, "Error", "Config file not found");
-        return -1;
+    if(getExeConfigJson()){
+        qDebug()<<"当前软件开发版本："<<EXE_CONFIG["version"].toString();
     }
-    EXE_CONFIG = QJsonDocument::fromJson(file.readAll()).object();
-    if(EXE_CONFIG.isEmpty()) {
-        qFatal("Config file is not valid JSON");
-        QMessageBox::critical(nullptr, "Error", "Config file is not valid JSON");
-        file.close();
-        return -1;
-    }
-    file.close();
-    qDebug()<<"当前软件开发版本："<<EXE_CONFIG["version"].toString();
-
     FirstShowWidget first;
-    first.show();
-
     MainWindow w;
-    w.show();
+//    QEventLoop loop;
+//    QObject::connect(&first,&FirstShowWidget::loginSuccess,&w,&MainWindow::show);
+//    loop.exec(); // 等待finished信号
+    // 信号发射后继续执行
+//    w.show();
+    if(first.startAutoLogin()){
+        w.show();
+        first.close();
+    }else{
+        QObject::connect(&first,&FirstShowWidget::loginSuccess,&w,&MainWindow::show);
+        first.show();
+    }
 
     SUB_MAIN = new SubMain;
     return a.exec();

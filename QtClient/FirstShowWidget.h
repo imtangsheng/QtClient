@@ -17,17 +17,25 @@ public:
 
     void init();
 
-protected:
-    int test1 = 0;
-    int m_nBorderWidth = 10;
-    bool nativeEvent(const QByteArray &eventType, void *message, qintptr *result);
-private slots:
-    void on_pushButton_isShowFootMain_clicked();
+    bool startAutoLogin();
+    bool start();
 
-    void on_pushButton_test_clicked();
+    QString username;
+    QString password;
+    bool isAutoLogin;
+    bool isSavaPassword;
+
+protected:
+
+private slots:
+
+    void on_pushButton_login_clicked();
 
 private:
     Ui::FirstShowWidget *ui;
+
+signals:
+    void loginSuccess();
 };
 
 #endif // FIRSTSHOWWIDGET_H

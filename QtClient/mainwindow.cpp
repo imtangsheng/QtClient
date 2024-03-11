@@ -7,16 +7,16 @@
 #include <QDir>
 #include <QFile>
 #include <QIcon>
-#include "ui/WidgetHeader.h"
+
 
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    ui_WidgetHeader = new WidgetHeader(this);
+    ui_TitleBar = new TitleBar(this);
 //    ui_header = ui_WidgetHeader->getUi();
-    setMenuWidget(ui_WidgetHeader);
+    setMenuWidget(ui_TitleBar);
 
     test();
     init();
@@ -107,7 +107,7 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
     return QMainWindow::mousePressEvent(event);
 }
 
-void MainWindow::on_pushButton_video_playback_clicked()
+void MainWindow::on_Button_videoPlayback_clicked()
 {
     qDebug() << "on_pushButton_video_playback_clicked()";
     //    qDebug()<<m_tabWidget_mainWindow.contains("video_playback");
@@ -124,7 +124,7 @@ void MainWindow::on_pushButton_video_playback_clicked()
     qDebug() << m_tabWidget_mainWindow["VideoPlayback"];
 }
 
-void MainWindow::on_pushButton_dataView_clicked()
+void MainWindow::on_Button_dataView_clicked()
 {
     qDebug() << "on_pushButton_dataview_clicked";
     addTabWidget(TabWindow_DataView);
@@ -226,4 +226,3 @@ void MainWindow::on_pushButton_test_clicked()
 
 
 }
-

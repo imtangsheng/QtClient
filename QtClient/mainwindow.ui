@@ -63,10 +63,10 @@
    <string>MianWindow客户端</string>
   </property>
   <property name="autoFillBackground">
-   <bool>true</bool>
+   <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(170, 0, 0);</string>
+   <string notr="true">background-color: rgb(38, 50, 56);</string>
   </property>
   <property name="inputMethodHints">
    <set>Qt::ImhNone</set>
@@ -88,7 +88,7 @@
     <bool>false</bool>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(0, 85, 0);</string>
+    <string notr="true">background-color: rgb(144, 164, 174);</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="spacing">
@@ -121,7 +121,8 @@
        <bool>false</bool>
       </property>
       <property name="styleSheet">
-       <string notr="true">QTabWidget::pane { border: 0; }</string>
+       <string notr="true">QTabWidget::pane { border: 0; };
+background-color:transparent;</string>
       </property>
       <property name="currentIndex">
        <number>0</number>
@@ -131,7 +132,7 @@
       </property>
       <widget class="QWidget" name="tab_main">
        <property name="styleSheet">
-        <string notr="true">background-color: rgb(0, 170, 0);</string>
+        <string notr="true">background-color:transparent;</string>
        </property>
        <attribute name="icon">
         <iconset resource="resource.qrc">

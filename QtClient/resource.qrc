@@ -44,5 +44,6 @@
         <file>asset/Home/playback.svg</file>
         <file>asset/Home/DataView.svg</file>
         <file>asset/Home/Home.svg</file>
+        <file>asset/Image/login/login.jpg</file>
     </qresource>
 </RCC>

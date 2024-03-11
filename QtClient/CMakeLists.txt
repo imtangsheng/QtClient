@@ -12,7 +12,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools MultimediaWidgets Charts Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools MultimediaWidgets Charts Network)
 
-set(TS_FILES i18n/QtClient_zh_CN.ts)
+set(TS_FILES QtClient_zh_CN.ts)
 
 set(PROJECT_SOURCES
         main.cpp
@@ -36,7 +36,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         readme.md
         doc/dev.md
         FirstShowWidget.h FirstShowWidget.cpp FirstShowWidget.ui
-        ui/WidgetHeader.h ui/WidgetHeader.cpp ui/WidgetHeader.ui
+        ui/TitleBar.h ui/TitleBar.cpp ui/TitleBar.ui
 
 
     )

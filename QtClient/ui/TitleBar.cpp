@@ -1,32 +1,21 @@
-#include "WidgetHeader.h"
-#include "ui_WidgetHeader.h"
+#include "TitleBar.h"
+#include "ui_TitleBar.h"
 #include <QMouseEvent>
 
-WidgetHeader::WidgetHeader(QWidget *parent) :
+TitleBar::TitleBar(QWidget *parent) :
     QWidget(parent),
-    ui(new Ui::WidgetHeader)
+    ui(new Ui::TitleBar)
 {
     ui->setupUi(this);
-    this->installEventFilter(this);
 }
 
-WidgetHeader::~WidgetHeader()
+TitleBar::~TitleBar()
 {
     qDebug()<<"WidgetHeader::~WidgetHeader()";
     delete ui;
 }
 
-QWidget *WidgetHeader::getWidgetHeader()
-{
-    return this;
-}
-
-Ui::WidgetHeader *WidgetHeader::getUi()
-{
-    return ui;
-}
-
-void WidgetHeader::mousePressEvent(QMouseEvent *event)
+void TitleBar::mousePressEvent(QMouseEvent *event)
 {
     qDebug()<<"WidgetHeader::mousePressEvent "<<event->button();
     if(event->button() == Qt::LeftButton){
@@ -37,7 +26,7 @@ void WidgetHeader::mousePressEvent(QMouseEvent *event)
     return QWidget::mousePressEvent(event);
 }
 
-void WidgetHeader::mouseMoveEvent(QMouseEvent *event)
+void TitleBar::mouseMoveEvent(QMouseEvent *event)
 {
     qDebug()<<"WidgetHeader::mouseMoveEvent "<<event->button();
     if(event->buttons() == Qt::LeftButton && isMousePressed){
@@ -46,7 +35,7 @@ void WidgetHeader::mouseMoveEvent(QMouseEvent *event)
     }
 }
 
-void WidgetHeader::mouseReleaseEvent(QMouseEvent *event)
+void TitleBar::mouseReleaseEvent(QMouseEvent *event)
 {
     qDebug()<<"WidgetHeader::mouseReleaseEvent "<<event->button();
     if(event->button() == Qt::LeftButton){
@@ -56,7 +45,7 @@ void WidgetHeader::mouseReleaseEvent(QMouseEvent *event)
     return QWidget::mouseReleaseEvent(event);
 }
 
-void WidgetHeader::mouseDoubleClickEvent(QMouseEvent *event)
+void TitleBar::mouseDoubleClickEvent(QMouseEvent *event)
 {
     qDebug()<<"WidgetHeader::mouseDoubleClickEvent "<<event->button();
     if(event->button() == Qt::LeftButton){
@@ -76,19 +65,19 @@ void WidgetHeader::mouseDoubleClickEvent(QMouseEvent *event)
 当窗口从最小化状态恢复到正常显示状态时。
 当窗口从隐藏状态恢复到正常显示状态时。
 */
-void WidgetHeader::showEvent(QShowEvent *event)
+void TitleBar::showEvent(QShowEvent *event)
 {
     qDebug()<<"WidgetHeader::showEvent(QShowEvent "<<event;
     QWidget::showEvent(event);
     isMaximizedWindowDisplay();
 }
 
-void WidgetHeader::on_toolButton_closeWindow_clicked()
+void TitleBar::on_toolButton_closeWindow_clicked()
 {
     this->window()->close();
 }
 
-void WidgetHeader::isMaximizedWindowDisplay()
+void TitleBar::isMaximizedWindowDisplay()
 {
     if(this->window()->windowState() == Qt::WindowMaximized){
         ui->toolButton_MaximizedWindow->setVisible(false);
@@ -100,21 +89,21 @@ void WidgetHeader::isMaximizedWindowDisplay()
 }
 
 
-void WidgetHeader::on_toolButton_MaximizedWindow_clicked()
+void TitleBar::on_toolButton_MaximizedWindow_clicked()
 {
     window()->showMaximized();
     isMaximizedWindowDisplay();
 }
 
 
-void WidgetHeader::on_toolButton_normalWindow_clicked()
+void TitleBar::on_toolButton_normalWindow_clicked()
 {
     window()->showNormal();
     isMaximizedWindowDisplay();
 }
 
 
-void WidgetHeader::on_toolButton_minimizedWindow_clicked()
+void TitleBar::on_toolButton_minimizedWindow_clicked()
 {
     window()->showMinimized();
 }

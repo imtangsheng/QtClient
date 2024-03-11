@@ -2,6 +2,8 @@
 #define APPSYSTEM_H
 
 #include <QDebug>
+#include <QMessageBox>
+
 #include "./AppOS.h"
 
 /*供了互斥锁机制，用于保护共享资源，防止多个线程同时访问*/
@@ -70,6 +72,7 @@ public:
 /*json文件读取软件相关配置*/
 #include <QJsonObject>
 extern QJsonObject EXE_CONFIG;
+bool getExeConfigJson();
 /*ini文件读取配置，Qt自带系统方法，指定存储在本地或者系统注册表等地方*/
 #include <QSettings>
 extern QSettings APP_SETTINGS;

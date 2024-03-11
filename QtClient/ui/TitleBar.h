@@ -1,23 +1,20 @@
-#ifndef WIDGETHEADER_H
-#define WIDGETHEADER_H
+#ifndef TITLEBAR_H
+#define TITLEBAR_H
 
 #include <QWidget>
-#include "ui_WidgetHeader.h"
+#include "ui_TitleBar.h"
 
 namespace Ui {
-class WidgetHeader;
+class TitleBar;
 }
 
-class WidgetHeader : public QWidget
+class TitleBar : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit WidgetHeader(QWidget *parent = nullptr);
-    ~WidgetHeader();
-
-    QWidget *getWidgetHeader();
-    Ui::WidgetHeader *getUi();
+    explicit TitleBar(QWidget *parent = nullptr);
+    ~TitleBar();
 
 private:
     bool isMousePressed;
@@ -39,8 +36,8 @@ private slots:
     void on_toolButton_minimizedWindow_clicked();
 
 private:
-    Ui::WidgetHeader *ui;
+    Ui::TitleBar *ui;
     void isMaximizedWindowDisplay();
 };
 
-#endif // WIDGETHEADER_H
+#endif // TITLEBAR_H
