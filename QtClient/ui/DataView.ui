@@ -13,6 +13,13 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resource.qrc">
+    <normaloff>:/asset/Home/DataView.svg</normaloff>:/asset/Home/DataView.svg</iconset>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <widget class="QWidget" name="widget_dataView" native="true">
    <property name="geometry">
     <rect>
@@ -70,6 +77,9 @@
       </item>
       <item>
        <widget class="QComboBox" name="themeComboBox">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(144, 164, 174);</string>
+        </property>
         <item>
          <property name="text">
           <string>浅色主题</string>
@@ -104,6 +114,9 @@
       </item>
       <item>
        <widget class="QComboBox" name="animatedComboBox">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(144, 164, 174);</string>
+        </property>
         <item>
          <property name="text">
           <string>禁用动画效果</string>
@@ -144,6 +157,9 @@
       </item>
       <item>
        <widget class="QComboBox" name="legendComboBox">
+        <property name="styleSheet">
+         <string notr="true">background-color: rgb(144, 164, 174);</string>
+        </property>
         <property name="currentIndex">
          <number>1</number>
         </property>
@@ -217,6 +233,9 @@
         </item>
         <item>
          <widget class="QSpinBox" name="spinBox_axisYRangeMin">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(144, 164, 174);</string>
+          </property>
           <property name="minimum">
            <number>-20</number>
           </property>
@@ -231,6 +250,9 @@
         </item>
         <item>
          <widget class="QSpinBox" name="spinBox_axisYRangeMax">
+          <property name="styleSheet">
+           <string notr="true">background-color: rgb(144, 164, 174);</string>
+          </property>
           <property name="value">
            <number>50</number>
           </property>
@@ -458,6 +480,10 @@
          <bool>true</bool>
         </property>
         <widget class="QWidget" name="tab_filesOptions">
+         <attribute name="icon">
+          <iconset resource="../resource.qrc">
+           <normaloff>:/asset/dataview/DataAnalysis.svg</normaloff>:/asset/dataview/DataAnalysis.svg</iconset>
+         </attribute>
          <attribute name="title">
           <string>数据</string>
          </attribute>
@@ -590,7 +616,7 @@
         <widget class="QWidget" name="tab_filesLocal">
          <attribute name="icon">
           <iconset resource="../resource.qrc">
-           <normaloff>:/asset/dataview/Tools.svg</normaloff>:/asset/dataview/Tools.svg</iconset>
+           <normaloff>:/asset/dataview/DataAnalysis.svg</normaloff>:/asset/dataview/DataAnalysis.svg</iconset>
          </attribute>
          <attribute name="title">
           <string>本地</string>
@@ -623,7 +649,7 @@
         <widget class="QWidget" name="tab_dataViewSetting">
          <attribute name="icon">
           <iconset resource="../resource.qrc">
-           <normaloff>:/asset/dataview/MoreFilled.svg</normaloff>:/asset/dataview/MoreFilled.svg</iconset>
+           <normaloff>:/asset/dataview/Tools.svg</normaloff>:/asset/dataview/Tools.svg</iconset>
          </attribute>
          <attribute name="title">
           <string>设置</string>

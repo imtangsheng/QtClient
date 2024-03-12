@@ -6,7 +6,7 @@
 
 
 #include "public/AppSystem.h"
-QJsonObject EXE_CONFIG;
+
 //QSettings APP_SETTINGS;
 QSettings APP_SETTINGS(PATH_APP_SETTINGS,QSettings::IniFormat); //无编码配置，已经移除，使用UTF-8
 
@@ -44,10 +44,10 @@ int main(int argc, char *argv[])
     // 信号发射后继续执行
 //    w.show();
     if(first.startAutoLogin()){
-        w.show();
+        w.showUI();
         first.close();
     }else{
-        QObject::connect(&first,&FirstShowWidget::loginSuccess,&w,&MainWindow::show);
+        QObject::connect(&first,&FirstShowWidget::loginSuccess,&w,&MainWindow::showUI);
         first.show();
     }
 

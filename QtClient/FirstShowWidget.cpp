@@ -12,6 +12,7 @@ FirstShowWidget::FirstShowWidget(QWidget *parent) :
 
 FirstShowWidget::~FirstShowWidget()
 {
+    qDebug()<<"FirstShowWidget::~FirstShowWidget()";
     delete ui;
 }
 
@@ -55,7 +56,6 @@ bool FirstShowWidget::start()
         QMessageBox::warning(this, "警告", "password error");
         return false;
     }
-    qDebug()<<"FirstShowWidget::start() loginSuccess";
 
     APP_SETTINGS.beginGroup("FirstShowWidget");
     if(ui->checkBox_savaPassword->isChecked()){
@@ -84,6 +84,7 @@ bool FirstShowWidget::start()
     APP_SETTINGS.setValue("isAutoLogin", false);
     }
     APP_SETTINGS.endGroup();
+    CurrentUser =  ui->lineEdit_username->text();
     return true;
 
 }

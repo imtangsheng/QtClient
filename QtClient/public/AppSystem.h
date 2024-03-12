@@ -70,6 +70,7 @@ public:
 };
 
 /*json文件读取软件相关配置*/
+#include <QJsonDocument>
 #include <QJsonObject>
 extern QJsonObject EXE_CONFIG;
 bool getExeConfigJson();
@@ -88,5 +89,22 @@ void logToFile(QtMsgType type, const QMessageLogContext &context, const QString 
 extern QString PATH_EXE_CONFIG;
 extern QString PATH_APP_SETTINGS;
 extern QString PATH_LOG;
+
+extern QString CurrentUser;
+
+/*定义功能集*/
+enum TabWindow
+{
+    TabWindow_VideoPlayback,
+    TabWindow_DataView
+};
+
+static std::map<int, QString>& TabWindowMap() {
+    static std::map<int, QString> tab;
+    tab[TabWindow_VideoPlayback] = "widget_videoPlay";
+    tab[TabWindow_DataView] = "widget_dataView";
+    return tab;
+}
+
 
 #endif // APPSYSTEM_H

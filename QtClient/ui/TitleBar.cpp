@@ -2,6 +2,8 @@
 #include "ui_TitleBar.h"
 #include <QMouseEvent>
 
+
+
 TitleBar::TitleBar(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TitleBar)
@@ -11,7 +13,7 @@ TitleBar::TitleBar(QWidget *parent) :
 
 TitleBar::~TitleBar()
 {
-    qDebug()<<"WidgetHeader::~WidgetHeader()";
+    qDebug()<<"TitleBar::~TitleBar()";
     delete ui;
 }
 
@@ -67,7 +69,7 @@ void TitleBar::mouseDoubleClickEvent(QMouseEvent *event)
 */
 void TitleBar::showEvent(QShowEvent *event)
 {
-    qDebug()<<"WidgetHeader::showEvent(QShowEvent "<<event;
+    qDebug()<<"TitleBar::showEvent(QShowEvent "<<event;
     QWidget::showEvent(event);
     isMaximizedWindowDisplay();
 }

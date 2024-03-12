@@ -19,6 +19,10 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../resource.qrc">
+    <normaloff>:/asset/Home/playback.svg</normaloff>:/asset/Home/playback.svg</iconset>
+  </property>
   <property name="styleSheet">
    <string notr="true">background-color:transparent;</string>
   </property>

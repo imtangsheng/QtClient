@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>asset/logo.ico</file>
         <file>asset/video_playback/Movie_Active.svg</file>
         <file>asset/video_playback/Play_Icon.svg</file>
         <file>asset/video_playback/Stop_Icon.svg</file>
@@ -36,14 +35,14 @@
         <file>asset/media/VideoWidget_backgroundImage.jpeg</file>
         <file>i18n/QtClient_zh_CN.qm</file>
         <file>asset/Home/Close.svg</file>
-        <file>asset/Home/FullScreen.svg</file>
         <file>asset/Home/Minus.svg</file>
         <file>asset/Home/User.svg</file>
         <file>asset/Home/window-maximize.svg</file>
         <file>asset/Home/window-restore.svg</file>
         <file>asset/Home/playback.svg</file>
         <file>asset/Home/DataView.svg</file>
-        <file>asset/Home/Home.svg</file>
         <file>asset/Image/login/login.jpg</file>
+        <file>asset/Home/logo.png</file>
+        <file>asset/favicon.png</file>
     </qresource>
 </RCC>

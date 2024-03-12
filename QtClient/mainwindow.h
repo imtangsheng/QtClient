@@ -26,6 +26,8 @@ public:
 
     void init();
     void test();
+
+    void showUI();
 //signals:
 //    void testSignal();
 
@@ -36,8 +38,6 @@ private slots:
 
     void on_Button_dataView_clicked();
 
-    void on_pushButton_test_clicked();
-
 private:
     TitleBar *ui_TitleBar;
     QWidget *ui_foot;
@@ -45,14 +45,10 @@ private:
 
     void closeEvent(QCloseEvent *event) override;
 
-    QJsonObject m_tabWidget_mainWindow;
+    QJsonObject jsonSettingsVariable;
 
-    enum TabWindow
-    {
-        TabWindow_VideoPlayback,
-        TabWindow_DataView
-    };
-    void addTabWidget(TabWindow window);
+    int currentTabNum;
+    void addTabWidget(int window);
     void TabCloseRequested(int index);
     void TabCurrentChanged(int index);
 

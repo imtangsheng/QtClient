@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>680</width>
-    <height>41</height>
+    <width>930</width>
+    <height>169</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
   </property>
   <property name="focusPolicy">
    <enum>Qt::ClickFocus</enum>
@@ -17,7 +23,7 @@
    <string>Form</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-color: rgb(144, 164, 174);</string>
+   <string notr="true"/>
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <property name="spacing">
@@ -44,7 +50,7 @@
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="../resource.qrc">:/asset/logo.ico</pixmap>
+      <pixmap resource="../resource.qrc">:/asset/Home/logo.png</pixmap>
      </property>
     </widget>
    </item>

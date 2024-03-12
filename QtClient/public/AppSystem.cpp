@@ -3,7 +3,7 @@
 QString PATH_EXE_CONFIG = "config.json";
 QString PATH_APP_SETTINGS = "./config/config.ini";
 QString PATH_LOG = "log/";
-
+QString CurrentUser = "None";
 
 void logToFile(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
@@ -42,7 +42,7 @@ void logToFile(QtMsgType type, const QMessageLogContext &context, const QString 
 
 }
 
-#include <QJsonDocument>
+QJsonObject EXE_CONFIG;
 bool getExeConfigJson()
 {
     //初始化配置 EXE_CONFIG

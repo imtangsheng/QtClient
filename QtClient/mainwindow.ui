@@ -42,7 +42,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="resource.qrc">
-    <normaloff>:/asset/logo.ico</normaloff>:/asset/logo.ico</iconset>
+    <normaloff>:/asset/favicon.png</normaloff>:/asset/favicon.png</iconset>
   </property>
   <property name="toolTip">
    <string>工具提示</string>
@@ -121,8 +121,14 @@
        <bool>false</bool>
       </property>
       <property name="styleSheet">
-       <string notr="true">QTabWidget::pane { border: 0; };
-background-color:transparent;</string>
+       <string notr="true">QTabBar::tab {
+    background: transparent;
+}
+
+QTabWidget::pane {
+	border: 0; 
+    background: transparent;
+}</string>
       </property>
       <property name="currentIndex">
        <number>0</number>
