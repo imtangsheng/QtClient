@@ -2,11 +2,14 @@
 #include "ui_mainwindow.h"
 #include "ui/VideoPlayback.h"
 #include "ui/DataView.h"
-#include "public/AppSystem.h"
 #include <QMessageBox>
 #include <QDir>
 #include <QFile>
 #include <QIcon>
+#include <QTabBar>
+
+#include "ui/SubMain.h"
+SubMain *SUB_MAIN;
 
 #define VARNAME(var) #var
 
@@ -17,14 +20,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui_TitleBar = new TitleBar(this);
 //    ui_header = ui_WidgetHeader->getUi();
     setMenuWidget(ui_TitleBar);
-
+    _Awake();
 }
 
 void MainWindow::showUI()
 {
     qDebug() << "MainWindow::show() 当前登录用户："<<CurrentUser;
-    init();
-    test();
+    SUB_MAIN = new SubMain;
+    _Start();
     show();
 }
 
@@ -34,16 +37,25 @@ void MainWindow::closeEvent(QCloseEvent *event)
     //    qApp->quit(); //重载主程序点击退出事件，软件退出
     APP_SETTINGS.beginGroup("MainWindow");
     APP_SETTINGS.setValue("geometry", saveGeometry());
-    APP_SETTINGS.setValue("jsonSettingsVariable",jsonSettingsVariable);
+    APP_SETTINGS.setValue("jsonSettingsVariable",jsonMainConfig);
 //    APP_SETTINGS.setValue("jsonSettingsVariable",QJsonDocument::fromVariant(jsonSettingsVariable).toJson());
     APP_SETTINGS.endGroup();
+    qDebug() << "MainWindow::closeEvent(QCloseEvent *event) END";
 }
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "~MainWindow()";
+    qDebug() << "MainWindow::~MainWindow() delete this";
     delete ui;
+    delete SUB_MAIN;
     //    qApp->quit();
+}
+
+void MainWindow::_Awake()
+{
+    //    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
+    setWindowFlags( Qt::FramelessWindowHint);
+
 }
 
 /*
@@ -54,19 +66,9 @@ Qt::FramelessWindowHint 无边框和标题，【只有右下角可以缩放】�
 Qt::Window | Qt::FramelessWindowHint
 */
 #include <QJsonArray>
-void MainWindow::init()
+void MainWindow::_Start()
 {
-    qDebug() << "MainWindow::init 使用版本号：" << EXE_CONFIG["version"];
-//    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
-    setWindowFlags( Qt::FramelessWindowHint);
-//    setContentsMargins(-9,-9,-9,-9);
-    //    this->setContentsMargins(2,2,2,2); //设置QWidget内部内容的边距
-    ui->tabWidget_mainWindow->setAttribute(Qt::WA_TranslucentBackground); //窗体透明
-
-    // 连接删除请求的槽函数
-    connect(ui->tabWidget_mainWindow, &QTabWidget::tabCloseRequested, this, &MainWindow::TabCloseRequested);
-    connect(ui->tabWidget_mainWindow, &QTabWidget::currentChanged, this, &MainWindow::TabCurrentChanged);
-
+    qDebug() << "MainWindow::_Start() 使用版本号：" << EXE_CONFIG["version"];
     APP_SETTINGS.beginGroup("MainWindow");
     const auto geometry = APP_SETTINGS.value("geometry", QByteArray()).toByteArray(); // QByteArray 类型
     if (geometry.isEmpty())
@@ -74,46 +76,37 @@ void MainWindow::init()
     else
         restoreGeometry(geometry);
 
-
-    jsonSettingsVariable = APP_SETTINGS.value("jsonSettingsVariable",QJsonObject()).toJsonObject();
+    jsonMainConfig = APP_SETTINGS.value("jsonSettingsVariable",QJsonObject()).toJsonObject();
     //    const auto list2 = APP_SETTINGS.value("list",QVariant::fromValue(QList<int>{}));
     //    QList<int> list4 = APP_SETTINGS.value("list").value<QList<int>>();
     APP_SETTINGS.endGroup();
+    qDebug()<<"jsonSettingsVariable 格式的配置："<<jsonMainConfig;
+    /* MainWindow::ui->tabWidget_mainWindow 初始化加载 */
+    // 连接删除请求的槽函数
+    connect(ui->tabWidget_mainWindow, &QTabWidget::tabCloseRequested, this, &MainWindow::TabCloseRequested);
+    connect(ui->tabWidget_mainWindow, &QTabWidget::currentChanged, this, &MainWindow::TabCurrentChanged);
+    foreach (const QString key, jsonMainConfig["TabWindow"].toObject().keys()) {
+        //初始化加载页面
+        addTabWidget(TabWindow(key.toInt()));
+    }
+    ui->tabWidget_mainWindow->setTabsClosable(true);
+    // 要设置第1个选项卡不可关闭
+    ui->tabWidget_mainWindow->tabBar()->setTabButton(0,QTabBar::RightSide,nullptr);
+    foreach (const QString key, jsonMainConfig["TabWindow"].toObject().keys()) {
+        //初始化Tab标签的数据和其他配置
+        int index = jsonMainConfig["TabWindow"].toObject()[key].toObject()["index"].toInt();
+        ui->tabWidget_mainWindow->tabBar()->tabButton(index,QTabBar::RightSide)->setVisible(false);
+    }
+    ui->tabWidget_mainWindow->setCurrentIndex(jsonMainConfig["TabCurrent"].toInt());
 
-    qDebug()<<"jsonSettingsVariable 格式的配置："<<jsonSettingsVariable;
-//    foreach (const QJsonValue &value, jsonSettingsVariable["TabWindow"].toArray()) {
-//        //        qDebug()<<tab<< jsonSettingsVariable["TabWindow"].toArray();
-//        qDebug()<<"TabWindow:"<<value.toInt();
-//    }
-//    foreach (TabWindow tab, jsonSettingsVariable["TabWindow"].toVariant().value<QList<TabWindow>>()) {
-////        qDebug()<<tab<< jsonSettingsVariable["TabWindow"].toArray();
-//    }
-
-//    QJsonObject object = QJsonDocument::fromJson("{\"a\":{\"1\":[1,2,3]},\"b\":{\"2\":1}}").object();
-//    qDebug()<<"QJsonObject object:"<<object;
-//    QJsonObject &ref = object; jsonSettingsVariable["TabWindow"]
-//    QJsonObject *ref2 = &object;
-//    ref["key"] = "value";
-//    qDebug()<<"QJsonObject object:"<<object<<ref;
-//    *ref2 = {{"property1", 1},{"property2", 2}};
-//    qDebug()<<"QJsonObject object:"<<object<<ref<<*ref2;
-//    jsonTest = &object;
-//    *jsonTest = {{"property1", 2},{"property2", 4}};
-//    qDebug()<<"QJsonObject object:"<<object<<ref<<*ref2;
-
+    test();
 }
 
 void MainWindow::test()
 {
     qDebug() << "MainWindow::test";
-    foreach (const QString key, jsonSettingsVariable["TabWindow"].toObject().keys()) {
-        qDebug()<<"QJsonObject object key:"<<key;
-        qDebug()<<"QJsonObject object:"<<jsonSettingsVariable["TabWindow"].toObject()[key].toObject();
-        //初始化加载页面
-        addTabWidget(key.toInt());
-    }
-    ui->tabWidget_mainWindow->setCurrentIndex(jsonSettingsVariable["TabCurrent"].toInt());
-
+    ui->tabWidget_mainWindow->setAttribute(Qt::WA_TranslucentBackground); //窗体透明
+    qDebug() << "MainWindow::test  mapTabIndexToWindow"<<mapTabIndexToWindow;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -125,17 +118,14 @@ void MainWindow::mousePressEvent(QMouseEvent *event)
 void MainWindow::on_Button_videoPlayback_clicked()
 {
     qDebug() << "on_pushButton_video_playback_clicked()";
-//    for(int i=0;i<ui->tabWidget_mainWindow->count();i++){
-//        QWidget* tab = ui->tabWidget_mainWindow->widget(i);
-//        qDebug() << "tabWidget_mainWindow->widget on_pushButton_video_playback_clicked()"<<tab->objectName();
-//    }
     // 判断是否存在指定名称的Tab页
     QWidget* existingTab = ui->tabWidget_mainWindow->findChild<QWidget*>(TabWindowMap()[TabWindow_VideoPlayback]);
     if(existingTab){
+        qDebug() << "MainWindow::on_Button_videoPlayback_clicked()) TabWindowMap*"<<existingTab->objectName();
         ui->tabWidget_mainWindow->setCurrentWidget(existingTab);
     }else{
         addTabWidget(TabWindow_VideoPlayback);
-        ui->tabWidget_mainWindow->setCurrentIndex(jsonSettingsVariable["TabWindow"].toObject()[QString::number(TabWindow_VideoPlayback)].toObject()["index"].toInt());
+        ui->tabWidget_mainWindow->setCurrentIndex(jsonMainConfig["TabWindow"].toObject()[QString::number(TabWindow_VideoPlayback)].toObject()["index"].toInt());
     }
 }
 
@@ -147,18 +137,18 @@ void MainWindow::on_Button_dataView_clicked()
         ui->tabWidget_mainWindow->setCurrentWidget(existingTab);
     }else{
         addTabWidget(TabWindow_DataView);
-        ui->tabWidget_mainWindow->setCurrentIndex(jsonSettingsVariable["TabWindow"].toObject()[QString::number(TabWindow_DataView)].toObject()["index"].toInt());
+        ui->tabWidget_mainWindow->setCurrentIndex(jsonMainConfig["TabWindow"].toObject()[QString::number(TabWindow_DataView)].toObject()["index"].toInt());
     }
 }
 
 
-void MainWindow::addTabWidget(int window)
+void MainWindow::addTabWidget(TabWindow window)
 {
-    QJsonObject tabJson = jsonSettingsVariable["TabWindow"].toObject();
-//    TabWindow tabW = static_cast<TabWindow>(window);
+    QJsonObject tabJson = jsonMainConfig["TabWindow"].toObject();
     if(TabWindow_VideoPlayback == window){
-        VideoPlayback *ui_VideoPlayback = new VideoPlayback();
-        QWidget *tabVideoPlayback = ui_VideoPlayback->getVideoPaly();
+//        std::unique_ptr<VideoPlayback> ui_VideoPlayback = std::make_unique<VideoPlayback>(this);
+        VideoPlayback* ui_VideoPlayback = new VideoPlayback(SUB_MAIN);
+        QWidget* tabVideoPlayback = ui_VideoPlayback->getVideoPaly();
         if(tabVideoPlayback->objectName() == TabWindowMap()[TabWindow_VideoPlayback]){
             //    QIcon icon_videoPlayback = QIcon::fromTheme("media-playback-start");//系统主题不能用
             QIcon icon(":/asset/Home/playback.svg");
@@ -166,12 +156,13 @@ void MainWindow::addTabWidget(int window)
             if(objVideoPlayback["index"].isNull()){
                 objVideoPlayback["index"] = ui->tabWidget_mainWindow->count();
             }
+            qDebug() << "MainWindow::addTabWidget(int window) *"<<objVideoPlayback["index"].toInt()<<ui->tabWidget_mainWindow->count();
             ui->tabWidget_mainWindow->insertTab(objVideoPlayback["index"].toInt(), tabVideoPlayback, icon, tr("视频回放"));
+            mapTabIndexToWindow[objVideoPlayback["index"].toInt()] = TabWindow_VideoPlayback;
             tabJson[QString::number(TabWindow_VideoPlayback)] = objVideoPlayback;
-
         }
     }else if (TabWindow_DataView==window){
-        DataView *ui_DataView = new DataView();
+        DataView *ui_DataView = new DataView(SUB_MAIN);
         QWidget *tabDataView= ui_DataView->getDataView();
         if(tabDataView->objectName() == TabWindowMap()[TabWindow_DataView]){
             QIcon icon(":/asset/Home/DataView.svg");
@@ -180,37 +171,73 @@ void MainWindow::addTabWidget(int window)
                 objDataView["index"] = ui->tabWidget_mainWindow->count();
             }
             ui->tabWidget_mainWindow->insertTab(objDataView["index"].toInt(), tabDataView, icon, tr("数据图表"));
+            mapTabIndexToWindow[objDataView["index"].toInt()] = TabWindow_DataView;
             tabJson[QString::number(TabWindow_DataView)] = objDataView;
         }
     }else{
         qDebug()<<"window 没有定义对应的ui"<<window;
     }
 
-    jsonSettingsVariable["TabWindow"] = tabJson;
-    qDebug()<<"addTabWidget(int window):"<<tabJson<<jsonSettingsVariable;
+    jsonMainConfig["TabWindow"] = tabJson;
+    qDebug()<<"addTabWidget(int window):"<<tabJson<<jsonMainConfig;
 }
 
 void MainWindow::TabCloseRequested(int index)
 {
     qDebug() << "TabCloseRequested(int index):" << index;
-    //    ui->tabWidget_mainWindow->isVisible();
-    if (index == 0)
-    {
-        return;
+    QJsonObject tabJson = jsonMainConfig["TabWindow"].toObject();
+    QMap<int,TabWindow> newTabIndexToWindow;
+
+    if(mapTabIndexToWindow.contains(index)){
+        foreach (QString key, tabJson.keys()) {
+            int objectIndex = tabJson[key].toObject()["index"].toInt();
+            if(objectIndex==index){
+                tabJson.remove(key);
+                QWidget *tabWindow = ui->tabWidget_mainWindow->widget(index);
+                ui->tabWidget_mainWindow->removeTab(index);
+                delete tabWindow;
+//                tabWindow->deleteLater();
+//                tabWindow->destroyed();
+            }else if(objectIndex>index){
+                QJsonObject tabIndex = tabJson[key].toObject();
+                tabIndex["index"] = tabIndex["index"].toInt() - 1;
+                tabJson[key] = tabIndex;
+                newTabIndexToWindow[tabIndex["index"].toInt()] = TabWindow(key.toInt());
+
+            }else{
+                newTabIndexToWindow[objectIndex] = TabWindow(key.toInt());
+            }
+        }
+    }else{
+        qWarning()<<"mapTabIndexToWindow.contains(index) no key"<<index<<mapTabIndexToWindow;
     }
-    ui->tabWidget_mainWindow->setTabVisible(index, false);
+
+    jsonMainConfig["TabWindow"] = tabJson;
+    mapTabIndexToWindow = newTabIndexToWindow;
+    qDebug() << "TabCloseRequested(int index) 步骤4:" << tabJson<<mapTabIndexToWindow;
+
 }
 
-#include <QMouseEvent>
-#include <QTabBar>
-#include <QToolBar>
-#include <QToolBar>
 void MainWindow::TabCurrentChanged(int index)
 {
-    qDebug() << "TabCurrentChanged(int index):" << index;
-    jsonSettingsVariable["TabCurrent"] = index;
+    qDebug() << "TabCurrentChanged(int index):当前选中" << index;
+        jsonMainConfig["TabCurrent"] = index;
     //    QTabBar *tabBar = ui->tabWidget_mainWindow->tabBar();
     //    tabBar->setTabsClosable(false);
     //    ui->tabWidget_mainWindow->setTabBar(tabBar);
+
+//    ui->tabWidget_mainWindow->tabBar()->tabButton(index,QTabBar::RightSide)->setVisible(false);
+    QWidget *button = ui->tabWidget_mainWindow->tabBar()->tabButton(tabCloseLastShowNum,QTabBar::RightSide);
+    if(button){
+//        qDebug() << "TabCurrentChanged(int index):当前选中tabCloseLastShowNum false"<<tabCloseLastShowNum;
+        button->setVisible(false);
+    }
+    button = ui->tabWidget_mainWindow->tabBar()->tabButton(index,QTabBar::RightSide);
+    if(button){
+//        qDebug() << "TabCurrentChanged(int index):当前选中 ture"<<index;
+        button->setVisible(true);
+        tabCloseLastShowNum = index;
+    }
+
 }
 

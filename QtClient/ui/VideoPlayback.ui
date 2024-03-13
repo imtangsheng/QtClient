@@ -904,5 +904,22 @@ QSlider::sub-page:horizontal{
  <resources>
   <include location="../resource.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>widget_videoPlay</sender>
+   <signal>destroyed()</signal>
+   <receiver>VideoPlayback</receiver>
+   <slot>deleteLater()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>570</x>
+     <y>134</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>993</x>
+     <y>261</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

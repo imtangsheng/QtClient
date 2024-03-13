@@ -88,7 +88,7 @@
     <bool>false</bool>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color: rgb(144, 164, 174);</string>
+    <string notr="true">background-color: rgb(38, 50, 56);</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_2">
     <property name="spacing">
@@ -114,8 +114,26 @@
         <height>582</height>
        </size>
       </property>
+      <property name="tabletTracking">
+       <bool>true</bool>
+      </property>
       <property name="focusPolicy">
-       <enum>Qt::NoFocus</enum>
+       <enum>Qt::TabFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>主页选择组件</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>5</number>
+      </property>
+      <property name="whatsThis">
+       <string>主页选择组件2</string>
+      </property>
+      <property name="accessibleName">
+       <string>主页选择组件2</string>
+      </property>
+      <property name="accessibleDescription">
+       <string>主页选择组件0</string>
       </property>
       <property name="autoFillBackground">
        <bool>false</bool>
@@ -128,12 +146,45 @@
 QTabWidget::pane {
 	border: 0; 
     background: transparent;
-}</string>
+}
+
+QTabBar::tab:selected{
+	font-weight: bold;
+	color: rgb(255, 255, 255);
+	background-color: rgb(144, 164, 174);
+}
+
+QTabBar::close-button{	
+	image: url(:/asset/Home/Close.svg);
+	background: transparent;
+}
+
+QTabBar::close-button:hover{
+	image: url(:/asset/Home/Close_Orange.svg);
+}
+/*
+QTabBar::tab:selected, QTabBar::close-button {
+		image: url(:/asset/favicon.png);
+}
+QTabBar::tab{
+	
+	color: white;
+	background:#5c8dff;
+	border:px solid #73b7ff;
+	min-width:40ex;
+	mini-height:16ex;
+	
+}
+*/
+</string>
       </property>
       <property name="currentIndex">
        <number>0</number>
       </property>
       <property name="tabsClosable">
+       <bool>false</bool>
+      </property>
+      <property name="tabBarAutoHide">
        <bool>false</bool>
       </property>
       <widget class="QWidget" name="tab_main">
@@ -145,7 +196,7 @@ QTabWidget::pane {
          <normaloff>:/asset/Home/Menu.svg</normaloff>:/asset/Home/Menu.svg</iconset>
        </attribute>
        <attribute name="title">
-        <string/>
+        <string>主界面</string>
        </attribute>
        <attribute name="toolTip">
         <string>主界面</string>

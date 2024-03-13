@@ -15,8 +15,8 @@ VideoPlayback::VideoPlayback(QWidget *parent) : QWidget(parent),
 
 VideoPlayback::~VideoPlayback()
 {
+    qDebug() << "VideoPlayback::~VideoPlayback()";
     delete ui;
-    qDebug() << "~VideoPlayback()";
 }
 
 void VideoPlayback::init()

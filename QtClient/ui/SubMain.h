@@ -16,6 +16,9 @@ class SubMain : public QMainWindow
 public:
     explicit SubMain(QWidget *parent = nullptr);
     ~SubMain();
+
+    void init();
+
     void showFiles();
 
 public:

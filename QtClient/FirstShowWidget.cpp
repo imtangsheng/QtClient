@@ -19,7 +19,6 @@ FirstShowWidget::~FirstShowWidget()
 void FirstShowWidget::init()
 {
     setWindowFlags( Qt::FramelessWindowHint);
-//    setAttribute(Qt::WA_DeleteOnClose);//close(); //先关闭再发信号，不然点击后会等待发送信号的时间才会触发
     APP_SETTINGS.beginGroup("FirstShowWidget");
     username = APP_SETTINGS.value("username", "").toString();
     password =  APP_SETTINGS.value("password", "").toString();
@@ -93,9 +92,10 @@ bool FirstShowWidget::start()
 void FirstShowWidget::on_pushButton_login_clicked()
 {
     if(start()){
-//        close(); //先关闭再发信号，不然点击后会等待发送信号的时间才会触发
         emit loginSuccess(); //加载需要时间
-        deleteLater(); //会主动释放，但是不能直接调用，需要先show
+        setAttribute(Qt::WA_DeleteOnClose);//close(); //先关闭再发信号，不然点击后会等待发送信号的时间才会触发
+        close(); //先关闭再发信号，不然点击后会等待发送信号的时间才会触发
+//        deleteLater(); //会主动释放，但是不能直接调用，需要先show，其他退出导致程序奔溃，。只能用于小部件
 //        destroy(); //不会主动释放
     }
 }

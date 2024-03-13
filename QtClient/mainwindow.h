@@ -8,6 +8,8 @@
 #endif
 
 #include "ui/TitleBar.h"
+#include "public/AppSystem.h"
+#include <QMap>
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -24,12 +26,21 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void init();
+    void _Awake();//初始化运行一次
     void test();
+    void _Start();//
+//    void _Update();//
+//    void _FixedUpdate();//
+//    void _LateUpdata();//
+//    void _OnEnable();
+//    void _OnDestory();
+//    void _Close();
 
     void showUI();
-//signals:
-//    void testSignal();
+
+signals:
+    void onDestorySignal();
+
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -40,17 +51,19 @@ private slots:
 
 private:
     TitleBar *ui_TitleBar;
-    QWidget *ui_foot;
     Ui::MainWindow *ui;
 
     void closeEvent(QCloseEvent *event) override;
 
-    QJsonObject jsonSettingsVariable;
+    QJsonObject jsonMainConfig;
 
     int currentTabNum;
-    void addTabWidget(int window);
+    int tabCloseLastShowNum = 0;
+    QMap<int,TabWindow> mapTabIndexToWindow;
+    void addTabWidget(TabWindow window);
     void TabCloseRequested(int index);
     void TabCurrentChanged(int index);
+    void TabRemove(int index);
 
 };
 #endif // MAINWINDOW_H

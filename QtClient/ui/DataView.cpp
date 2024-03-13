@@ -30,7 +30,7 @@ DataView::DataView(QWidget *parent) :
 
 DataView::~DataView()
 {
-    qDebug()<<"~DataView()";
+    qDebug()<<"DataView::~DataView()";
     delete ui;
 //    delete m_filesUtil;
 }

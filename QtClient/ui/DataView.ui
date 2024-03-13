@@ -30,7 +30,7 @@
     </rect>
    </property>
    <property name="styleSheet">
-    <string notr="true">background-color:transparent;</string>
+    <string notr="true">background-color: rgb(144, 164, 174);</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="spacing">
@@ -690,5 +690,22 @@
  <resources>
   <include location="../resource.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>widget_dataView</sender>
+   <signal>destroyed()</signal>
+   <receiver>DataView</receiver>
+   <slot>deleteLater()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>682</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>922</x>
+     <y>171</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>

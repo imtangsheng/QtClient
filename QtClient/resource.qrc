@@ -44,5 +44,6 @@
         <file>asset/Image/login/login.jpg</file>
         <file>asset/Home/logo.png</file>
         <file>asset/favicon.png</file>
+        <file>asset/Home/Close_Orange.svg</file>
     </qresource>
 </RCC>
