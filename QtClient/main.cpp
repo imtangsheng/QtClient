@@ -36,21 +36,20 @@ int main(int argc, char *argv[])
     if(getExeConfigJson()){
         qDebug()<<"当前软件开发版本："<<EXE_CONFIG["version"].toString();
     }
-    FirstShowWidget first;
-    MainWindow w;
-//    QEventLoop loop;
-//    QObject::connect(&first,&FirstShowWidget::loginSuccess,&w,&MainWindow::show);
-//    loop.exec(); // 等待finished信号
-    // 信号发射后继续执行
-//    w.show();
-    if(first.startAutoLogin()){
+    SUB_MAIN = new SubMain;
+    MainWindow w;    
+    std::unique_ptr<FirstShowWidget> first(new FirstShowWidget());
+//    QObject::connect(first.get(),&FirstShowWidget::loginSuccess,&w,&MainWindow::showUI);
+//    first->show();
+    if(first->startAutoLogin()){
+        //对于dialog/window还需要先关闭窗口 对指针类使用
+        first->deleteLater(); //只能使用指针方式，才会调用析构函数
         w.showUI();
-        first.close();
     }else{
-        QObject::connect(&first,&FirstShowWidget::loginSuccess,&w,&MainWindow::showUI);
-        first.show();
+        QObject::connect(first.get(),&FirstShowWidget::loginSuccess,&w,&MainWindow::showUI);
+        first->show();
     }
 
-    SUB_MAIN = new SubMain;
+
     return a.exec();
 }

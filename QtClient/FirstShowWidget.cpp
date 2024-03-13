@@ -19,7 +19,7 @@ FirstShowWidget::~FirstShowWidget()
 void FirstShowWidget::init()
 {
     setWindowFlags( Qt::FramelessWindowHint);
-
+//    setAttribute(Qt::WA_DeleteOnClose);//close(); //先关闭再发信号，不然点击后会等待发送信号的时间才会触发
     APP_SETTINGS.beginGroup("FirstShowWidget");
     username = APP_SETTINGS.value("username", "").toString();
     password =  APP_SETTINGS.value("password", "").toString();
@@ -28,6 +28,9 @@ void FirstShowWidget::init()
     APP_SETTINGS.endGroup();
 
     ui->lineEdit_username->setText(username);
+    if(isSavaPassword){
+        ui->lineEdit_password->setText(password);
+    }
     ui->checkBox_savaPassword->setCheckState(isSavaPassword ? Qt::Checked : Qt::Unchecked);
     ui->checkBox_autoLogin->setCheckState(isAutoLogin ? Qt::Checked : Qt::Unchecked);
 }
@@ -35,11 +38,8 @@ void FirstShowWidget::init()
 bool FirstShowWidget::startAutoLogin()
 {
     qDebug()<<"FirstShowWidget::startAutoLogin()"<<isAutoLogin<<isAutoLogin;
-    if(isSavaPassword){
-        ui->lineEdit_password->setText(password);
-        if(isAutoLogin){
-            if(start()){return true;}
-        }
+    if(isAutoLogin){
+        if(start()){return true;}
     }
     return false;
 }
@@ -93,7 +93,9 @@ bool FirstShowWidget::start()
 void FirstShowWidget::on_pushButton_login_clicked()
 {
     if(start()){
-        emit loginSuccess();
-        close();
+//        close(); //先关闭再发信号，不然点击后会等待发送信号的时间才会触发
+        emit loginSuccess(); //加载需要时间
+        deleteLater(); //会主动释放，但是不能直接调用，需要先show
+//        destroy(); //不会主动释放
     }
 }
