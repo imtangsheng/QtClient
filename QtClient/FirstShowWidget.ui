@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>491</width>
+    <height>337</height>
    </rect>
   </property>
   <property name="focusPolicy">
@@ -20,15 +20,14 @@
    <string>客户端软件</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resource.qrc">
+   <iconset>
     <normaloff>:/asset/logo.ico</normaloff>:/asset/logo.ico</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
   <property name="styleSheet">
-   <string notr="true">background-image: url(:/asset/Image/login/login.jpg);
-background-color: rgb(144, 164, 174);</string>
+   <string notr="true">background-color: rgb(38, 50, 56);</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <property name="spacing">
@@ -281,6 +280,12 @@ background-color: rgb(144, 164, 174);</string>
      <property name="sizeType">
       <enum>QSizePolicy::Maximum</enum>
      </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>0</width>
+       <height>0</height>
+      </size>
+     </property>
     </spacer>
    </item>
    <item>
@@ -442,9 +447,7 @@ background-color: rgb(144, 164, 174);</string>
    </item>
   </layout>
  </widget>
- <resources>
-  <include location="resource.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>pushButton_cancle</sender>

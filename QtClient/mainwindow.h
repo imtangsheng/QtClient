@@ -44,14 +44,24 @@ signals:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void paintEvent(QPaintEvent *event) override;
+    void changeEvent(QEvent *event) override;
+//    void geometryChanged(const QRect &newGeometry, const QRect &oldGeometry) override;
+
 private slots:
     void on_Button_videoPlayback_clicked();
 
     void on_Button_dataView_clicked();
 
+    void on_toolButton_WidgetStatus_isFloatable_clicked();
+
+    void on_toolButton_WidgetStatus_isStaysOnTopHint_clicked();
+
 private:
     TitleBar *ui_TitleBar;
     Ui::MainWindow *ui;
+    QWidget * wtest;
 
     void closeEvent(QCloseEvent *event) override;
 
@@ -65,5 +75,12 @@ private:
     void TabCurrentChanged(int index);
     void TabRemove(int index);
 
+    bool isFloatableWidgetStatus = false;
+    void geometryChanged(const QPoint& pos = QPoint(0, 0));
+
+    void showMessage(const QString &text, int timeout = 0);
+    void clearMessage();
+
+    bool isOnTopWidgetStatus = false;
 };
 #endif // MAINWINDOW_H

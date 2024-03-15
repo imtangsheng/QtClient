@@ -26,6 +26,9 @@ private:
 
     void showEvent(QShowEvent *event) override;
 
+signals:
+    void posChange(const QPoint& pos);
+
 private slots:
     void on_toolButton_closeWindow_clicked();
 

@@ -33,6 +33,7 @@ void TitleBar::mouseMoveEvent(QMouseEvent *event)
     qDebug()<<"WidgetHeader::mouseMoveEvent "<<event->button();
     if(event->buttons() == Qt::LeftButton && isMousePressed){
         this->window()->move(this->window()->pos() + event->pos() - mouseStartMovePos);
+        emit posChange(event->pos());
         return;
     }
 }

@@ -18,14 +18,23 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     ui_TitleBar = new TitleBar(this);
+    connect(ui_TitleBar,&TitleBar::posChange,this,&MainWindow::geometryChanged);
 //    ui_header = ui_WidgetHeader->getUi();
     setMenuWidget(ui_TitleBar);
+//    ui->statusBar->addWidget();
+//    addDockWidget(Qt::BottomDockWidgetArea,ui->WidgetStatus);
+    ui->statusBar->addPermanentWidget(ui->widget_statusBarTitle,1);//拉伸系数(stretch factor)设置最大占满，默认0是在在右侧
+//    ui->statusBar->showMessage();
+    connect(ui->statusBar,&QStatusBar::showMessage,this,&MainWindow::showMessage);
+    connect(ui->statusBar,&QStatusBar::clearMessage,this,&MainWindow::clearMessage);
+
     _Awake();
 }
 
 void MainWindow::showUI()
 {
     qDebug() << "MainWindow::show() 当前登录用户："<<CurrentUser;
+    showMessage("当前登录用户：" +CurrentUser);
     SUB_MAIN = new SubMain;
     _Start();
     show();
@@ -40,6 +49,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
     APP_SETTINGS.setValue("jsonSettingsVariable",jsonMainConfig);
 //    APP_SETTINGS.setValue("jsonSettingsVariable",QJsonDocument::fromVariant(jsonSettingsVariable).toJson());
     APP_SETTINGS.endGroup();
+
+    delete SUB_MAIN;
+//    deleteLater();//直接使用会奔溃
     qDebug() << "MainWindow::closeEvent(QCloseEvent *event) END";
 }
 
@@ -47,18 +59,26 @@ MainWindow::~MainWindow()
 {
     qDebug() << "MainWindow::~MainWindow() delete this";
     delete ui;
-    delete SUB_MAIN;
     //    qApp->quit();
 }
 
 void MainWindow::_Awake()
 {
-    //    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
-    setWindowFlags( Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+//    setWindowFlags( Qt::FramelessWindowHint);
+//    setWindowFlags(Qt::CustomizeWindowHint);
+//    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
+    ui->WidgetStatus->setVisible(false);
+    ui->toolButton_WidgetStatus_isStaysOnTopHint->setVisible(false);
 
 }
 
 /*
+ * Qt::Widget	0x00000000	这是 的默认类型。如果这种类型的小组件有父级，则为子小组件，如果没有父级，则为独立窗口。参见 Qt：：Window 和 Qt：：SubWindow。
+ * Qt::Window 指示小组件是一个窗口，通常具有窗口系统框架和标题栏，而不管小组件是否具有父项。请注意，如果小部件没有父级，则无法取消设置此标志。
+ * Qt::FramelessWindowHint	0x00000800	生成无边框窗口。
+ * Qt::CustomizeWindowHint	0x02000000	关闭默认窗口标题提示。
+ * Qt::WindowStaysOnTopHint	0x00040000	通知窗口系统该窗口应位于所有其他窗口的顶部。请注意，在 X11 上的某些窗口管理器上，您还必须传递 Qt：：X11BypassWindowManagerHint 才能使此标志正常工作。
 Qt::CustomizeWindowHint 【可以缩放】，【不能拖动】，【最上面会有白边】，最大化会消失不能双击放大
 Qt::Widget | Qt::CustomizeWindowHint
 Qt::Window | Qt::CustomizeWindowHint
@@ -66,6 +86,8 @@ Qt::FramelessWindowHint 无边框和标题，【只有右下角可以缩放】�
 Qt::Window | Qt::FramelessWindowHint
 */
 #include <QJsonArray>
+#include <QTimer>
+#include <QWindow>
 void MainWindow::_Start()
 {
     qDebug() << "MainWindow::_Start() 使用版本号：" << EXE_CONFIG["version"];
@@ -106,13 +128,43 @@ void MainWindow::test()
 {
     qDebug() << "MainWindow::test";
     ui->tabWidget_mainWindow->setAttribute(Qt::WA_TranslucentBackground); //窗体透明
+//    ui->dockWidget_test->setFloating(true);
+//    addDockWidget(Qt::BottomDockWidgetArea,ui->dockWidget_test);
+    ui->WidgetStatus->raise();
+//    ui->dockWidget_test->setTitleBarWidget(ui_TitleBar);
+    //    SUB_MAIN->show();
+//    addDockWidget(Qt::TopDockWidgetArea,SUB_MAIN->ui->dockWidget);
+    //    setCorner(Qt::BottomLeftCorner,Qt::BottomDockWidgetArea);
+
     qDebug() << "MainWindow::test  mapTabIndexToWindow"<<mapTabIndexToWindow;
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     qDebug() << "MainWindow::mousePressEvent(QMouseEvent *"<<event->button();
+    showMessage("MainWindow::mousePressEvent(QMouseEvent *");
     return QMainWindow::mousePressEvent(event);
+}
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    qDebug() << "MainWindow::resizeEvent(QResizeEvent"<<event->size();
+    QMainWindow::resizeEvent(event);
+    geometryChanged(this->pos());
+
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    qDebug() << "MainWindow::paintEvent(QPaintEvent *"<<event->type();
+
+    QMainWindow::paintEvent(event);
+}
+
+void MainWindow::changeEvent(QEvent *event)
+{
+    qDebug() << "MainWindow::changeEvent(QEvent *"<<event->type();
+    QMainWindow::changeEvent(event);
 }
 
 void MainWindow::on_Button_videoPlayback_clicked()
@@ -241,3 +293,104 @@ void MainWindow::TabCurrentChanged(int index)
 
 }
 
+void MainWindow::geometryChanged(const QPoint& pos)
+{
+    qDebug() << "MainWindow::geometryChanged(const QPoint *"<<pos;
+    if(ui->WidgetStatus->isFloating())    {
+        QPoint posW = mapFromGlobal(QPoint(0, 0)); //负数
+        qDebug() << "dockWidget::resizeEvent(QResizeEvent"<<posW.toPointF();
+        ui->WidgetStatus->raise();
+        ui->WidgetStatus->setGeometry(-posW.x(),
+                                      -posW.y() + height() -ui->WidgetStatus->height() ,
+                                         width(),
+                                      ui->WidgetStatus->height());
+    }
+
+}
+
+void MainWindow::showMessage(const QString &text, int timeout)
+{
+    ui->label_statusBarMsg->setText(text);
+    if(timeout>0){
+        QTimer *timer = new QTimer(this);
+        connect(timer, &QTimer::timeout, this, &MainWindow::clearMessage);
+        timer->start(timeout);
+    }
+}
+
+void MainWindow::clearMessage()
+{
+    ui->label_statusBarMsg->setText("");
+}
+
+void MainWindow::on_toolButton_WidgetStatus_isFloatable_clicked()
+{
+    qDebug() << "MainWindow::on_toolButton_WidgetStatus_isFloatable_clicked()"<<ui->WidgetStatus->isFloating();
+    if(isFloatableWidgetStatus){
+//        qDebug() << "MainWindow::on_toolButton_WidgetStatus_isFloatable_clicked()11"<<ui->WidgetStatus->isFloating();
+        isFloatableWidgetStatus = false;
+        ui->WidgetStatus->setFloating(false);
+
+        ui->toolButton_WidgetStatus_isFloatable->setToolTip("浮动");
+        ui->toolButton_WidgetStatus_isFloatable->setIcon(QIcon(":/asset/Home/double-arrow-top.svg"));
+
+        ui->statusBar->addPermanentWidget(ui->widget_statusBarTitle,1);
+        ui->WidgetStatus->setVisible(false);
+        ui->toolButton_WidgetStatus_isStaysOnTopHint->setVisible(false);//置顶前提是要先显示
+
+    }else{
+        isFloatableWidgetStatus = true;
+//        qDebug() << "MainWindow::on_toolButton_WidgetStatus_isFloatable_clicked()22"<<ui->WidgetStatus->isFloating()<<ui->WidgetStatus->windowFlags();
+        ui->statusBar->removeWidget(ui->widget_statusBarTitle);
+        ui->WidgetStatus->setFloating(true);
+
+        ui->toolButton_WidgetStatus_isFloatable->setToolTip("取消浮动");
+        ui->toolButton_WidgetStatus_isFloatable->setIcon(QIcon(":/asset/Home/double-arrow-down.svg"));
+
+//        ui->WidgetStatus->setWindowFlags(Qt::Window);
+        ui->WidgetStatus->setTitleBarWidget(ui->widget_statusBarTitle);
+//        ui->WidgetStatus->setTitleBarWidget(ui->label_statusBarMsg);
+        geometryChanged();
+        ui->WidgetStatus->setVisible(true);
+        ui->toolButton_WidgetStatus_isStaysOnTopHint->setVisible(true);//置顶前提是要先显示
+
+    }
+//    qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()置顶"<<ui->statusBar->geometry()<<ui->widget_statusBarTitle->geometry();
+}
+
+
+void MainWindow::on_toolButton_WidgetStatus_isStaysOnTopHint_clicked()
+{
+    qDebug() << "MainWindow::on_toolButton_WidgetStatus_isStaysOnTopHint_clicked()";
+    Qt::WindowFlags flags = ui->WidgetStatus->windowFlags();
+    bool isOnTop = flags.testFlags(Qt::WindowStaysOnTopHint);
+    qDebug()<<flags<<isOnTop;
+    if(isOnTopWidgetStatus){
+        isOnTopWidgetStatus = false;
+
+        ui->toolButton_WidgetStatus_isStaysOnTopHint->setToolTip("置顶");
+        ui->toolButton_WidgetStatus_isStaysOnTopHint->setIcon(QIcon(":/asset/Home/on_top.svg"));
+
+//        qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()取消置顶";
+        QWindow* pWin = ui->WidgetStatus->windowHandle();
+        pWin->setFlag(Qt::WindowStaysOnTopHint,false);
+//        ui->WidgetStatus->setWindowFlag(Qt::WindowStaysOnTopHint,false);
+        qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()"<<ui->WidgetStatus->isHidden();
+//        ui->WidgetStatus->show();//会发生闪动，瞬间消失再显示
+//        pWin->setFlag(Qt::WindowStaysOnTopHint,false);
+//        pWin->setFlags(Qt::Widget | Qt::WindowStaysOnTopHint);
+    } else {
+        // 置顶
+        isOnTopWidgetStatus = true;
+
+        ui->toolButton_WidgetStatus_isStaysOnTopHint->setToolTip("取消置顶");
+        ui->toolButton_WidgetStatus_isStaysOnTopHint->setIcon(QIcon(":/asset/Home/on_top_cancel.svg"));
+
+        QWindow* pWin = ui->WidgetStatus->windowHandle();
+//        ui->WidgetStatus->setWindowFlag(Qt::WindowStaysOnTopHint,true);
+        qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()"<<ui->WidgetStatus->isHidden();
+//        ui->WidgetStatus->show();
+        pWin->setFlag(Qt::WindowStaysOnTopHint,true);
+    }
+//    qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()置顶"<<ui->statusBar->geometry()<<ui->widget_statusBarTitle->geometry();
+}
