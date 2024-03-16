@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->statusBar,&QStatusBar::showMessage,this,&MainWindow::showMessage);
     connect(ui->statusBar,&QStatusBar::clearMessage,this,&MainWindow::clearMessage);
 
+    SUB_MAIN = new SubMain;
     _Awake();
 }
 
@@ -36,7 +37,7 @@ void MainWindow::showUI()
 {
     qDebug() << "MainWindow::show() 当前登录用户："<<CurrentUser;
     showMessage("当前登录用户：" +CurrentUser);
-    SUB_MAIN = new SubMain;
+
     init();
     _Start();
     show();
@@ -100,10 +101,14 @@ void MainWindow::init()
     if(loadPlugin()){
         qDebug() << "MainWindow::插件数量"<<pluginInterface.count();
         foreach (PluginInterface* plug, pluginInterface) {
-            qDebug() << "MainWindow::init()"<<"name";
+            qDebug() << "MainWindow::init()"<<"插件加载界面";
             plug->init();
+            ui->layout_tabMain->addWidget(plug->getHomeTiler());
+//            ui->tabMainTest->addWidget(plug->getHomeTiler());
+//            ui->tabMainTest->addWidget(SUB_MAIN->ui->widget_test);
 
         }
+//        ui->tab_main->layout()->addItem(ui->verticalSpacer_tabMain);
     }
     qDebug() << "MainWindow::init() end";
 }
@@ -442,7 +447,6 @@ bool MainWindow::loadPlugin()
         if (plugin) {
             PluginInterface* inter = qobject_cast<PluginInterface*>(plugin);
             if(inter){
-                inter->init();
                 pluginInterface.append(inter);
             }
 //            pluginLoader.unload();//主动释放会把加载的插件也释放掉

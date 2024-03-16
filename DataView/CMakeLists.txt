@@ -8,8 +8,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Gui LinguistTools)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui LinguistTools)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Gui LinguistTools Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui LinguistTools Widgets)
 
 set(TS_FILES DataView_zh_CN.ts)
 
@@ -25,7 +25,10 @@ set_target_properties(DataView PROPERTIES
     PREFIX "" #默认位lib，不设置空的话
 )
 
-target_link_libraries(DataView PRIVATE Qt${QT_VERSION_MAJOR}::Gui)
+target_link_libraries(DataView PRIVATE
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Widgets
+)
 
 target_compile_definitions(DataView PRIVATE DATAVIEW_LIBRARY)
 

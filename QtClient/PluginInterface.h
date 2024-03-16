@@ -2,12 +2,14 @@
 #define PLUGININTERFACE_H
 
 #include <QObject>
+#include <qwidget.h>
 
 class PluginInterface
 {
 public:
     virtual ~PluginInterface() = default;
-    virtual void init() = 0;
+    virtual void init() = 0; //添加=0显式声明为纯虚函数,必须实现
+    virtual QWidget* getHomeTiler() = 0;
 
 };
 

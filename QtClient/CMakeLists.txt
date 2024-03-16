@@ -113,7 +113,8 @@ set_target_properties(QtClient PROPERTIES
 #如果不是使用共享库构建，即Qt是以静态方式构建的，那么它将链接库到示例目标中。这意味着在构建示例目标时，会将库静态链接到示例目标中。
 if(QT6_IS_SHARED_LIBS_BUILD)
     # Build the shared plugin too when building this example target.
-    add_dependencies(QtClient DataView MediaPlayer)
+#    add_dependencies(QtClient DataView MediaPlayer)
+     add_dependencies(QtClient MediaPlayer)
 else()
     # Link the echoplugin if Qt is built statically.
     target_link_libraries(QtClient PRIVATE

@@ -355,7 +355,10 @@ QTabBar::tab{
          </widget>
         </item>
         <item>
-         <spacer name="verticalSpacer_2">
+         <layout class="QVBoxLayout" name="layout_tabMain"/>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_tabMain">
           <property name="orientation">
            <enum>Qt::Vertical</enum>
           </property>

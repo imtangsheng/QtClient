@@ -4,6 +4,11 @@
 #include <QGenericPlugin>
 #include "PluginInterface.h"
 
+#include <QWidget>
+
+
+class MediaWidget;
+
 //! [0] 定义插件接入
 class MediaPlayer : public QGenericPlugin, PluginInterface
 {
@@ -18,8 +23,11 @@ public:
 //    void initialize() override;
 public:
     void init() override;
+    QWidget *getHomeTiler() override;
+    MediaWidget* widget;
 
 private:
+
     QObject *create(const QString &name, const QString &spec) override;
 };
 
