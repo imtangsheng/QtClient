@@ -38,6 +38,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         FirstShowWidget.h FirstShowWidget.cpp FirstShowWidget.ui
         ui/TitleBar.h ui/TitleBar.cpp ui/TitleBar.ui
 
+        PluginInterface.h
+
 
     )
 # Define target properties for Android with Qt 6 as:
@@ -81,9 +83,9 @@ set_target_properties(QtClient PROPERTIES
 
 include(GNUInstallDirs)
 install(TARGETS QtClient
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    BUNDLE DESTINATION . #BUNDLE DESTINATION选项用于指定应用程序捆绑包的安装目录
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} #LIBRARY DESTINATION选项用于指定库文件的安装目录
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR} #RUNTIME DESTINATION选项用于指定可执行文件的安装目录
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
@@ -99,3 +101,22 @@ set(APP_VERSION_MINOR 0)
 set(APP_VERSION_PATCH 2)
 # 定义 SOFTWARE_VERSION 宏
 add_compile_definitions(APP_VERSION="${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.${APP_VERSION_PATCH}")
+
+#设置目标的属性，包括构建选项、目标类型和其他属性
+set_target_properties(QtClient PROPERTIES
+    WIN32_EXECUTABLE TRUE #指定示例目标是否为Windows可执行文件
+    MACOSX_BUNDLE TRUE #指定示例目标是否为Mac应用程序捆绑包
+)
+
+#检查是否使用了共享库构建
+#如果是，则将共享插件作为构建示例目标的依赖项进行构建。这意味着在构建示例目标时，也会构建共享插件。
+#如果不是使用共享库构建，即Qt是以静态方式构建的，那么它将链接库到示例目标中。这意味着在构建示例目标时，会将库静态链接到示例目标中。
+if(QT6_IS_SHARED_LIBS_BUILD)
+    # Build the shared plugin too when building this example target.
+    add_dependencies(QtClient DataView MediaPlayer)
+else()
+    # Link the echoplugin if Qt is built statically.
+    target_link_libraries(QtClient PRIVATE
+        DataView MediaPlayer
+    )
+endif()

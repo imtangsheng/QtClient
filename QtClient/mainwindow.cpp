@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QIcon>
 #include <QTabBar>
+#include <QPluginLoader>
 
 #include "ui/SubMain.h"
 SubMain *SUB_MAIN;
@@ -36,6 +37,7 @@ void MainWindow::showUI()
     qDebug() << "MainWindow::show() 当前登录用户："<<CurrentUser;
     showMessage("当前登录用户：" +CurrentUser);
     SUB_MAIN = new SubMain;
+    init();
     _Start();
     show();
 }
@@ -62,17 +64,6 @@ MainWindow::~MainWindow()
     //    qApp->quit();
 }
 
-void MainWindow::_Awake()
-{
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-//    setWindowFlags( Qt::FramelessWindowHint);
-//    setWindowFlags(Qt::CustomizeWindowHint);
-//    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
-    ui->WidgetStatus->setVisible(false);
-    ui->toolButton_WidgetStatus_isStaysOnTopHint->setVisible(false);
-
-}
-
 /*
  * Qt::Widget	0x00000000	这是 的默认类型。如果这种类型的小组件有父级，则为子小组件，如果没有父级，则为独立窗口。参见 Qt：：Window 和 Qt：：SubWindow。
  * Qt::Window 指示小组件是一个窗口，通常具有窗口系统框架和标题栏，而不管小组件是否具有父项。请注意，如果小部件没有父级，则无法取消设置此标志。
@@ -85,6 +76,38 @@ Qt::Window | Qt::CustomizeWindowHint
 Qt::FramelessWindowHint 无边框和标题，【只有右下角可以缩放】，【不能拖动】，不能双击放大
 Qt::Window | Qt::FramelessWindowHint
 */
+void MainWindow::_Awake()
+{
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+//    setWindowFlags( Qt::FramelessWindowHint);
+//    setWindowFlags(Qt::CustomizeWindowHint);
+//    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
+
+    ui->toolButton_WidgetStatus_isStaysOnTopHint->setVisible(false);
+//    ui->toolButton_WidgetStatus_isStaysOnTopHint->setParent(ui->WidgetStatus); //无用，还是会不显示
+    ui->WidgetStatus->setVisible(false);
+
+    /* MainWindow::ui->tabWidget_mainWindow 初始化加载 */
+    // 连接删除请求的槽函数
+    connect(ui->tabWidget_mainWindow, &QTabWidget::tabCloseRequested, this, &MainWindow::TabCloseRequested);
+    connect(ui->tabWidget_mainWindow, &QTabWidget::currentChanged, this, &MainWindow::TabCurrentChanged);
+
+}
+
+void MainWindow::init()
+{
+    qDebug() << "MainWindow::init()";
+    if(loadPlugin()){
+        qDebug() << "MainWindow::插件数量"<<pluginInterface.count();
+        foreach (PluginInterface* plug, pluginInterface) {
+            qDebug() << "MainWindow::init()"<<"name";
+            plug->init();
+
+        }
+    }
+    qDebug() << "MainWindow::init() end";
+}
+
 #include <QJsonArray>
 #include <QTimer>
 #include <QWindow>
@@ -103,10 +126,7 @@ void MainWindow::_Start()
     //    QList<int> list4 = APP_SETTINGS.value("list").value<QList<int>>();
     APP_SETTINGS.endGroup();
     qDebug()<<"jsonSettingsVariable 格式的配置："<<jsonMainConfig;
-    /* MainWindow::ui->tabWidget_mainWindow 初始化加载 */
-    // 连接删除请求的槽函数
-    connect(ui->tabWidget_mainWindow, &QTabWidget::tabCloseRequested, this, &MainWindow::TabCloseRequested);
-    connect(ui->tabWidget_mainWindow, &QTabWidget::currentChanged, this, &MainWindow::TabCurrentChanged);
+
     foreach (const QString key, jsonMainConfig["TabWindow"].toObject().keys()) {
         //初始化加载页面
         addTabWidget(TabWindow(key.toInt()));
@@ -137,6 +157,8 @@ void MainWindow::test()
     //    setCorner(Qt::BottomLeftCorner,Qt::BottomDockWidgetArea);
 
     qDebug() << "MainWindow::test  mapTabIndexToWindow"<<mapTabIndexToWindow;
+
+
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -156,14 +178,14 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 void MainWindow::paintEvent(QPaintEvent *event)
 {
-    qDebug() << "MainWindow::paintEvent(QPaintEvent *"<<event->type();
+//    qDebug() << "MainWindow::paintEvent(QPaintEvent *"<<event->type();
 
     QMainWindow::paintEvent(event);
 }
 
 void MainWindow::changeEvent(QEvent *event)
 {
-    qDebug() << "MainWindow::changeEvent(QEvent *"<<event->type();
+//    qDebug() << "MainWindow::changeEvent(QEvent *"<<event->type();
     QMainWindow::changeEvent(event);
 }
 
@@ -392,5 +414,45 @@ void MainWindow::on_toolButton_WidgetStatus_isStaysOnTopHint_clicked()
 //        ui->WidgetStatus->show();
         pWin->setFlag(Qt::WindowStaysOnTopHint,true);
     }
-//    qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()置顶"<<ui->statusBar->geometry()<<ui->widget_statusBarTitle->geometry();
+    //    qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()置顶"<<ui->statusBar->geometry()<<ui->widget_statusBarTitle->geometry();
+}
+
+
+bool MainWindow::loadPlugin()
+{
+    QDir pluginsDir(QCoreApplication::applicationDirPath());
+    qDebug()<<"EchoWindow::loadPlugin():"<<pluginsDir;
+#if defined(Q_OS_WIN)
+//    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+//        pluginsDir.cdUp();
+#elif defined(Q_OS_MAC)
+    if (pluginsDir.dirName() == "MacOS") {
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+        pluginsDir.cdUp();
+    }
+#endif
+    pluginsDir.cd("plugins");
+    qDebug()<<"EchoWindow::loadPlugin():"<<pluginsDir;
+    const QStringList entries = pluginsDir.entryList(QDir::Files);
+    for (const QString &fileName : entries) {
+        qDebug()<<"Window::loadPlugin():"<<entries<<fileName;
+        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = pluginLoader.instance();
+        if (plugin) {
+            PluginInterface* inter = qobject_cast<PluginInterface*>(plugin);
+            if(inter){
+                inter->init();
+                pluginInterface.append(inter);
+            }
+//            pluginLoader.unload();//主动释放会把加载的插件也释放掉
+        }
+    }
+
+    if(pluginInterface.isEmpty()){
+    return false;
+    }
+    else{
+    return true;
+    }
 }

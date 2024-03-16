@@ -60,6 +60,19 @@
        <number>0</number>
       </property>
       <item>
+       <widget class="QVideoWidget" name="widget_videoplay" native="true">
+        <property name="minimumSize">
+         <size>
+          <width>24</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">image: url(:/asset/video_playback/Movie_Active.svg);</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QLabel" name="label_videoBackground">
         <property name="minimumSize">
          <size>
@@ -901,6 +914,14 @@ QSlider::sub-page:horizontal{
    </layout>
   </widget>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QVideoWidget</class>
+   <extends>QWidget</extends>
+   <header location="global">qvideowidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources>
   <include location="../resource.qrc"/>
  </resources>

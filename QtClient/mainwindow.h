@@ -10,6 +10,7 @@
 #include "ui/TitleBar.h"
 #include "public/AppSystem.h"
 #include <QMap>
+#include "PluginInterface.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -27,6 +28,8 @@ public:
     ~MainWindow();
 
     void _Awake();//初始化运行一次
+    void init();
+
     void test();
     void _Start();//
 //    void _Update();//
@@ -62,6 +65,8 @@ private:
     TitleBar *ui_TitleBar;
     Ui::MainWindow *ui;
     QWidget * wtest;
+    QList<PluginInterface*> pluginInterface;
+    bool loadPlugin();
 
     void closeEvent(QCloseEvent *event) override;
 

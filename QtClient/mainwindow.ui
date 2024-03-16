@@ -392,6 +392,12 @@ QTabBar::tab{
      <height>25</height>
     </size>
    </property>
+   <property name="toolTipDuration">
+    <number>3</number>
+   </property>
+   <property name="sizeGripEnabled">
+    <bool>false</bool>
+   </property>
   </widget>
   <widget class="QDockWidget" name="WidgetStatus">
    <property name="enabled">
@@ -548,19 +554,6 @@ QTabBar::tab{
          </widget>
         </item>
         <item>
-         <widget class="QToolButton" name="toolButton_3">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>test</string>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QToolButton" name="toolButton_WidgetStatus_isFloatable">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -583,6 +576,19 @@ QTabBar::tab{
           <property name="icon">
            <iconset resource="resource.qrc">
             <normaloff>:/asset/Home/double-arrow-top.svg</normaloff>:/asset/Home/double-arrow-top.svg</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="toolButton_3">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>test</string>
           </property>
          </widget>
         </item>
