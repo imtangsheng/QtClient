@@ -3,11 +3,7 @@
 
 #include <QGenericPlugin>
 #include "PluginInterface.h"
-
-#include <QWidget>
-
-
-class MediaWidget;
+#include "ui/MediaWidgets.h"
 
 //! [0] 定义插件接入
 class MediaPlayer : public QGenericPlugin, PluginInterface
@@ -24,7 +20,7 @@ public:
 public:
     void init() override;
     QWidget *getHomeTiler() override;
-    MediaWidget* widget;
+    MediaWidgets widgets;
 
 private:
 
@@ -32,3 +28,8 @@ private:
 };
 
 #endif // MEDIAPLAYER_H
+
+
+
+
+

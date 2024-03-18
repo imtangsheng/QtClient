@@ -1,3 +1,12 @@
+/**
+ * @file PluginInterface.h
+ * @brief 该文件是插件调用接口类模板
+ *
+ * @details
+ * Author: Tang
+ * Created: 2024-03
+ */
+
 #ifndef PLUGININTERFACE_H
 #define PLUGININTERFACE_H
 
@@ -10,6 +19,7 @@ public:
     virtual ~PluginInterface() = default;
     virtual void init() = 0; //添加=0显式声明为纯虚函数,必须实现
     virtual QWidget* getHomeTiler() = 0;
+    int id = 0;
 
 };
 

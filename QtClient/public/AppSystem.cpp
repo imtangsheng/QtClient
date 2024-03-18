@@ -64,3 +64,29 @@ bool getExeConfigJson()
     return true;
 
 }
+
+IsSucce ReadJsonData(QJsonObject &jsonData, const QString &filePath)
+{
+    QFile file(filePath);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QByteArray jsonDataByteArray = file.readAll();
+        QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonDataByteArray);
+        jsonData = jsonDoc.object();
+        return true;
+    }
+    return false;
+}
+
+IsSucce SavaJsonData(QJsonObject &jsonData, const QString &filePath)
+{
+    QJsonDocument jsonDoc(jsonData);
+    QByteArray jsonDataByteArray = jsonDoc.toJson();
+
+    QFile file(filePath);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        file.write(jsonDataByteArray);
+        file.close();
+        return true;
+    }
+    return false;
+}

@@ -422,41 +422,36 @@ void MainWindow::on_toolButton_WidgetStatus_isStaysOnTopHint_clicked()
     //    qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()置顶"<<ui->statusBar->geometry()<<ui->widget_statusBarTitle->geometry();
 }
 
-
+/*
+ * This happens automatically on application termination, so you shouldn't normally need to call this function.
+ * If other instances of QPluginLoader are using the same plugin, the call will fail, and unloading will only happen when every instance has called unload().
+ * Don't try to delete the root component. Instead rely on that unload() will automatically delete it when needed.
+*/
 bool MainWindow::loadPlugin()
 {
     QDir pluginsDir(QCoreApplication::applicationDirPath());
-    qDebug()<<"EchoWindow::loadPlugin():"<<pluginsDir;
 #if defined(Q_OS_WIN)
 //    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
 //        pluginsDir.cdUp();
 #elif defined(Q_OS_MAC)
-    if (pluginsDir.dirName() == "MacOS") {
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-        pluginsDir.cdUp();
-    }
 #endif
     pluginsDir.cd("plugins");
     qDebug()<<"EchoWindow::loadPlugin():"<<pluginsDir;
     const QStringList entries = pluginsDir.entryList(QDir::Files);
     for (const QString &fileName : entries) {
         qDebug()<<"Window::loadPlugin():"<<entries<<fileName;
-        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
+        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName),this);
         QObject *plugin = pluginLoader.instance();
         if (plugin) {
             PluginInterface* inter = qobject_cast<PluginInterface*>(plugin);
             if(inter){
                 pluginInterface.append(inter);
+                 qDebug()<<"EchoWindow::loadPlugin() name:"<<pluginLoader.metaData().value("MetaData").toObject().value("Name").toString();
             }
 //            pluginLoader.unload();//主动释放会把加载的插件也释放掉
         }
     }
-
-    if(pluginInterface.isEmpty()){
-    return false;
-    }
-    else{
-    return true;
-    }
+    return pluginInterface.isEmpty() ? false : true;
+//    if(pluginInterface.isEmpty()){return false;}
+//    else{return true;}
 }

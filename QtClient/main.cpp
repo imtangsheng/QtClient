@@ -4,13 +4,10 @@
 #include <QTranslator>
 #include <QMessageBox>
 
-
 #include "public/AppSystem.h"
 
 //QSettings APP_SETTINGS;
 QSettings APP_SETTINGS(PATH_APP_SETTINGS,QSettings::IniFormat); //无编码配置，已经移除，使用UTF-8
-
-
 
 #include "FirstShowWidget.h"
 
@@ -48,7 +45,6 @@ int main(int argc, char *argv[])
         QObject::connect(first.get(),&FirstShowWidget::loginSuccess,&w,&MainWindow::showUI);
         first->show();
     }
-
 
     return a.exec();
 }

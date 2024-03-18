@@ -18,7 +18,7 @@
 #define NET_ROBOT_API extern "C" __declspec(dllimport)
 // #define NET_ROBOT_API Q_DECL_EXPORT
 #else
-#define NET_API void
+#define IsSucce bool
 #endif
 typedef unsigned __int64 UINT64;
 typedef signed __int64 INT64;
@@ -27,6 +27,7 @@ typedef signed __int64 INT64;
 #define NET_ROBOT_API extern "C"
 #else
 #define NET_ROBOT_API
+#define IsSucce bool
 #endif
 #define BOOL int
 typedef unsigned int DWORD;

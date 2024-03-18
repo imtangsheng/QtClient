@@ -74,6 +74,8 @@ public:
 #include <QJsonObject>
 extern QJsonObject EXE_CONFIG;
 bool getExeConfigJson();
+IsSucce ReadJsonData(QJsonObject& jsonData,const QString& filePath);
+IsSucce SavaJsonData(QJsonObject& jsonData,const QString& filePath);
 /*ini文件读取配置，Qt自带系统方法，指定存储在本地或者系统注册表等地方*/
 #include <QSettings>
 extern QSettings APP_SETTINGS;
@@ -99,7 +101,8 @@ enum TabWindow
     TabWindow_DataView
 };
 
-static std::map<int, QString>& TabWindowMap() {
+//使用[[maybe_unused]]属性或__attribute__((unused))属性来标记未使用的函数，以告诉编译器忽略这个警告
+ __attribute__((unused)) static std::map<int, QString>& TabWindowMap() {
     static std::map<int, QString> tab;
     tab[TabWindow_VideoPlayback] = "widget_videoPlay";
     tab[TabWindow_DataView] = "widget_dataView";

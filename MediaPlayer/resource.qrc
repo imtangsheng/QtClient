@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file>asset/titler/MediaPlayer.svg</file>
+    </qresource>
+</RCC>

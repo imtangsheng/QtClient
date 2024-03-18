@@ -1,3 +1,7 @@
+# Copyright (C) 2024 The DCRobot Company Ltd.
+# Author: Tang
+# Created: 2024-03
+
 cmake_minimum_required(VERSION 3.14)
 
 project(MediaPlayer VERSION 0.0.1 LANGUAGES CXX)
@@ -30,7 +34,9 @@ qt_add_plugin(MediaPlayer SHARED
 
 target_sources(MediaPlayer
   PRIVATE
-    MediaWidget.ui
+
+    resource.qrc
+    ui/MediaWidgets.h ui/MediaWidgets.cpp ui/MediaWidgets.ui
 )
 
 set_target_properties(MediaPlayer PROPERTIES
@@ -38,7 +44,6 @@ set_target_properties(MediaPlayer PROPERTIES
     PREFIX "" #默认位lib，不设置空的话
     OUTPUT_NAME "MediaPlayer"
 )
-
 
 target_link_libraries(MediaPlayer PRIVATE
     Qt${QT_VERSION_MAJOR}::Gui
