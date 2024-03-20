@@ -1,3 +1,6 @@
+#include <QJsonArray>
+#include <QTimer>
+#include <QWindow>
 #include <QMessageBox>
 #include <QDir>
 #include <QFile>
@@ -97,11 +100,9 @@ void MainWindow::_Awake()
 void MainWindow::init()
 {
     qDebug() << "MainWindow::init()";
-    if(loadPlugin()){
+    if(pluginLoad()){
         qDebug() << "MainWindow::插件数量"<<pluginInterface.count();
         foreach (PluginInterface* plug, pluginInterface) {
-            qDebug() << "MainWindow::init()"<<"插件加载界面";
-            plug->init();
 //            ui->layout_tabMain->addWidget(plug->getHomeTiler());
             ui->layout_tabMain->addWidget(plug->getWidgetByName(HomeMenu_WidgetName));
 //            ui->tabMainTest->addWidget(plug->getHomeTiler());
@@ -113,9 +114,6 @@ void MainWindow::init()
     qDebug() << "MainWindow::init() end";
 }
 
-#include <QJsonArray>
-#include <QTimer>
-#include <QWindow>
 void MainWindow::_Start()
 {
     qDebug() << "MainWindow::_Start() 使用版本号：" << EXE_CONFIG["version"];
@@ -136,12 +134,25 @@ void MainWindow::_Start()
         //初始化加载页面
         addTabWidget(TabWindow(key.toInt()));
     }
+    qDebug()<<"jsonMainConfig[\"PluginWindow\"] 格式的配置："<<jsonMainConfig["PluginWindow"];
+    foreach (const QString keyPlugin, jsonMainConfig["PluginWindow"].toObject().keys()) {
+        //初始化加载插件页面
+        qDebug()<<"pluginNameToListIndex"<<pluginNameToListIndex<<pluginNameToListIndex.contains(keyPlugin);
+        if(pluginNameToListIndex.contains(keyPlugin)){
+            QJsonObject objPlugin = jsonMainConfig["PluginWindow"].toObject()[keyPlugin].toObject();
+            pluginTabInsertMainWindow(pluginNameToListIndex[keyPlugin],objPlugin["name"].toString());
+        }
+    }
+
+
+
     ui->tabWidget_mainWindow->setTabsClosable(true);
     // 要设置第1个选项卡不可关闭
     ui->tabWidget_mainWindow->tabBar()->setTabButton(0,QTabBar::RightSide,nullptr);
-    foreach (const QString key, jsonMainConfig["TabWindow"].toObject().keys()) {
+    qDebug()<<"ui->tabWidget_mainWindow->count()格式的配置："<<ui->tabWidget_mainWindow->count();
+    for(int index = 1; index < ui->tabWidget_mainWindow->count();index++){
         //初始化Tab标签的数据和其他配置
-        int index = jsonMainConfig["TabWindow"].toObject()[key].toObject()["index"].toInt();
+//        int index = jsonMainConfig["TabWindow"].toObject()[key].toObject()["index"].toInt();
         ui->tabWidget_mainWindow->tabBar()->tabButton(index,QTabBar::RightSide)->setVisible(false);
     }
     ui->tabWidget_mainWindow->setCurrentIndex(jsonMainConfig["TabCurrent"].toInt());
@@ -202,19 +213,9 @@ void MainWindow::jump_ShowMainTabWidget(int index, QString name)
         ui->tabWidget_mainWindow->setCurrentWidget(existingTab);
     }else{
         qDebug() << "MainWindow::jump_ShowMainTabWidget(int "<<pluginInterface.count()<<pluginInterface.size();
-
-        QWidget * addWidget = pluginInterface.at(index)->getWidgetByName(name);
-        if(addWidget){
-            pluginInterface.at(index)->indexTabBar = ui->tabWidget_mainWindow->count();
-            ui->tabWidget_mainWindow->insertTab(pluginInterface.at(index)->indexTabBar,
-                                                addWidget,
-                                                pluginInterface.at(index)->WindowIcon,
-                                                pluginInterface.at(index)->WindowTitle);
-
-            ui->tabWidget_mainWindow->setCurrentIndex(pluginInterface.at(index)->indexTabBar);
-        }
+        pluginTabInsertMainWindow(index,name);
+        ui->tabWidget_mainWindow->setCurrentIndex(pluginInterface.at(index)->indexTabBar);
     }
-
 }
 
 void MainWindow::on_Button_videoPlayback_clicked()
@@ -450,9 +451,7 @@ void MainWindow::on_toolButton_WidgetStatus_isStaysOnTopHint_clicked()
  * If other instances of QPluginLoader are using the same plugin, the call will fail, and unloading will only happen when every instance has called unload().
  * Don't try to delete the root component. Instead rely on that unload() will automatically delete it when needed.
 */
-#include <QObject>
-
-bool MainWindow::loadPlugin()
+bool MainWindow::pluginLoad()
 {
     QDir pluginsDir(QCoreApplication::applicationDirPath());
 #if defined(Q_OS_WIN)
@@ -471,13 +470,18 @@ bool MainWindow::loadPlugin()
         if (plugin) {
             PluginInterface* inter = qobject_cast<PluginInterface*>(plugin);
             if(inter){
-                qDebug()<<"加载插件Window::"<<pluginInterface.count();
+                qDebug()<<"加载插件Window::"<<pluginInterface.count()<<inter->id;
+                qDebug() << "MainWindow::init()"<<"插件加载界面";
+                inter->init();
                 inter->id = pluginInterface.count();
                 pluginInterface.append(inter);
 
                 qDebug()<<"加载插件Window::loadPlugin() name:"<<pluginLoader.metaData().value("MetaData").toObject().value("Name").toString();
                 //信号连接字符方法，可以使用建立一个全局唯一的信号类，建立一个返回该类的方法从而使用指针方法发送信号
                 connect(plugin,SIGNAL(signalShowMainWidget(int,QString)),this,SLOT(jump_ShowMainTabWidget(int,QString)));
+                //记录插件对应的lilst下标
+                qDebug()<<"加载插件Window::"<<pluginInterface.count()<<inter->id<<inter->ObjectName<<inter->getObjectNane();
+                pluginNameToListIndex.insert(inter->getObjectNane(),inter->id);
 
             }
 //            pluginLoader.unload();//主动释放会把加载的插件也释放掉
@@ -485,5 +489,36 @@ bool MainWindow::loadPlugin()
     }
     return pluginInterface.isEmpty() ? false : true;
 //    if(pluginInterface.isEmpty()){return false;}
-//    else{return true;}
+    //    else{return true;}
+}
+
+bool MainWindow::pluginTabInsertMainWindow(int index,QString name)
+{
+    qDebug()<<"MainWindow::pluginTabInsertMainWindow(int "<<index<<name;
+    if( index < 0  || index >= pluginInterface.count()){
+        qDebug() << "pluginInterface下标：" << index << " 不存在";
+        return false;
+    }
+
+    QWidget * addWidget = pluginInterface.at(index)->getWidgetByName(name);
+    if(!addWidget){
+        qDebug() << "pluginInterface界面Widget：" << name << " 不存在";
+        return false;
+    }
+    QJsonObject tabJson = jsonMainConfig["PluginWindow"].toObject();
+    QJsonObject objPlugin = tabJson[pluginInterface.at(index)->ObjectName].toObject();
+    int indexTab = ui->tabWidget_mainWindow->count();
+    if(objPlugin["indexTab"].isNull()){
+        objPlugin["indexTab"] = indexTab;
+    }
+    objPlugin["name"] = name;
+    pluginInterface.at(index)->indexTabBar = indexTab;
+    ui->tabWidget_mainWindow->insertTab(indexTab,
+                addWidget,
+                pluginInterface.at(index)->WindowIcon,
+                pluginInterface.at(index)->WindowTitle);
+
+    tabJson[pluginInterface.at(index)->ObjectName] = objPlugin;
+    jsonMainConfig["PluginWindow"] = tabJson;
+    return true;
 }

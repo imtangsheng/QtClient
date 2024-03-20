@@ -64,15 +64,16 @@ private slots:
     void on_toolButton_WidgetStatus_isStaysOnTopHint_clicked();
 
 private:
+    QJsonObject jsonMainConfig;
     TitleBar *ui_TitleBar;
     Ui::MainWindow *ui;
     QWidget * wtest;
     QList<PluginInterface*> pluginInterface;
-    bool loadPlugin();
+    bool pluginLoad();
+    bool pluginTabInsertMainWindow(int index,QString name);
+    QMap<QString,int> pluginNameToListIndex;
 
     void closeEvent(QCloseEvent *event) override;
-
-    QJsonObject jsonMainConfig;
 
     int currentTabNum;
     int tabCloseLastShowNum = 0;

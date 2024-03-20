@@ -21,6 +21,7 @@ public:
 //    void initialize() override;
 public:
     void init() override;
+    QString getObjectNane() override;
     QWidget *getWidgetByName(QString name) override;
     QWidget *getHomeTiler() override;
     MediaWidgets widgets;

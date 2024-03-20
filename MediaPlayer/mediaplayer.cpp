@@ -13,13 +13,20 @@ void MediaPlayer::init()
 //    QPluginMetaData metaData = QPluginMetaData::data
     qDebug()<<this->metaObject()->className();
     qDebug()<<this->staticMetaObject.metaType();
-    qDebug()<<"创建的插件MediaPlayer::init()"<<id;
-
+    qDebug()<<"创建的插件MediaPlayer::init()"<<id<<ObjectName<<widgets.objectName();
+    ObjectName = widgets.objectName();
     WindowIcon = QIcon(":/asset/titler/MediaPlayer.svg");
     WindowTitle = tr("视频回放");
+
     connect(&widgets,&MediaWidgets::homeMune_jump_TabWidget,this,&MediaPlayer::jumpTabWidget);
 
 
+}
+
+QString MediaPlayer::getObjectNane()
+{
+    qDebug()<<"创建的插件MediaPlayer::init()"<<id<<ObjectName;
+    return ObjectName;
 }
 
 QWidget *MediaPlayer::getWidgetByName(QString name)
