@@ -20,7 +20,7 @@
    <string>Form</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resource.qrc">
+   <iconset>
     <normaloff>:/asset/Home/playback.svg</normaloff>:/asset/Home/playback.svg</iconset>
   </property>
   <property name="styleSheet">
@@ -84,7 +84,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="../resource.qrc">:/asset/media/VideoWidget_backgroundImage.jpeg</pixmap>
+         <pixmap>:/asset/media/VideoWidget_backgroundImage.jpeg</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -293,7 +293,7 @@ QSlider::sub-page:horizontal{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/media/VideoPlay.svg</normaloff>:/asset/media/VideoPlay.svg</iconset>
          </property>
          <property name="iconSize">
@@ -322,7 +322,7 @@ QSlider::sub-page:horizontal{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/media/VideoPause.svg</normaloff>:/asset/media/VideoPause.svg</iconset>
          </property>
          <property name="iconSize">
@@ -348,7 +348,7 @@ QSlider::sub-page:horizontal{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/video_playback/Stop_Icon.svg</normaloff>:/asset/video_playback/Stop_Icon.svg</iconset>
          </property>
          <property name="iconSize">
@@ -377,7 +377,7 @@ QSlider::sub-page:horizontal{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/media/FullScreen.svg</normaloff>:/asset/media/FullScreen.svg</iconset>
          </property>
          <property name="iconSize">
@@ -515,7 +515,7 @@ QSlider::sub-page:horizontal{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/media/Audio.svg</normaloff>:/asset/media/Audio.svg</iconset>
          </property>
          <property name="iconSize">
@@ -551,7 +551,7 @@ QSlider::sub-page:horizontal{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/media/Setting.svg</normaloff>:/asset/media/Setting.svg</iconset>
          </property>
          <property name="iconSize">
@@ -580,7 +580,7 @@ QSlider::sub-page:horizontal{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/Home/More.svg</normaloff>:/asset/Home/More.svg</iconset>
          </property>
          <property name="iconSize">
@@ -612,7 +612,7 @@ QSlider::sub-page:horizontal{
     <bool>true</bool>
    </property>
    <property name="windowIcon">
-    <iconset resource="../resource.qrc">
+    <iconset>
      <normaloff>:/asset/video_playback/Movie_Active.svg</normaloff>:/asset/video_playback/Movie_Active.svg</iconset>
    </property>
    <property name="autoFillBackground">
@@ -669,7 +669,7 @@ QSlider::sub-page:horizontal{
        </property>
        <widget class="QWidget" name="tab_videoFiles">
         <attribute name="icon">
-         <iconset resource="../resource.qrc">
+         <iconset>
           <normaloff>:/asset/media/Operation.svg</normaloff>:/asset/media/Operation.svg</iconset>
         </attribute>
         <attribute name="title">
@@ -716,7 +716,7 @@ QSlider::sub-page:horizontal{
        </widget>
        <widget class="QWidget" name="tab_videoSetting">
         <attribute name="icon">
-         <iconset resource="../resource.qrc">
+         <iconset>
           <normaloff>:/asset/video_playback/Settings_Icon.svg</normaloff>:/asset/video_playback/Settings_Icon.svg</iconset>
         </attribute>
         <attribute name="title">
@@ -760,7 +760,7 @@ QSlider::sub-page:horizontal{
           <string/>
          </property>
          <property name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/media/Operation.svg</normaloff>:/asset/media/Operation.svg</iconset>
          </property>
          <property name="iconSize">
@@ -922,9 +922,7 @@ QSlider::sub-page:horizontal{
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resource.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>widget_videoPlay</sender>

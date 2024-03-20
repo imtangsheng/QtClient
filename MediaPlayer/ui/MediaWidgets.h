@@ -1,8 +1,12 @@
 #ifndef MEDIAWIDGETS_H
 #define MEDIAWIDGETS_H
 
+#include <QMediaPlayer>
+#include <QVideoWidget>
 #include <QWidget>
 #include "ui_MediaWidgets.h"
+
+
 
 namespace Ui {
 class MediaWidgets;
@@ -27,7 +31,7 @@ private slots:
     void on_Button_videoPlayback_clicked();
 
 private:
-
+    QMediaPlayer *m_player;
 };
 
 #endif // MEDIAWIDGETS_H

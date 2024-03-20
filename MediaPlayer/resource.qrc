@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>asset/titler/MediaPlayer.svg</file>
+        <file>asset/mianWidget/bg.jpeg</file>
     </qresource>
 </RCC>

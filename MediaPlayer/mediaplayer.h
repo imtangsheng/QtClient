@@ -5,6 +5,8 @@
 #include "PluginInterface.h"
 #include "ui/MediaWidgets.h"
 
+
+
 //! [0] 定义插件接入
 class MediaPlayer : public QObject,PluginInterface
 {
@@ -19,12 +21,12 @@ public:
 //    void initialize() override;
 public:
     void init() override;
-
+    QWidget *getWidgetByName(QString name) override;
     QWidget *getHomeTiler() override;
     MediaWidgets widgets;
 
 signals:
-    void sendSignal(int index = -1) override;
+    void signalShowMainWidget(int index,QString name) override;
 
 public slots:
     void jumpTabWidget();

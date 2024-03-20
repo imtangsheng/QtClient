@@ -2,13 +2,22 @@
 #include "ui_TitleBar.h"
 #include <QMouseEvent>
 
-
+#include <QFile>
 
 TitleBar::TitleBar(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::TitleBar)
 {
     ui->setupUi(this);
+    // 定义文件路径
+    QString filePath = "logo.png";
+    // 判断文件是否存在
+    QFile file(filePath);
+    if (file.exists()) {
+        // 文件存在，加载并显示图像
+        QPixmap pixmap(filePath);
+        ui->label_logo->setPixmap(pixmap);
+    }
 }
 
 TitleBar::~TitleBar()

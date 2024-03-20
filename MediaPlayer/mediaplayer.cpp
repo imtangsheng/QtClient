@@ -15,19 +15,26 @@ void MediaPlayer::init()
     qDebug()<<this->staticMetaObject.metaType();
     qDebug()<<"创建的插件MediaPlayer::init()"<<id;
 
+    WindowIcon = QIcon(":/asset/titler/MediaPlayer.svg");
+    WindowTitle = tr("视频回放");
     connect(&widgets,&MediaWidgets::homeMune_jump_TabWidget,this,&MediaPlayer::jumpTabWidget);
 
 
 }
 
+QWidget *MediaPlayer::getWidgetByName(QString name)
+{
+    return widgets.findChild<QWidget*>(name);
+}
+
 QWidget *MediaPlayer::getHomeTiler()
 {
-    return widgets.ui->groupBox_video;
+    return widgets.ui->HomeMenu;
 }
 
 void MediaPlayer::jumpTabWidget()
 {
-    emit sendSignal(12);
+    emit signalShowMainWidget(id,HomeMain_TabWidgetName);
 }
 
 /*

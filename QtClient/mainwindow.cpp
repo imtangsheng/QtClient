@@ -25,8 +25,8 @@ MainWindow::MainWindow(QWidget *parent)
 //    addDockWidget(Qt::BottomDockWidgetArea,ui->WidgetStatus);
     ui->statusBar->addPermanentWidget(ui->widget_statusBarTitle,1);//拉伸系数(stretch factor)设置最大占满，默认0是在在右侧
 //    ui->statusBar->showMessage();
-    connect(ui->statusBar,&QStatusBar::showMessage,this,&MainWindow::showMessage);
-    connect(ui->statusBar,&QStatusBar::clearMessage,this,&MainWindow::clearMessage);
+//    connect(ui->statusBar,&QStatusBar::showMessage,this,&MainWindow::showMessage);
+//    connect(ui->statusBar,&QStatusBar::clearMessage,this,&MainWindow::clearMessage);
 
     SUB_MAIN = new SubMain;
     _Awake();
@@ -102,7 +102,8 @@ void MainWindow::init()
         foreach (PluginInterface* plug, pluginInterface) {
             qDebug() << "MainWindow::init()"<<"插件加载界面";
             plug->init();
-            ui->layout_tabMain->addWidget(plug->getHomeTiler());
+//            ui->layout_tabMain->addWidget(plug->getHomeTiler());
+            ui->layout_tabMain->addWidget(plug->getWidgetByName(HomeMenu_WidgetName));
 //            ui->tabMainTest->addWidget(plug->getHomeTiler());
 //            ui->tabMainTest->addWidget(SUB_MAIN->ui->widget_test);
 
@@ -193,9 +194,27 @@ void MainWindow::changeEvent(QEvent *event)
     QMainWindow::changeEvent(event);
 }
 
-void MainWindow::jump_Main_TabWidget(int index)
+void MainWindow::jump_ShowMainTabWidget(int index, QString name)
 {
-    qDebug() << "MainWindow::jump_Main_TabWidget(int "<<index;
+    qDebug() << "MainWindow::jump_ShowMainTabWidget(int "<<index<<name;
+    QWidget* existingTab = ui->tabWidget_mainWindow->findChild<QWidget*>(name);
+    if(existingTab){
+        ui->tabWidget_mainWindow->setCurrentWidget(existingTab);
+    }else{
+        qDebug() << "MainWindow::jump_ShowMainTabWidget(int "<<pluginInterface.count()<<pluginInterface.size();
+
+        QWidget * addWidget = pluginInterface.at(index)->getWidgetByName(name);
+        if(addWidget){
+            pluginInterface.at(index)->indexTabBar = ui->tabWidget_mainWindow->count();
+            ui->tabWidget_mainWindow->insertTab(pluginInterface.at(index)->indexTabBar,
+                                                addWidget,
+                                                pluginInterface.at(index)->WindowIcon,
+                                                pluginInterface.at(index)->WindowTitle);
+
+            ui->tabWidget_mainWindow->setCurrentIndex(pluginInterface.at(index)->indexTabBar);
+        }
+    }
+
 }
 
 void MainWindow::on_Button_videoPlayback_clicked()
@@ -444,6 +463,7 @@ bool MainWindow::loadPlugin()
     pluginsDir.cd("plugins");
     qDebug()<<"加载插件EchoWindow::loadPlugin():"<<pluginsDir;
     const QStringList entries = pluginsDir.entryList(QDir::Files);
+    pluginInterface.clear();
     for (const QString &fileName : entries) {
         qDebug()<<"加载插件Window::loadPlugin():"<<entries<<fileName;
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName),this);
@@ -451,11 +471,13 @@ bool MainWindow::loadPlugin()
         if (plugin) {
             PluginInterface* inter = qobject_cast<PluginInterface*>(plugin);
             if(inter){
+                qDebug()<<"加载插件Window::"<<pluginInterface.count();
+                inter->id = pluginInterface.count();
                 pluginInterface.append(inter);
 
                 qDebug()<<"加载插件Window::loadPlugin() name:"<<pluginLoader.metaData().value("MetaData").toObject().value("Name").toString();
                 //信号连接字符方法，可以使用建立一个全局唯一的信号类，建立一个返回该类的方法从而使用指针方法发送信号
-                connect(plugin,SIGNAL(sendSignal(int)),this,SLOT(jump_Main_TabWidget(int)));
+                connect(plugin,SIGNAL(signalShowMainWidget(int,QString)),this,SLOT(jump_ShowMainTabWidget(int,QString)));
 
             }
 //            pluginLoader.unload();//主动释放会把加载的插件也释放掉
