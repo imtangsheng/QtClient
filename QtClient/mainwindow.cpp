@@ -1,14 +1,13 @@
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
-#include "ui/VideoPlayback.h"
-#include "ui/DataView.h"
 #include <QMessageBox>
 #include <QDir>
 #include <QFile>
 #include <QIcon>
 #include <QTabBar>
 #include <QPluginLoader>
-
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
+#include "ui/VideoPlayback.h"
+#include "ui/DataView.h"
 #include "ui/SubMain.h"
 SubMain *SUB_MAIN;
 
@@ -192,6 +191,11 @@ void MainWindow::changeEvent(QEvent *event)
 {
 //    qDebug() << "MainWindow::changeEvent(QEvent *"<<event->type();
     QMainWindow::changeEvent(event);
+}
+
+void MainWindow::jump_Main_TabWidget(int index)
+{
+    qDebug() << "MainWindow::jump_Main_TabWidget(int "<<index;
 }
 
 void MainWindow::on_Button_videoPlayback_clicked()
@@ -427,6 +431,8 @@ void MainWindow::on_toolButton_WidgetStatus_isStaysOnTopHint_clicked()
  * If other instances of QPluginLoader are using the same plugin, the call will fail, and unloading will only happen when every instance has called unload().
  * Don't try to delete the root component. Instead rely on that unload() will automatically delete it when needed.
 */
+#include <QObject>
+
 bool MainWindow::loadPlugin()
 {
     QDir pluginsDir(QCoreApplication::applicationDirPath());
@@ -436,17 +442,21 @@ bool MainWindow::loadPlugin()
 #elif defined(Q_OS_MAC)
 #endif
     pluginsDir.cd("plugins");
-    qDebug()<<"EchoWindow::loadPlugin():"<<pluginsDir;
+    qDebug()<<"加载插件EchoWindow::loadPlugin():"<<pluginsDir;
     const QStringList entries = pluginsDir.entryList(QDir::Files);
     for (const QString &fileName : entries) {
-        qDebug()<<"Window::loadPlugin():"<<entries<<fileName;
+        qDebug()<<"加载插件Window::loadPlugin():"<<entries<<fileName;
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName),this);
         QObject *plugin = pluginLoader.instance();
         if (plugin) {
             PluginInterface* inter = qobject_cast<PluginInterface*>(plugin);
             if(inter){
                 pluginInterface.append(inter);
-                 qDebug()<<"EchoWindow::loadPlugin() name:"<<pluginLoader.metaData().value("MetaData").toObject().value("Name").toString();
+
+                qDebug()<<"加载插件Window::loadPlugin() name:"<<pluginLoader.metaData().value("MetaData").toObject().value("Name").toString();
+                //信号连接字符方法，可以使用建立一个全局唯一的信号类，建立一个返回该类的方法从而使用指针方法发送信号
+                connect(plugin,SIGNAL(sendSignal(int)),this,SLOT(jump_Main_TabWidget(int)));
+
             }
 //            pluginLoader.unload();//主动释放会把加载的插件也释放掉
         }

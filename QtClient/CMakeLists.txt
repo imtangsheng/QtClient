@@ -36,11 +36,10 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         FirstShowWidget.h FirstShowWidget.cpp FirstShowWidget.ui
         ui/TitleBar.h ui/TitleBar.cpp ui/TitleBar.ui
 
-        PluginInterface.h
-
         readme.md
         doc/dev.md
         resource.qrc
+        ../public/PluginInterface.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QtClient APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
@@ -106,6 +105,11 @@ add_compile_definitions(APP_VERSION="${APP_VERSION_MAJOR}.${APP_VERSION_MINOR}.$
 set_target_properties(QtClient PROPERTIES
     WIN32_EXECUTABLE TRUE #指定示例目标是否为Windows可执行文件
     MACOSX_BUNDLE TRUE #指定示例目标是否为Mac应用程序捆绑包
+)
+
+# 添加include目录
+target_include_directories(QtClient PRIVATE
+    ../public
 )
 
 #检查是否使用了共享库构建

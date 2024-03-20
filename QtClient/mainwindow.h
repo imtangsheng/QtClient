@@ -53,6 +53,8 @@ protected:
 //    void geometryChanged(const QRect &newGeometry, const QRect &oldGeometry) override;
 
 private slots:
+    void jump_Main_TabWidget(int index);
+
     void on_Button_videoPlayback_clicked();
 
     void on_Button_dataView_clicked();

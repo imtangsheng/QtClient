@@ -23,5 +23,6 @@ void MediaWidgets::init()
 void MediaWidgets::on_Button_videoPlayback_clicked()
 {
     qDebug()<<"MediaWidgets::on_Button_videoPlayback_clicked()";
+    emit homeMune_jump_TabWidget();
 }
 

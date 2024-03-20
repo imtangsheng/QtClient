@@ -37,6 +37,8 @@ target_sources(MediaPlayer
 
     resource.qrc
     ui/MediaWidgets.h ui/MediaWidgets.cpp ui/MediaWidgets.ui
+
+    ../public/PluginInterface.h
 )
 
 set_target_properties(MediaPlayer PROPERTIES
@@ -61,7 +63,7 @@ endif()
 
 # 添加include目录
 target_include_directories(MediaPlayer PRIVATE
-    ../QtClient
+    ../QtClient ../public
 )
 
 

@@ -20,6 +20,9 @@ public:
 
     void init();
 
+signals:
+    void homeMune_jump_TabWidget();
+
 private slots:
     void on_Button_videoPlayback_clicked();
 
