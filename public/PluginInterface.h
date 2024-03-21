@@ -29,18 +29,17 @@ class PluginInterface// : public QObject
 public:
 /**声明方法函数**/
     virtual ~PluginInterface() = default;
-    virtual void init() = 0; //添加=0显式声明为纯虚函数,必须实现
-    virtual QString getObjectNane() = 0;
+    virtual QString getObjectNane() = 0; //添加=0显式声明为纯虚函数,必须实现
     virtual QWidget* getWidgetByName(QString name = "") = 0;
+    virtual bool widgetReturnAfterRemoved(QWidget* widget = nullptr) = 0; //在移除widget后添加回来
     virtual QWidget* getHomeTiler() = 0;
 /**声明信号函数的声明，在信号连接器中使用字符串的信号连接模式**/
     virtual void signalShowMainWidget(int index = -1,QString name = HomeMain_TabWidgetName) = 0;
 
 /**声明定义变量**/
-    QString ObjectName;
+    QString ObjectName; //该插件类的唯一标识名称
     int id = -1; //顺序list 的下标id
-//    在TabWidget中的顺序index
-    int indexTabBar = -1;
+    int indexTabBar = -1;//    在TabWidget中的顺序index
     QIcon WindowIcon;
     QString WindowTitle;
 };

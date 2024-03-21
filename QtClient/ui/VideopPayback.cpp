@@ -16,6 +16,7 @@ VideoPlayback::VideoPlayback(QWidget *parent) : QWidget(parent),
 VideoPlayback::~VideoPlayback()
 {
     qDebug() << "VideoPlayback::~VideoPlayback()";
+    delete m_player; //不会主动释放
     delete ui;
 }
 

@@ -109,5 +109,4 @@ enum TabWindow
     return tab;
 }
 
-
 #endif // APPSYSTEM_H

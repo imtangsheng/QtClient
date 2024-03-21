@@ -1,11 +1,8 @@
 #ifndef MEDIAPLAYER_H
 #define MEDIAPLAYER_H
 
-//#include <QGenericPlugin>
 #include "PluginInterface.h"
 #include "ui/MediaWidgets.h"
-
-
 
 //! [0] 定义插件接入
 class MediaPlayer : public QObject,PluginInterface
@@ -18,11 +15,12 @@ class MediaPlayer : public QObject,PluginInterface
 public:
     explicit MediaPlayer(QObject *parent = nullptr);
     ~MediaPlayer();
+     void init();
 //    void initialize() override;
 public:
-    void init() override;
     QString getObjectNane() override;
     QWidget *getWidgetByName(QString name) override;
+    bool widgetReturnAfterRemoved(QWidget* widget) override;
     QWidget *getHomeTiler() override;
     MediaWidgets widgets;
 

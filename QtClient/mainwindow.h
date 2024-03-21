@@ -3,10 +3,6 @@
 
 #include <QMainWindow>
 #include <QJsonObject>
-#ifdef Q_OS_WIN
-#include <Windows.h>
-#endif
-
 #include "ui/TitleBar.h"
 #include "public/AppSystem.h"
 #include <QMap>
@@ -29,7 +25,6 @@ public:
 
     void _Awake();//初始化运行一次
     void init();
-
     void test();
     void _Start();//
 //    void _Update();//
@@ -40,10 +35,15 @@ public:
 //    void _Close();
 
     void showUI();
+    /*定义Tab窗口的类型*/
+    enum TabWindowType
+    {
+        TabWindowType_Self = 1,
+        TabWindowType_Plugin = 2,
+    };
 
 signals:
     void onDestorySignal();
-
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -67,21 +67,18 @@ private:
     QJsonObject jsonMainConfig;
     TitleBar *ui_TitleBar;
     Ui::MainWindow *ui;
-    QWidget * wtest;
-    QList<PluginInterface*> pluginInterface;
+    QList<PluginInterface*> pluginList;
     bool pluginLoad();
     bool pluginTabInsertMainWindow(int index,QString name);
-    QMap<QString,int> pluginNameToListIndex;
+    QMap<QString,int> pluginGetListIndexFromName;
 
     void closeEvent(QCloseEvent *event) override;
 
     int currentTabNum;
     int tabCloseLastShowNum = 0;
-    QMap<int,TabWindow> mapTabIndexToWindow;
     void addTabWidget(TabWindow window);
     void TabCloseRequested(int index);
     void TabCurrentChanged(int index);
-    void TabRemove(int index);
 
     bool isFloatableWidgetStatus = false;
     void geometryChanged(const QPoint& pos = QPoint(0, 0));

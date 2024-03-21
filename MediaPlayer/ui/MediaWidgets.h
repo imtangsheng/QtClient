@@ -6,8 +6,6 @@
 #include <QWidget>
 #include "ui_MediaWidgets.h"
 
-
-
 namespace Ui {
 class MediaWidgets;
 }
