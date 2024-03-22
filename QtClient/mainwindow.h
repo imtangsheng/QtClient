@@ -51,6 +51,8 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void changeEvent(QEvent *event) override;
 //    void geometryChanged(const QRect &newGeometry, const QRect &oldGeometry) override;
+    const int borderSize = 5; //调整窗口大小内边距
+    bool nativeEvent(const QByteArray &eventType,void *message, qintptr *result) override; //qt5使用loog
 
 private slots:
     void jump_ShowMainTabWidget(int index,QString name);

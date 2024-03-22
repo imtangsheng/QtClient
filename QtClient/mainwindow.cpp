@@ -1,16 +1,19 @@
 #include <QJsonArray>
 #include <QTimer>
-#include <QWindow>
 #include <QMessageBox>
 #include <QDir>
 #include <QFile>
 #include <QIcon>
 #include <QTabBar>
 #include <QPluginLoader>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "ui/VideoPlayback.h"
 #include "ui/DataView.h"
+
+#define TIMEMS QTime::currentTime().toString("hh:mm:ss zzz")
+
 #include "ui/SubMain.h"
 SubMain *SUB_MAIN;
 
@@ -208,6 +211,55 @@ void MainWindow::changeEvent(QEvent *event)
     QMainWindow::changeEvent(event);
 }
 
+#ifdef Q_OS_WIN
+#include "windows.h"
+#include "windowsx.h"
+#endif
+bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr *result)
+{
+//    qDebug() << "MainWindow::nativeEvent(const QByteArray &"<<eventType<<message<<*result;
+    // 检查事件类型是否为窗口大小变化事件
+    //windows_generic_MSG表示通用的Windows消息，包括诸如鼠标、键盘、窗口大小调整等各种类型的消息
+    //windows_dispatcher_MSG表示分发器消息，用于在Qt的事件循环中分发和处理Windows消息
+#ifdef Q_OS_WIN
+    if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
+    {
+        MSG* msg = static_cast<MSG*>(message);
+//        qDebug()<<TIMEMS<<"nativeEvent"<<msg->wParam<<msg->message;
+        if(msg->message == WM_NCCALCSIZE) {
+            //WM_NCCALCSIZE是一个Windows消息，用于通知窗口系统计算非客户区（non-client area）的大小和位置。非客户区包括窗口的边框、标题栏、系统菜单和窗口装饰等。
+            *result = 0;return true;
+        } else if (msg->message == WM_NCHITTEST)
+        {
+            //WM_NCHITTEST是一个Windows消息，用于确定鼠标在窗口的非客户区（non-client area）的哪个部分进行了点击或者悬停。
+            // 判断鼠标位置是否在窗口边界
+            const int width = this->width();
+            const int height = this->height();
+            const QPoint localPos = mapFromGlobal(QPoint(GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam)));//#include "windowsx.h"
+            if (localPos.x() < borderSize && localPos.y() < borderSize) {*result = HTTOPLEFT;}
+            else if (localPos.x() > width - borderSize && localPos.y() < borderSize) {*result = HTTOPRIGHT;}
+            else if (localPos.x() < borderSize && localPos.y() > height - borderSize) {*result = HTBOTTOMLEFT;}
+            else if (localPos.x() > width - borderSize && localPos.y() > height - borderSize) {*result = HTBOTTOMRIGHT;}
+            else if (localPos.x() < borderSize) {*result = HTLEFT;}
+            else if (localPos.x() > width - borderSize) {*result = HTRIGHT;}
+            else if (localPos.y() < borderSize) {*result = HTTOP;}
+            else if (localPos.y() > height - borderSize) {*result = HTBOTTOM;}
+
+            if (*result != 0) {return true;}
+        }
+    }
+#endif //win平台结束
+
+#ifdef Q_OS_MACOS
+    if(evnetType == "NSevent"){}
+#endif
+
+#ifdef Q_OS_LINUX
+    if(eventType == "xcb_generic_event_t") {}
+#endif
+    return QMainWindow::nativeEvent(eventType, message, result);// 如果不需要处理该事件，调用基类的nativeEvent函数
+}
+
 void MainWindow::jump_ShowMainTabWidget(int index, QString name)
 {
     qDebug() << "MainWindow::jump_ShowMainTabWidget(int "<<index<<name;
@@ -403,7 +455,7 @@ void MainWindow::on_toolButton_WidgetStatus_isFloatable_clicked()
 //    qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()置顶"<<ui->statusBar->geometry()<<ui->widget_statusBarTitle->geometry();
 }
 
-
+#include <QWindow>
 void MainWindow::on_toolButton_WidgetStatus_isStaysOnTopHint_clicked()
 {
     qDebug() << "MainWindow::on_toolButton_WidgetStatus_isStaysOnTopHint_clicked()";
