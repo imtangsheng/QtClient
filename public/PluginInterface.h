@@ -33,6 +33,7 @@ public:
     virtual QWidget* getWidgetByName(QString name = "") = 0;
     virtual bool widgetReturnAfterRemoved(QWidget* widget = nullptr) = 0; //在移除widget后添加回来
     virtual QWidget* getHomeTiler() = 0;
+    virtual void quit() = 0;
 /**声明信号函数的声明，在信号连接器中使用字符串的信号连接模式**/
     virtual void signalShowMainWidget(int index = -1,QString name = HomeMain_TabWidgetName) = 0;
 

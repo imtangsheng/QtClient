@@ -157,8 +157,8 @@ QTabBar::tab:selected{
 }
 
 QTabBar::close-button{	
-	image: url(:/asset/Home/Close.svg);
 	background: transparent;
+	image: url(:/asset/Home/Close.svg);
 }
 
 QTabBar::close-button:hover{

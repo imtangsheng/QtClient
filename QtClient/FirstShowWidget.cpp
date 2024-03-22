@@ -12,8 +12,8 @@ FirstShowWidget::FirstShowWidget(QWidget *parent) :
 
 FirstShowWidget::~FirstShowWidget()
 {
-    qDebug()<<"FirstShowWidget::~FirstShowWidget()";
     delete ui;
+    qDebug()<<"FirstShowWidget::~FirstShowWidget()";
 }
 
 void FirstShowWidget::init()

@@ -44,6 +44,7 @@ public:
 
 signals:
     void onDestorySignal();
+    void quit();
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
@@ -64,6 +65,8 @@ private slots:
     void on_toolButton_WidgetStatus_isFloatable_clicked();
 
     void on_toolButton_WidgetStatus_isStaysOnTopHint_clicked();
+
+    void on_toolButton_3_clicked();
 
 private:
     QJsonObject jsonMainConfig;

@@ -22,12 +22,15 @@ public:
     QWidget *getWidgetByName(QString name) override;
     bool widgetReturnAfterRemoved(QWidget* widget) override;
     QWidget *getHomeTiler() override;
-    MediaWidgets widgets;
+
+
+    MediaWidgets *widgets;
 
 signals:
     void signalShowMainWidget(int index,QString name) override;
 
 public slots:
+    void quit() override;
     void jumpTabWidget();
 private:
 

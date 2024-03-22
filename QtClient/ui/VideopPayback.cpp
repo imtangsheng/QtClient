@@ -15,9 +15,9 @@ VideoPlayback::VideoPlayback(QWidget *parent) : QWidget(parent),
 
 VideoPlayback::~VideoPlayback()
 {
-    qDebug() << "VideoPlayback::~VideoPlayback()";
     delete m_player; //不会主动释放
     delete ui;
+    qDebug() << "VideoPlayback::~VideoPlayback()";
 }
 
 void VideoPlayback::init()
@@ -343,7 +343,7 @@ void VideoPlayback::initSettingPlayback()
     m_player->setAudioOutput(audioOutput);
 
     // 预先加载播放视频文件
-        m_player->setSource(QUrl("rtsp://admin:dacang80@10.40.94.203:554/Streaming/Channels/1"));
+        m_player->setSource(QUrl("rtsp://admin:dacang80@192.168.1.99:554/Streaming/Channels/1"));
     //    m_player->play();
     //    videoWidget->show();
     qDebug() << "play_clicked" << m_player->isAvailable() << m_player->hasVideo();

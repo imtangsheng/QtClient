@@ -62,6 +62,13 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //    APP_SETTINGS.setValue("jsonSettingsVariable",QJsonDocument::fromVariant(jsonSettingsVariable).toJson());
     APP_SETTINGS.endGroup();
 
+//    emit quit();不会触发退出事件
+    foreach (PluginInterface* plugin, pluginList) {
+        plugin->quit();
+    }
+
+
+
     delete SUB_MAIN;
 //    deleteLater();//直接使用会奔溃
     qDebug() << "MainWindow::closeEvent(QCloseEvent *event) END";
@@ -69,9 +76,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "MainWindow::~MainWindow() delete this";
     delete ui;
     //    qApp->quit();
+    qDebug() << "MainWindow::~MainWindow() delete this";
 }
 
 /*
@@ -109,7 +116,7 @@ void MainWindow::init()
     qDebug() << "MainWindow::init()";
     if(pluginLoad()){
         qDebug() << "MainWindow::插件数量"<<pluginList.count();
-                                              foreach (PluginInterface* plug, pluginList) {
+        foreach (PluginInterface* plug, pluginList) {
 //            ui->layout_tabMain->addWidget(plug->getHomeTiler());
             ui->layout_tabMain->addWidget(plug->getWidgetByName(HomeMenu_WidgetName));
 //            ui->tabMainTest->addWidget(plug->getHomeTiler());
@@ -246,6 +253,7 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr
             else if (localPos.y() > height - borderSize) {*result = HTBOTTOM;}
 
             if (*result != 0) {return true;}
+            //HTCAPTION是一个Windows消息中的返回值，用于指示鼠标位于窗口的标题栏上,可以触发与标题栏相关的操作，例如拖动窗口或者处理特定的鼠标事件。
         }
     }
 #endif //win平台结束
@@ -380,11 +388,13 @@ void MainWindow::TabCurrentChanged(int index)
     if(button){
 //        qDebug() << "TabCurrentChanged(int index):当前选中tabCloseLastShowNum false"<<tabCloseLastShowNum;
         button->setVisible(false);
+//        button->setStyleSheet("background-color: transparent;image:;");
     }
-    button = ui->tabWidget_mainWindow->tabBar()->tabButton(index,QTabBar::RightSide);
-    if(button){
+    QWidget *buttonCurrent = ui->tabWidget_mainWindow->tabBar()->tabButton(index,QTabBar::RightSide);
+    if(buttonCurrent){
 //        qDebug() << "TabCurrentChanged(int index):当前选中 ture"<<index;
-        button->setVisible(true);
+        buttonCurrent->setVisible(true);
+//        buttonCurrent->setStyleSheet("image: url(:/asset/Home/Close.svg);");
         tabCloseLastShowNum = index;
     }
 
@@ -397,10 +407,7 @@ void MainWindow::geometryChanged(const QPoint& pos)
         QPoint posW = mapFromGlobal(QPoint(0, 0)); //负数
         qDebug() << "dockWidget::resizeEvent(QResizeEvent"<<posW.toPointF();
         ui->WidgetStatus->raise();
-        ui->WidgetStatus->setGeometry(-posW.x(),
-                                      -posW.y() + height() -ui->WidgetStatus->height() ,
-                                         width(),
-                                      ui->WidgetStatus->height());
+        ui->WidgetStatus->setGeometry(-posW.x(),-posW.y() + height() -ui->WidgetStatus->height(),width(),ui->WidgetStatus->height());
     }
 
 }
@@ -516,17 +523,16 @@ bool MainWindow::pluginLoad()
         if (plugin) {
             PluginInterface* inter = qobject_cast<PluginInterface*>(plugin);
             if(inter){
-                qDebug()<<"加载插件Window::"<<pluginList.count()<<inter->id;
-                qDebug() << "MainWindow::init()"<<"插件加载界面";
+//                qDebug()<<"加载插件Window::"<<pluginList.count()<<inter->id;
                 inter->id = pluginList.count();
                 pluginList.append(inter);
-                qDebug()<<"加载插件Window::loadPlugin() name:"<<pluginLoader.metaData().value("MetaData").toObject().value("Name").toString();
+//                qDebug()<<"加载插件Window::loadPlugin() name:"<<pluginLoader.metaData().value("MetaData").toObject().value("Name").toString();
                 //信号连接字符方法，可以使用建立一个全局唯一的信号类，建立一个返回该类的方法从而使用指针方法发送信号
                 connect(plugin,SIGNAL(signalShowMainWidget(int,QString)),this,SLOT(jump_ShowMainTabWidget(int,QString)));
+//                connect(this,SIGNAL(quit),plugin,SLOT(quit));//不会触发该信号
                 //记录插件对应的lilst下标
                 qDebug()<<"加载插件Window::"<<pluginList.count()<<inter->id<<inter->ObjectName<<inter->getObjectNane();
-                                                                                                              pluginGetListIndexFromName.insert(inter->getObjectNane(),inter->id);
-
+                pluginGetListIndexFromName.insert(inter->getObjectNane(),inter->id);
             }
 //            pluginLoader.unload();//主动释放会把加载的插件也释放掉
         }
@@ -557,12 +563,16 @@ bool MainWindow::pluginTabInsertMainWindow(int index,QString name)
     objPlugin["object"] = pluginList.at(index)->ObjectName;
     
     pluginList.at(index)->indexTabBar = indexTab;
-    ui->tabWidget_mainWindow->insertTab(indexTab,
-                addWidget,
-                                        pluginList.at(index)->WindowIcon,
-                                        pluginList.at(index)->WindowTitle);
+    ui->tabWidget_mainWindow->insertTab(indexTab,addWidget,pluginList.at(index)->WindowIcon,pluginList.at(index)->WindowTitle);
 
     tabJson[i2s(indexTab)] = objPlugin;
     jsonMainConfig["TabWindow"] = tabJson;
     return true;
 }
+
+void MainWindow::on_toolButton_3_clicked()
+{
+    qDebug() << "pluginInterface界面Widget： 不存在";
+        emit quit();//不会触发退出事件
+}
+

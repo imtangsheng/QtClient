@@ -1,9 +1,8 @@
-#include "mainwindow.h"
 #include <QApplication>
 #include <QLocale>
 #include <QTranslator>
-#include <QMessageBox>
-
+#include <QCommandLineParser>
+#include "mainwindow.h"
 #include "public/AppSystem.h"
 
 //QSettings APP_SETTINGS;
@@ -13,7 +12,18 @@ QSettings APP_SETTINGS(PATH_APP_SETTINGS,QSettings::IniFormat); //无编码配�
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QApplication app(argc, argv);
+    QCommandLineParser parser;
+    parser.setApplicationDescription("My Application");
+    parser.addHelpOption();
+
+    QCommandLineOption nameOption("name", "Specify a name", "name");
+    parser.addOption(nameOption);
+
+    QString name = parser.value(nameOption);
+    qDebug() << "APP Name:" << name;
+
+    parser.process(app);
 //    a.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);//让QWidget子对象不再共享父窗口,各自独立
 #ifdef QT_NO_DEBUG
     qInstallMessageHandler(logToFile);
@@ -23,7 +33,7 @@ int main(int argc, char *argv[])
     for (const QString &locale : uiLanguages) {
         const QString baseName = "QtClient_" + QLocale(locale).name();
         if (translator.load(":/i18n/" + baseName)) {
-            a.installTranslator(&translator);
+            app.installTranslator(&translator);
             qDebug()<<"当前显示语言Languages："<<baseName;
             break;
         }
@@ -46,5 +56,5 @@ int main(int argc, char *argv[])
         first->show();
     }
 
-    return a.exec();
+    return app.exec();
 }

@@ -22,8 +22,8 @@ TitleBar::TitleBar(QWidget *parent) :
 
 TitleBar::~TitleBar()
 {
-    qDebug()<<"TitleBar::~TitleBar()";
     delete ui;
+    qDebug()<<"TitleBar::~TitleBar()";
 }
 
 void TitleBar::mousePressEvent(QMouseEvent *event)

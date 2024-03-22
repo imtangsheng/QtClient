@@ -2,28 +2,28 @@
 
 MediaPlayer::MediaPlayer(QObject *parent) : QObject(parent)
 {
+    widgets = new MediaWidgets(nullptr);
     init();
 }
 
 void MediaPlayer::init()
 {
-    ObjectName = widgets.objectName();
+    ObjectName = widgets->objectName();
     WindowIcon = QIcon(":/asset/titler/MediaPlayer.svg");
     WindowTitle = tr("视频回放");
-    connect(&widgets,&MediaWidgets::homeMune_jump_TabWidget,this,&MediaPlayer::jumpTabWidget);
-    qDebug()<<"创建的插件MediaPlayer::init()"<<id<<ObjectName<<widgets.objectName();
+    connect(widgets,&MediaWidgets::homeMune_jump_TabWidget,this,&MediaPlayer::jumpTabWidget);
+    qDebug()<<"创建的插件MediaPlayer::init()"<<id<<ObjectName<<widgets->objectName();
 
 }
 
 QString MediaPlayer::getObjectNane()
 {
-    qDebug()<<"创建的插件MediaPlayer::init()"<<id<<ObjectName;
     return ObjectName;
 }
 
 QWidget *MediaPlayer::getWidgetByName(QString name)
 {
-    return widgets.findChild<QWidget*>(name);
+    return widgets->findChild<QWidget*>(name);
 }
 
 bool MediaPlayer::widgetReturnAfterRemoved(QWidget *widget)
@@ -31,7 +31,7 @@ bool MediaPlayer::widgetReturnAfterRemoved(QWidget *widget)
     qDebug()<<"MediaPlayer::widgetReturnAfterRemoved(QWidget *widget)";
     if(widget){
         // 使用setParent方法将子QWidget重新设置为父QWidget的子对象
-        widget->setParent(&widgets);
+        widget->setParent(widgets);
 //        widgets.layout()->addWidget(widget);//方法会奔溃
         return true;
     }
@@ -40,7 +40,13 @@ bool MediaPlayer::widgetReturnAfterRemoved(QWidget *widget)
 
 QWidget *MediaPlayer::getHomeTiler()
 {
-    return widgets.ui->HomeMenu;
+    return widgets->ui->HomeMenu;
+}
+
+void MediaPlayer::quit()
+{
+    qDebug()<<"MediaPlayer::quit()保存，再删除";
+    widgets->quit(); //先保存，再删除，
 }
 
 void MediaPlayer::jumpTabWidget()
@@ -61,7 +67,8 @@ void MediaPlayer::jumpTabWidget()
 
 MediaPlayer::~MediaPlayer()
 {
-    qDebug()<<"MediaPlayer::~MediaPlayer()释放";
+    delete widgets;
+    qDebug()<<"MediaPlayer::~MediaPlayer()";
 }
 
 

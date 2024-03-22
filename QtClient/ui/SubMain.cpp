@@ -9,8 +9,8 @@ SubMain::SubMain(QWidget *parent) : QMainWindow(parent),
 
 SubMain::~SubMain()
 {
-    qDebug()<<"SubMain::~SubMain()";
     delete ui;
+    qDebug()<<"SubMain::~SubMain()";
 }
 
 void SubMain::init()
