@@ -456,8 +456,8 @@
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>210</x>
-     <y>285</y>
+     <x>215</x>
+     <y>259</y>
     </hint>
     <hint type="destinationlabel">
      <x>218</x>
