@@ -29,7 +29,10 @@ class PluginInterface// : public QObject
 public:
 /**声明方法函数**/
     virtual ~PluginInterface() = default;
-    virtual QString getObjectNane() = 0; //添加=0显式声明为纯虚函数,必须实现
+    /*1.添加=0显式声明为纯虚函数,必须实现 2.const 在函数内部不会修改对象的成员变量。*/
+    virtual QObject* instance() = 0;
+    virtual bool Start() = 0;
+    virtual QString getObjectNane() const = 0;
     virtual QWidget* getWidgetByName(QString name = "") = 0;
     virtual bool widgetReturnAfterRemoved(QWidget* widget = nullptr) = 0; //在移除widget后添加回来
     virtual QWidget* getHomeTiler() = 0;
