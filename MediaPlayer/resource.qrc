@@ -1,6 +1,26 @@
 <RCC>
     <qresource prefix="/">
         <file>asset/titler/MediaPlayer.svg</file>
-        <file>asset/mianWidget/bg.jpeg</file>
+        <file>asset/playerControls/OpenFiles.svg</file>
+        <file>asset/playerControls/FastBack.svg</file>
+        <file>asset/playerControls/FastForward.svg</file>
+        <file>asset/playerControls/FullScreen.svg</file>
+        <file>asset/playerControls/Microphone.svg</file>
+        <file>asset/playerControls/MicrophoneMute.svg</file>
+        <file>asset/playerControls/ListNext.svg</file>
+        <file>asset/playerControls/ListPrevious.svg</file>
+        <file>asset/playerControls/MoreSetting.svg</file>
+        <file>asset/playerControls/VideoStop.svg</file>
+        <file>asset/playerControls/VideoPause.svg</file>
+        <file>asset/playerControls/VideoPlay_notAvailable.svg</file>
+        <file>asset/playerControls/VideoPlay.svg</file>
+        <file>asset/playerControls/FixedWidget.svg</file>
+        <file>asset/playerControls/FixedWidget_Cancel.svg</file>
+        <file>asset/playerControls/AutoShow.svg</file>
+        <file>asset/playerControls/AutoShow_Cancel.svg</file>
+        <file>asset/mianWidget/pupup_left.svg</file>
+        <file>asset/mianWidget/pupup_right.svg</file>
+        <file>asset/mianWidget/videoFiles.svg</file>
+        <file>asset/mianWidget/videoSettings.svg</file>
     </qresource>
 </RCC>
