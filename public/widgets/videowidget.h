@@ -23,9 +23,9 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 signals:
-
     void mouseEnterEvent();
     void mouseLeaveEvent();
+    void mousePress();
 
 public:
     QMediaPlayer player;

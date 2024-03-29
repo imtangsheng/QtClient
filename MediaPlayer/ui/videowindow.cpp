@@ -26,10 +26,11 @@ void VideoWindow::init()
 
     connect(ui->video,&VideoWidget::mouseEnterEvent,this,&VideoWindow::mouseEnterVideo);
     connect(ui->video,&VideoWidget::mouseLeaveEvent,this,&VideoWindow::mouseLeaveVideo);
+    connect(ui->video,&VideoWidget::mousePress,this,[=]() {
+        mouseIsSelected(true);
+    });
 
 //    config = new QSettings("config/" + objectName() + ".ini", QSettings::IniFormat); // 无编码配置，已经移除，使用UTF-8
-
-
     ui->video->init();
     ui->video->player.setSource(QUrl::fromLocalFile("G:/data/雪花啤酒/test.mp4"));
     ui->video->player.play();
@@ -39,7 +40,10 @@ void VideoWindow::init()
 //    ui->PlayerControls->setWindowOpacity(0.6);
 
     ui->WidgetMore->setTitleBarWidget(ui->WidgetMoreTitleBar);
-
+//    setContentsMargins(0, 0, 0, 0);
+//ui->WidgetMore->setWindowFlags(Qt::CustomizeWindowHint); //不可设置标题
+    ui->WidgetMore->hide();
+    ui->WidgetPlayerControls->hide();
 
 }
 
@@ -50,7 +54,7 @@ void VideoWindow::quit()
 //    config->endGroup();
 //    config->sync();
     ui->video->quit();
-    qDebug() << "VideoWindow::closeEvent";
+    qDebug() << "VideoWindow::quit()";
 }
 
 void VideoWindow::mouseEnterVideo()
@@ -63,6 +67,16 @@ void VideoWindow::mouseLeaveVideo()
 qDebug() << "VideoWindow::mouseLeaveVideo()";
 }
 
+void VideoWindow::mouseIsSelected(bool selected)
+{
+    if(selected){
+        ui->Widget->setContentsMargins(1, 1, 1, 1);
+    }else{
+        ui->Widget->setContentsMargins(0, 0, 0, 0);
+    }
+
+}
+
 void VideoWindow::showEvent(QShowEvent *event)
 {
     qDebug() <<"VideoWindow::showEvent(QShowEvent *"<<event;
@@ -72,14 +86,13 @@ void VideoWindow::showEvent(QShowEvent *event)
 //    }
 }
 
-void VideoWindow::on_Button_moreFloatable_clicked()
+
+void VideoWindow::on_Button_moreWidget_isFloatable_clicked()
 {
-    if(ui->WidgetMore->isFloating()){
-        ui->WidgetMore->setFloating(false);
+    if(ui->tabWidget_Video->isVisible()){
+        ui->tabWidget_Video->setVisible(false);
     }else{
-        ui->WidgetMore->setFloating(true);
+        ui->tabWidget_Video->setVisible(true);
     }
 }
-
-
 

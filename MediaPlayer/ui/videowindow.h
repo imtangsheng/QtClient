@@ -23,15 +23,14 @@ public:
 public slots:
     void mouseEnterVideo();
     void mouseLeaveVideo();
+    void mouseIsSelected(bool selected = true);
 
 protected:
 
     void showEvent(QShowEvent *event) override; //在控件第一次显示时以及每次从隐藏状态恢复到显示状态时都会被触发
 
 private slots:
-    void on_Button_moreFloatable_clicked();
-
-
+    void on_Button_moreWidget_isFloatable_clicked();
 private:
     Ui::VideoWindow *ui;
 };

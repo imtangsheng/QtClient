@@ -53,6 +53,7 @@ void VideoWidget::mouseDoubleClickEvent(QMouseEvent *event)
 void VideoWidget::mousePressEvent(QMouseEvent *event)
 {
     qDebug()<<"VideoWidget::mousePressEvent(QMouseEvent *"<<event->button();
+    emit mousePress();
     return QVideoWidget::mousePressEvent(event);
 }
 
