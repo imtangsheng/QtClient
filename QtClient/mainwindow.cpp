@@ -37,7 +37,6 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->statusBar->showMessage();
 //    connect(ui->statusBar,&QStatusBar::showMessage,this,&MainWindow::showMessage);
 //    connect(ui->statusBar,&QStatusBar::clearMessage,this,&MainWindow::clearMessage);
-
     SUB_MAIN = new SubMain;
     _Awake();
 }
@@ -61,14 +60,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     APP_SETTINGS.setValue("jsonSettingsVariable",jsonMainConfig);
 //    APP_SETTINGS.setValue("jsonSettingsVariable",QJsonDocument::fromVariant(jsonSettingsVariable).toJson());
     APP_SETTINGS.endGroup();
-
-//    emit quit();不会触发退出事件
-    foreach (PluginInterface* plugin, pluginList) {
-        plugin->quit();
-    }
-
-
-
+    emit quit();
     delete SUB_MAIN;
 //    deleteLater();//直接使用会奔溃
     qDebug() << "MainWindow::closeEvent(QCloseEvent *event) END";
@@ -116,11 +108,9 @@ void MainWindow::init()
     qDebug() << "MainWindow::init()";
     if(pluginLoad()){
         qDebug() << "MainWindow::插件数量"<<pluginList.count();
-        foreach (PluginInterface* plug, pluginList) {
-//            ui->layout_tabMain->addWidget(plug->getHomeTiler());
-            ui->layout_tabMain->addWidget(plug->getWidgetByName(HomeMenu_WidgetName));
-//            ui->tabMainTest->addWidget(plug->getHomeTiler());
-//            ui->tabMainTest->addWidget(SUB_MAIN->ui->widget_test);
+        foreach (PluginInterface* plugin, pluginList) {
+            plugin->Start();
+            ui->layout_tabMain->addWidget(plugin->getWidgetByName(HomeMenu_WidgetName));
 
         }
 //        ui->tab_main->layout()->addItem(ui->verticalSpacer_tabMain);
@@ -528,6 +518,9 @@ bool MainWindow::pluginLoad()
                 pluginList.append(inter);
 //                qDebug()<<"加载插件Window::loadPlugin() name:"<<pluginLoader.metaData().value("MetaData").toObject().value("Name").toString();
                 //信号连接字符方法，可以使用建立一个全局唯一的信号类，建立一个返回该类的方法从而使用指针方法发送信号
+                //1.连接信号和槽函数时使用括号，例如 SIGNAL(quit()) 和 SLOT(quit())，这表示你正在使用字符串来指示信号和槽函数。
+                //2.不使用括号：从 Qt 5 开始，你也可以在连接信号和槽函数时不使用括号。这意味着你直接使用函数指针来指示信号和槽函数。这种方式更加直观和类型安全，因为它在编译时进行了检查。
+                connect(this,SIGNAL(quit()),plugin,SLOT(quit()));
                 connect(plugin,SIGNAL(signalShowMainWidget(int,QString)),this,SLOT(jump_ShowMainTabWidget(int,QString)));
 //                connect(this,SIGNAL(quit),plugin,SLOT(quit));//不会触发该信号
                 //记录插件对应的lilst下标

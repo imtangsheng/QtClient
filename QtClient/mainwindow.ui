@@ -41,7 +41,7 @@
    <string>客户端程序</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="resource.qrc">
+   <iconset>
     <normaloff>:/asset/favicon.png</normaloff>:/asset/favicon.png</iconset>
   </property>
   <property name="toolTip">
@@ -194,7 +194,7 @@ QTabBar::tab{
         <string notr="true">background-color:transparent;</string>
        </property>
        <attribute name="icon">
-        <iconset resource="resource.qrc">
+        <iconset>
          <normaloff>:/asset/Home/Menu.svg</normaloff>:/asset/Home/Menu.svg</iconset>
        </attribute>
        <attribute name="title">
@@ -246,7 +246,7 @@ QTabBar::tab{
               <string>视频回放</string>
              </property>
              <property name="icon">
-              <iconset resource="resource.qrc">
+              <iconset>
                <normaloff>:/asset/Home/playback.svg</normaloff>:/asset/Home/playback.svg</iconset>
              </property>
              <property name="iconSize">
@@ -324,7 +324,7 @@ QTabBar::tab{
               <string>数据图表</string>
              </property>
              <property name="icon">
-              <iconset resource="resource.qrc">
+              <iconset>
                <normaloff>:/asset/Home/DataView.svg</normaloff>:/asset/Home/DataView.svg</iconset>
              </property>
              <property name="iconSize">
@@ -545,7 +545,7 @@ QTabBar::tab{
            <string>置顶</string>
           </property>
           <property name="icon">
-           <iconset resource="resource.qrc">
+           <iconset>
             <normaloff>:/asset/Home/on_top.svg</normaloff>:/asset/Home/on_top.svg</iconset>
           </property>
           <property name="checkable">
@@ -577,7 +577,7 @@ QTabBar::tab{
            <string>浮动</string>
           </property>
           <property name="icon">
-           <iconset resource="resource.qrc">
+           <iconset>
             <normaloff>:/asset/Home/double-arrow-top.svg</normaloff>:/asset/Home/double-arrow-top.svg</iconset>
           </property>
          </widget>
@@ -912,8 +912,6 @@ background-color: rgb(85, 0, 255);
    </property>
   </action>
  </widget>
- <resources>
-  <include location="resource.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
