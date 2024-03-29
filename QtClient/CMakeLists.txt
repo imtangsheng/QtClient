@@ -15,8 +15,29 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets LinguistTools MultimediaWidgets Charts Network)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets LinguistTools MultimediaWidgets Charts Network)
 
+include_directories("./")
+include_directories(${PROJECT_SOURCE_DIR})
+
+file(GLOB_RECURSE UI ./ui/*.*)
+file(GLOB_RECURSE MODULES ./modules/*.*)
+file(GLOB_RECURSE PRIVATRE_PUBLIC ./public/*.*)
+
+set(PUBLIC
+    ../public/PluginInterface.h
+)
+set(RESOURCES
+#    "${PROJECT_SOURCE_DIR}/../README.md"
+    "readme.md"
+    "resource.qrc"
+    "doc/dev.md"
+)
+
 set(TS_FILES QtClient_zh_CN.ts)
 
+source_group("UI" FILES ${UI})
+source_group("Resource" FILES ${RESOURCES} TS_FILES)
+source_group("Public" FILES ${PUBLIC} ${PRIVATRE_PUBLIC})
+source_group("Modules" FILES ${MODULES})
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp mainwindow.h mainwindow.ui
@@ -27,19 +48,18 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(QtClient
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
-        public/AppSystem.h public/AppSystem.cpp
-        public/AppOS.h
-        ui/SubMain.h ui/SubMain.cpp ui/SubMain.ui
-        ui/VideoPlayback.h ui/VideopPayback.cpp ui/VideoPlayback.ui
-        ui/DataView.h ui/DataView.cpp ui/DataView.ui
-        modules/FilesUtil.h modules/FilesUtil.cpp modules/FilesUtil.ui
         FirstShowWidget.h FirstShowWidget.cpp FirstShowWidget.ui
-        ui/TitleBar.h ui/TitleBar.cpp ui/TitleBar.ui
+#        public/AppSystem.h public/AppSystem.cpp
+#        public/AppOS.h
+#        ui/TitleBar.h ui/TitleBar.cpp ui/TitleBar.ui
+#        ui/SubMain.h ui/SubMain.cpp ui/SubMain.ui
+#        ui/VideoPlayback.h ui/VideopPayback.cpp ui/VideoPlayback.ui
+#        ui/DataView.h ui/DataView.cpp ui/DataView.ui
+#        modules/FilesUtil.h modules/FilesUtil.cpp modules/FilesUtil.ui
+        ${PUBLIC} ${PRIVATRE_PUBLIC} ${MODULES}
+        ${UI}
+        ${RESOURCES}
 
-        readme.md
-        doc/dev.md
-        resource.qrc
-        ../public/PluginInterface.h
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET QtClient APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
