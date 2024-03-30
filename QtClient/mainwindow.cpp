@@ -55,11 +55,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     qDebug() << "MainWindow::closeEvent(QCloseEvent *event)" << event;
     //    qApp->quit(); //重载主程序点击退出事件，软件退出
-    APP_SETTINGS.beginGroup("MainWindow");
-    APP_SETTINGS.setValue("geometry", saveGeometry());
-    APP_SETTINGS.setValue("jsonSettingsVariable",jsonMainConfig);
+    AppSettings.beginGroup("MainWindow");
+    AppSettings.setValue("geometry", saveGeometry());
+    AppSettings.setValue("jsonSettingsVariable",jsonMainConfig);
 //    APP_SETTINGS.setValue("jsonSettingsVariable",QJsonDocument::fromVariant(jsonSettingsVariable).toJson());
-    APP_SETTINGS.endGroup();
+    AppSettings.endGroup();
     emit quit();
     delete SUB_MAIN;
 //    deleteLater();//直接使用会奔溃
@@ -120,18 +120,18 @@ void MainWindow::init()
 
 void MainWindow::_Start()
 {
-    qDebug() << "MainWindow::_Start() 使用版本号：" << EXE_CONFIG["version"];
-    APP_SETTINGS.beginGroup("MainWindow");
-    const auto geometry = APP_SETTINGS.value("geometry", QByteArray()).toByteArray(); // QByteArray 类型
+    qDebug() << "MainWindow::_Start() 使用版本号：" << AppJson["version"];
+    AppSettings.beginGroup("MainWindow");
+    const auto geometry = AppSettings.value("geometry", QByteArray()).toByteArray(); // QByteArray 类型
     if (geometry.isEmpty())
         setGeometry(200, 200, 800, 600);
     else
         restoreGeometry(geometry);
 
-    jsonMainConfig = APP_SETTINGS.value("jsonSettingsVariable",QJsonObject()).toJsonObject();
+    jsonMainConfig = AppSettings.value("jsonSettingsVariable",QJsonObject()).toJsonObject();
     //    const auto list2 = APP_SETTINGS.value("list",QVariant::fromValue(QList<int>{}));
     //    QList<int> list4 = APP_SETTINGS.value("list").value<QList<int>>();
-    APP_SETTINGS.endGroup();
+    AppSettings.endGroup();
     qDebug()<<"jsonSettingsVariable 格式的配置："<<jsonMainConfig;
     foreach (const QString key, jsonMainConfig["TabWindow"].toObject().keys()) {
         QJsonObject objKey = jsonMainConfig["TabWindow"].toObject()[key].toObject();

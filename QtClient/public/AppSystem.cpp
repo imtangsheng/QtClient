@@ -42,7 +42,7 @@ void logToFile(QtMsgType type, const QMessageLogContext &context, const QString 
 
 }
 
-QJsonObject EXE_CONFIG;
+QJsonObject AppJson;
 bool getExeConfigJson()
 {
     //初始化配置 EXE_CONFIG
@@ -54,9 +54,9 @@ bool getExeConfigJson()
         file.close();
         return -1;
     }
-    EXE_CONFIG = QJsonDocument::fromJson(file.readAll()).object();
+    AppJson = QJsonDocument::fromJson(file.readAll()).object();
     file.close();
-    if(EXE_CONFIG.isEmpty()) {
+    if(AppJson.isEmpty()) {
         qErrnoWarning("Config file is not valid JSON");
 //        QMessageBox::critical(nullptr, "Error", "Config file is not valid JSON");
         return -1;

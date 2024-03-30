@@ -1,9 +1,9 @@
 #include "videowindow.h"
 
-//#include <QSettings>
+#include <QSettings>
 
 
-//QSettings *config; //("config/config.ini",QSettings::IniFormat); //无编码配置，已经移除，使用UTF-8
+QSettings *config; //("config/config.ini",QSettings::IniFormat); //无编码配置，已经移除，使用UTF-8
 
 VideoWindow::VideoWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -30,9 +30,10 @@ void VideoWindow::init()
         mouseIsSelected(true);
     });
 
-//    config = new QSettings("config/" + objectName() + ".ini", QSettings::IniFormat); // 无编码配置，已经移除，使用UTF-8
+    config = new QSettings("config/" + objectName() + ".ini", QSettings::IniFormat); // 无编码配置，已经移除，使用UTF-8
     ui->video->init();
-    ui->video->player.setSource(QUrl::fromLocalFile("G:/data/雪花啤酒/test.mp4"));
+//    ui->video->player.setSource(QUrl::fromLocalFile("G:/data/雪花啤酒/test.mp4"));
+    ui->video->player.setSource(QUrl("rtsp://admin:dacang80@192.168.1.99:554/Streaming/Channels/1"));
     ui->video->player.play();
 
 //    ui->PlayerControls->setTitleBarWidget(ui->WidgetControlsTitleBar);
@@ -42,17 +43,17 @@ void VideoWindow::init()
     ui->WidgetMore->setTitleBarWidget(ui->WidgetMoreTitleBar);
 //    setContentsMargins(0, 0, 0, 0);
 //ui->WidgetMore->setWindowFlags(Qt::CustomizeWindowHint); //不可设置标题
-    ui->WidgetMore->hide();
-    ui->WidgetPlayerControls->hide();
+//    ui->WidgetMore->hide();
+//    ui->WidgetPlayerControls->hide();
 
 }
 
 void VideoWindow::quit()
 {
-//    config->beginGroup(objectName());
-//    config->setValue("geometry", saveGeometry());
-//    config->endGroup();
-//    config->sync();
+    config->beginGroup(objectName());
+    config->setValue("geometry", saveGeometry());
+    config->endGroup();
+    config->sync();
     ui->video->quit();
     qDebug() << "VideoWindow::quit()";
 }

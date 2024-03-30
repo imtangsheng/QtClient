@@ -4,7 +4,7 @@
 #include <QDebug>
 #include <QMessageBox>
 
-#include "./AppOS.h"
+#include "AppOS.h"
 
 /*供了互斥锁机制，用于保护共享资源，防止多个线程同时访问*/
 #include <mutex>
@@ -71,14 +71,10 @@ public:
 
 /*json文件读取软件相关配置*/
 #include <QJsonDocument>
-#include <QJsonObject>
-extern QJsonObject EXE_CONFIG;
 bool getExeConfigJson();
 IsSucce ReadJsonData(QJsonObject& jsonData,const QString& filePath);
 IsSucce SavaJsonData(QJsonObject& jsonData,const QString& filePath);
 /*ini文件读取配置，Qt自带系统方法，指定存储在本地或者系统注册表等地方*/
-#include <QSettings>
-extern QSettings APP_SETTINGS;
 
 /*使用qt自带的消息映射，qDebug自定义输出*/
 #include <QtLogging>
@@ -91,8 +87,6 @@ void logToFile(QtMsgType type, const QMessageLogContext &context, const QString 
 extern QString PATH_EXE_CONFIG;
 extern QString PATH_APP_SETTINGS;
 extern QString PATH_LOG;
-
-extern QString CurrentUser;
 
 /*定义功能集*/
 enum TabWindow

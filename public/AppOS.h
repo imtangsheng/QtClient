@@ -1,3 +1,12 @@
+/**
+ * @file AppOS.h
+ * @brief 该文件是APP通用的大多数接口接口类模板，声明全局变量，方法
+ *
+ * @details
+ * Author: Tang
+ * Created: 2024-03
+ */
+
 #ifndef APPOS_H
 #define APPOS_H
 
@@ -56,5 +65,12 @@ typedef signed long long INT64;
 #define __stdcall
 #define CALLBACK
 #endif // windows
+/**全局变量**/
+#include <QJsonObject>
+extern QJsonObject AppJson;
+/*ini文件读取配置，Qt自带系统方法，指定存储在本地或者系统注册表等地方*/
+#include <QSettings>
+extern QSettings AppSettings;
 
+extern QString CurrentUser;
 #endif // APPOS_H

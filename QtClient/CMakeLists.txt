@@ -24,6 +24,7 @@ file(GLOB_RECURSE PRIVATRE_PUBLIC ./public/*.*)
 
 set(PUBLIC
     ../public/PluginInterface.h
+    ../public/AppOS.h
 )
 set(RESOURCES
 #    "${PROJECT_SOURCE_DIR}/../README.md"

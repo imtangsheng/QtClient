@@ -6,7 +6,7 @@
 #include "public/AppSystem.h"
 
 //QSettings APP_SETTINGS;
-QSettings APP_SETTINGS(PATH_APP_SETTINGS,QSettings::IniFormat); //无编码配置，已经移除，使用UTF-8
+QSettings AppSettings(PATH_APP_SETTINGS,QSettings::IniFormat); //无编码配置，已经移除，使用UTF-8
 
 #include "FirstShowWidget.h"
 
@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     }
 
     if(getExeConfigJson()){
-        qDebug()<<"当前软件开发版本："<<EXE_CONFIG["version"].toString();
+        qDebug()<<"当前软件开发版本："<<AppJson["version"].toString();
     }
     MainWindow w;    
     std::unique_ptr<FirstShowWidget> first(new FirstShowWidget());

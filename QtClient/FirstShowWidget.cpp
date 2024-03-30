@@ -19,12 +19,12 @@ FirstShowWidget::~FirstShowWidget()
 void FirstShowWidget::init()
 {
     setWindowFlags( Qt::FramelessWindowHint);
-    APP_SETTINGS.beginGroup("FirstShowWidget");
-    username = APP_SETTINGS.value("username", "").toString();
-    password =  APP_SETTINGS.value("password", "").toString();
-    isAutoLogin = APP_SETTINGS.value("isAutoLogin", false).toBool();
-    isSavaPassword = APP_SETTINGS.value("isSavaPassword", false).toBool();
-    APP_SETTINGS.endGroup();
+    AppSettings.beginGroup("FirstShowWidget");
+    username = AppSettings.value("username", "").toString();
+    password =  AppSettings.value("password", "").toString();
+    isAutoLogin = AppSettings.value("isAutoLogin", false).toBool();
+    isSavaPassword = AppSettings.value("isSavaPassword", false).toBool();
+    AppSettings.endGroup();
 
     ui->lineEdit_username->setText(username);
     if(isSavaPassword){
@@ -56,33 +56,33 @@ bool FirstShowWidget::start()
         return false;
     }
 
-    APP_SETTINGS.beginGroup("FirstShowWidget");
+    AppSettings.beginGroup("FirstShowWidget");
     if(ui->checkBox_savaPassword->isChecked()){
-        APP_SETTINGS.setValue("username", ui->lineEdit_username->text());
-        APP_SETTINGS.setValue("password", ui->lineEdit_password->text());
+        AppSettings.setValue("username", ui->lineEdit_username->text());
+        AppSettings.setValue("password", ui->lineEdit_password->text());
         //        APP_SETTINGS.setValue("isAutoLogin", true);
-        APP_SETTINGS.setValue("isSavaPassword", true);
+        AppSettings.setValue("isSavaPassword", true);
     }
     else {
 //        APP_SETTINGS.setValue("username", "");
-        APP_SETTINGS.setValue("password", "");
+        AppSettings.setValue("password", "");
         //        APP_SETTINGS.setValue("isAutoLogin", false);
-        APP_SETTINGS.setValue("isSavaPassword", false);
+        AppSettings.setValue("isSavaPassword", false);
         }
     if(ui->checkBox_autoLogin->isChecked()){
 //        APP_SETTINGS.setValue("username", ui->lineEdit_username->text());
 //        APP_SETTINGS.setValue("password", ui->lineEdit_password->text());
 //        APP_SETTINGS.setValue("isSavaPassword", true);
-        APP_SETTINGS.setValue("isAutoLogin", true);
+        AppSettings.setValue("isAutoLogin", true);
     }
     else {
     //        APP_SETTINGS.setValue("username", "");
     //        APP_SETTINGS.setValue("password", "");
     //        APP_SETTINGS.setValue("isAutoLogin", false);
     //        APP_SETTINGS.setValue("isSavaPassword", false);
-    APP_SETTINGS.setValue("isAutoLogin", false);
+    AppSettings.setValue("isAutoLogin", false);
     }
-    APP_SETTINGS.endGroup();
+    AppSettings.endGroup();
     CurrentUser =  ui->lineEdit_username->text();
     return true;
 
