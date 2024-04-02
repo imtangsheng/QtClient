@@ -20,3 +20,15 @@ void Slider::mousePressEvent(QMouseEvent *event)
     // 调用基类的mousePressEvent处理其他事件
     return QSlider::mousePressEvent(event);
 }
+
+void Slider::enterEvent(QEnterEvent *event)
+{
+    emit mouseEnterEvent();
+    return QSlider::enterEvent(event);
+}
+
+void Slider::leaveEvent(QEvent *event)
+{
+    emit mouseLeaveEvent();
+    return QSlider::leaveEvent(event);
+}

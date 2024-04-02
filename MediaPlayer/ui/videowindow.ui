@@ -52,7 +52,8 @@ QMainWindow::separator { width: 0px; height: 0px; margin: 2px; padding: 0px; };<
        </sizepolicy>
       </property>
       <property name="styleSheet">
-       <string notr="true">border: 2px solid red;</string>
+       <string notr="true">border: 2px solid red;
+image: url(:/asset/titler/MediaPlayer.svg);</string>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <property name="spacing">
@@ -375,9 +376,12 @@ QSlider::sub-page:horizontal {
         </widget>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_PlayerControls">
+        <layout class="QHBoxLayout" name="horizontalLayout_PlayerControls" stretch="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
          <property name="spacing">
           <number>0</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetFixedSize</enum>
          </property>
          <item>
           <widget class="QLabel" name="label_videoProgress">
@@ -411,239 +415,49 @@ QSlider::sub-page:horizontal {
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButton_listPrevious">
-           <property name="toolTip">
-            <string>上一个</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="statusTip">
-            <string>上一个</string>
-           </property>
-           <property name="text">
-            <string>上一个</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/ListPrevious.svg</normaloff>:/asset/playerControls/ListPrevious.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButton_fastBback">
-           <property name="toolTip">
-            <string>快退</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="statusTip">
-            <string>快退</string>
-           </property>
-           <property name="text">
-            <string>快退</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/FastBack.svg</normaloff>:/asset/playerControls/FastBack.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButton_videoPlay">
-           <property name="toolTip">
-            <string>播放</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="statusTip">
-            <string>播放</string>
-           </property>
-           <property name="text">
-            <string>播放</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/VideoPlay.svg</normaloff>:/asset/playerControls/VideoPlay.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButton_videoPause">
-           <property name="toolTip">
-            <string>暂停</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="statusTip">
-            <string>暂停</string>
-           </property>
-           <property name="text">
-            <string>暂停</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/VideoPause.svg</normaloff>:/asset/playerControls/VideoPause.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButton_videoStop">
-           <property name="toolTip">
-            <string>停止播放</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="text">
-            <string>停止播放</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/VideoStop.svg</normaloff>:/asset/playerControls/VideoStop.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButton_fastForward">
-           <property name="toolTip">
-            <string>快进</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="statusTip">
-            <string>快进</string>
-           </property>
-           <property name="text">
-            <string>快进</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/FastForward.svg</normaloff>:/asset/playerControls/FastForward.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButton_listNext">
-           <property name="toolTip">
-            <string>下一个</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="statusTip">
-            <string>下一个</string>
-           </property>
-           <property name="text">
-            <string>下一个</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/ListNext.svg</normaloff>:/asset/playerControls/ListNext.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="ToolButton" name="toolButton_microphoneMute">
-           <property name="mouseTracking">
-            <bool>true</bool>
-           </property>
-           <property name="focusPolicy">
-            <enum>Qt::StrongFocus</enum>
-           </property>
-           <property name="toolTip">
-            <string>静音/音量设置</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="statusTip">
-            <string>静音/音量设置</string>
-           </property>
-           <property name="text">
-            <string>静音/音量设置</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/Microphone.svg</normaloff>:/asset/playerControls/Microphone.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSlider" name="horizontalSlider_volume">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QSlider::groove:horizontal {
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="ToolButton" name="toolButton_microphoneMute">
+             <property name="mouseTracking">
+              <bool>true</bool>
+             </property>
+             <property name="focusPolicy">
+              <enum>Qt::StrongFocus</enum>
+             </property>
+             <property name="toolTip">
+              <string>静音/音量设置</string>
+             </property>
+             <property name="toolTipDuration">
+              <number>5</number>
+             </property>
+             <property name="statusTip">
+              <string>静音/音量设置</string>
+             </property>
+             <property name="text">
+              <string>静音/音量设置</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../resource.qrc">
+               <normaloff>:/asset/playerControls/MicrophoneMute.svg</normaloff>:/asset/playerControls/MicrophoneMute.svg</iconset>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="Slider" name="horizontalSlider_volume">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QSlider::groove:horizontal {
 	height: 8px;
 	background-color: transparent;
 }
@@ -667,58 +481,58 @@ QSlider::add-page:horizontal {
 QSlider::sub-page:horizontal {
     background:#1296db;
 }</string>
-           </property>
-           <property name="pageStep">
-            <number>0</number>
-           </property>
-           <property name="value">
-            <number>20</number>
-           </property>
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="comboBox_rate">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>36</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>24</height>
-            </size>
-           </property>
-           <property name="font">
-            <font>
-             <italic>false</italic>
-             <bold>true</bold>
-            </font>
-           </property>
-           <property name="toolTip">
-            <string>播放速度设置</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="statusTip">
-            <string>播放速度设置</string>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QComboBox:hover {
+             </property>
+             <property name="pageStep">
+              <number>0</number>
+             </property>
+             <property name="value">
+              <number>20</number>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="comboBox_rate">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>30</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>30</width>
+               <height>24</height>
+              </size>
+             </property>
+             <property name="font">
+              <font>
+               <italic>false</italic>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="toolTip">
+              <string>播放速度设置</string>
+             </property>
+             <property name="toolTipDuration">
+              <number>5</number>
+             </property>
+             <property name="statusTip">
+              <string>播放速度设置</string>
+             </property>
+             <property name="layoutDirection">
+              <enum>Qt::RightToLeft</enum>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">QComboBox:hover {
     background-color: #1296db; /* 设置鼠标悬停时的背景色为蓝色 */
 }
 
@@ -745,15 +559,92 @@ QComboBox QAbstractItemView::item:selected {
     background-color:#90a4ae; /* 设置选中的下拉列表项的背景色为蓝色 */
     color:red; /* 设置选中的下拉列表项的字体颜色为白色 */
 }</string>
-           </property>
-           <property name="editable">
+             </property>
+             <property name="editable">
+              <bool>false</bool>
+             </property>
+             <property name="currentText">
+              <string>1</string>
+             </property>
+             <property name="currentIndex">
+              <number>1</number>
+             </property>
+             <property name="sizeAdjustPolicy">
+              <enum>QComboBox::AdjustToContents</enum>
+             </property>
+             <property name="iconSize">
+              <size>
+               <width>24</width>
+               <height>24</height>
+              </size>
+             </property>
+             <item>
+              <property name="text">
+               <string>0.5</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1.5</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>2</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>4</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>8</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_listPrevious">
+           <property name="enabled">
             <bool>false</bool>
            </property>
-           <property name="currentIndex">
-            <number>0</number>
+           <property name="toolTip">
+            <string>上一个</string>
            </property>
-           <property name="sizeAdjustPolicy">
-            <enum>QComboBox::AdjustToContents</enum>
+           <property name="toolTipDuration">
+            <number>5</number>
+           </property>
+           <property name="statusTip">
+            <string>上一个</string>
+           </property>
+           <property name="text">
+            <string>上一个</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/asset/playerControls/ListPrevious.svg</normaloff>:/asset/playerControls/ListPrevious.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -761,35 +652,184 @@ QComboBox QAbstractItemView::item:selected {
              <height>24</height>
             </size>
            </property>
-           <item>
-            <property name="text">
-             <string>1x</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>1.5x</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>2x</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>4x</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>8x</string>
-            </property>
-           </item>
           </widget>
          </item>
          <item>
-          <spacer name="horizontalSpacer_PlayerControls">
+          <widget class="QToolButton" name="toolButton_fastBback">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>快退</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>5</number>
+           </property>
+           <property name="statusTip">
+            <string>快退</string>
+           </property>
+           <property name="text">
+            <string>快退</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/asset/playerControls/FastBack.svg</normaloff>:/asset/playerControls/FastBack.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_videoPlay">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>播放</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>5</number>
+           </property>
+           <property name="statusTip">
+            <string>播放</string>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>播放</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/asset/playerControls/VideoPlay.svg</normaloff>:/asset/playerControls/VideoPlay.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_videoPause">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>暂停</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>5</number>
+           </property>
+           <property name="statusTip">
+            <string>暂停</string>
+           </property>
+           <property name="text">
+            <string>暂停</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/asset/playerControls/VideoPause.svg</normaloff>:/asset/playerControls/VideoPause.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_videoStop">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>停止播放</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>5</number>
+           </property>
+           <property name="text">
+            <string>停止播放</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/asset/playerControls/VideoStop.svg</normaloff>:/asset/playerControls/VideoStop.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_fastForward">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>快进</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>5</number>
+           </property>
+           <property name="statusTip">
+            <string>快进</string>
+           </property>
+           <property name="text">
+            <string>快进</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/asset/playerControls/FastForward.svg</normaloff>:/asset/playerControls/FastForward.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_listNext">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>下一个</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>5</number>
+           </property>
+           <property name="statusTip">
+            <string>下一个</string>
+           </property>
+           <property name="text">
+            <string>下一个</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/asset/playerControls/ListNext.svg</normaloff>:/asset/playerControls/ListNext.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_2">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -800,6 +840,32 @@ QComboBox QAbstractItemView::item:selected {
             </size>
            </property>
           </spacer>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_openFiles">
+           <property name="toolTip">
+            <string>选择文件</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>5</number>
+           </property>
+           <property name="statusTip">
+            <string>选择文件</string>
+           </property>
+           <property name="text">
+            <string>选择文件</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/asset/playerControls/OpenFiles.svg</normaloff>:/asset/playerControls/OpenFiles.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
          </item>
          <item>
           <widget class="QToolButton" name="toolButton_AutoShow">
@@ -844,32 +910,6 @@ QComboBox QAbstractItemView::item:selected {
            <property name="icon">
             <iconset resource="../resource.qrc">
              <normaloff>:/asset/playerControls/FixedWidget.svg</normaloff>:/asset/playerControls/FixedWidget.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QToolButton" name="toolButton_openFiles">
-           <property name="toolTip">
-            <string>选择文件</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="statusTip">
-            <string>选择文件</string>
-           </property>
-           <property name="text">
-            <string>选择文件</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/OpenFiles.svg</normaloff>:/asset/playerControls/OpenFiles.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -1140,6 +1180,24 @@ QComboBox QAbstractItemView::item:selected {
          </property>
          <property name="toolTipDuration">
           <number>5</number>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QTabBar::tab {
+    background: transparent;
+	background-color: rgb(55, 71, 79);
+}
+
+QTabBar::tab:selected{
+	font-weight: bold;
+	color: rgb(255, 255, 255);
+	background-color: rgb(38, 50, 56);
+}
+
+/*
+QTabWidget::pane {
+	border: 0; 
+}
+*/</string>
          </property>
          <property name="currentIndex">
           <number>0</number>

@@ -61,10 +61,13 @@ void TitleBar::mouseDoubleClickEvent(QMouseEvent *event)
 {
     qDebug()<<"WidgetHeader::mouseDoubleClickEvent "<<event->button();
     if(event->button() == Qt::LeftButton){
-        if(this->window()->windowState() == Qt::WindowMaximized){
+        if(this->window()->windowState() == Qt::WindowFullScreen){
+            this->window()->showNormal();
+        }else if(this->window()->windowState() == Qt::WindowMaximized){
             this->window()->showNormal();
         }else{
-            this->window()->showMaximized();
+//            this->window()->showMaximized();
+            this->window()->showFullScreen();
         }
         isMaximizedWindowDisplay();
         return;

@@ -18,6 +18,7 @@ public:
     ~VideoWindow();
 
     void init();
+    void startShow();
     void quit();
 
 public slots:
@@ -25,14 +26,82 @@ public slots:
     void mouseLeaveVideo();
     void mouseIsSelected(bool selected = true);
 
+    void WidgetMoreIsFloating(bool isFloating);
+    bool PlayExecuteCmd(int command);
+
 protected:
 
     void showEvent(QShowEvent *event) override; //在控件第一次显示时以及每次从隐藏状态恢复到显示状态时都会被触发
 
+protected slots:
+    /*视频播放信号连接*/
+    //[!1-LoadingMedia !6-LoadedMedia !8-BufferingMedia -BufferedMedia -EndOfMedia]
+    /*
+     * enum QMediaPlayer::MediaStatus定义媒体播放器的当前媒体的状态。
+        QMediaPlayer::NoMedia	0	没有当前媒体。玩家在
+        QMediaPlayer::LoadingMedia	1	正在加载当前介质。玩家可以处于任何状态。
+        QMediaPlayer::LoadedMedia	2	当前介质已加载。玩家在
+        QMediaPlayer::StalledMedia	3	由于缓冲不足或其他一些临时中断，当前媒体的播放已停止。玩家PlayingState or PausedState.
+        QMediaPlayer::BufferingMedia	4	播放器正在缓冲数据，但已缓冲足够的数据，以便在不久的将来继续播放。玩家PlayingState or PausedState.
+        QMediaPlayer::BufferedMedia	5	播放器已完全缓冲当前媒体。玩家在 PlayingState or PausedState.
+        QMediaPlayer::EndOfMedia	6	播放已到达当前媒体的末尾。玩家在 StoppedState.
+        QMediaPlayer::InvalidMedia	7	无法播放当前媒体。玩家在 StoppedState.
+    */
+    void mediaStatusChanged(QMediaPlayer::MediaStatus status); //媒体状态变化
+    //[2!]
+    void sourceChanged(const QUrl &media); //播放源变化
+    //[3!]
+    void durationChanged(qint64 duration); //总时长变化
+    //[4!]
+    void tracksChanged(); //曲目变化
+    //[5!] Signals from player
+    void hasVideoChanged(bool videoAvailable); //表示视觉内容的可用性已更改为
+    //[7!]
+    /*  enum QMediaPlayer::PlaybackState        定义媒体播放器的当前状态。
+        QMediaPlayer::StoppedState	0	媒体播放器未播放内容，播放将从当前曲目的开头开始。
+        QMediaPlayer::PlayingState	1	媒体播放器当前正在播放内容。这表示与属性相同。
+        QMediaPlayer::PausedState	2	媒体播放器已暂停播放，当前曲目的播放将从播放器暂停的位置恢复。
+    */
+    void playbackStateChanged(QMediaPlayer::PlaybackState newState); // 播放状态变化
+
+    //[9!]
+    void positionChange(qint64 progress); //播放位置变化
+
+    //[end]
+    void bufferProgressChanged(float filled); //缓存变化，0-1
+    void errorOccurred(QMediaPlayer::Error error, const QString &errorString); //错误
+
 private slots:
     void on_Button_moreWidget_isFloatable_clicked();
+
+    void on_toolButton_videoPlay_clicked();
+
+    void on_toolButton_videoPause_clicked();
+
+    void on_toolButton_videoStop_clicked();
+
+    void on_toolButton_fullScreen_clicked();
+
+    void on_toolButton_moreSetting_clicked();
+
+    void on_horizontalSlider_position_valueChanged(int value);
+
+    void on_horizontalSlider_position_sliderMoved(int position);
+
+    void on_toolButton_microphoneMute_clicked();
+
+    void on_horizontalSlider_volume_valueChanged(int value);
+
 private:
     Ui::VideoWindow *ui;
+//    std::unique_ptr<QMediaPlayer> player;//std::unique_ptr不能直接指向已经存在的对象
+    QMediaPlayer *player;
+    QUrl source;
+
+    qint64 m_duration;
+    void updateDurationInfo(qint64 currentInfo); // 更新视频时长信息
+    void sliderMovedForPlayer(int value);
+
 };
 
 #endif // VIDEOWINDOW_H

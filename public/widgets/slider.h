@@ -11,8 +11,12 @@ public:
 
 protected:
     void mousePressEvent(QMouseEvent *event) override;
+    void enterEvent(QEnterEvent *event) override;
+    void leaveEvent(QEvent *event) override;
 
 signals:
+    void mouseEnterEvent();
+    void mouseLeaveEvent();
 
 };
 
