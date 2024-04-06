@@ -72,5 +72,10 @@ extern QJsonObject AppJson;
 #include <QSettings>
 extern QSettings AppSettings;
 
+#include<QString>
 extern QString CurrentUser;
+inline QString i2s(int num) {
+    return QString::number(num);
+}
+
 #endif // APPOS_H

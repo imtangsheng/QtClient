@@ -428,7 +428,7 @@ QSlider::sub-page:horizontal {
               <string>静音/音量设置</string>
              </property>
              <property name="toolTipDuration">
-              <number>5</number>
+              <number>-1</number>
              </property>
              <property name="statusTip">
               <string>静音/音量设置</string>
@@ -503,13 +503,13 @@ QSlider::sub-page:horizontal {
              </property>
              <property name="minimumSize">
               <size>
-               <width>30</width>
+               <width>36</width>
                <height>0</height>
               </size>
              </property>
              <property name="maximumSize">
               <size>
-               <width>30</width>
+               <width>36</width>
                <height>24</height>
               </size>
              </property>
@@ -523,7 +523,7 @@ QSlider::sub-page:horizontal {
               <string>播放速度设置</string>
              </property>
              <property name="toolTipDuration">
-              <number>5</number>
+              <number>-1</number>
              </property>
              <property name="statusTip">
               <string>播放速度设置</string>
@@ -540,7 +540,7 @@ QComboBox {
     background-color: transparent; /* 设置背景色为透明 */
 	color: #41cd52;
     text-align: center; /* 将文本居中显示  无效*/
-    padding-right: 0px; /* 为了隐藏下拉箭头，增加右边内边距 */
+   padding-right: -2px;   /*为了隐藏下拉箭头，增加右边内边距 */
 }
 
 QComboBox::drop-down {
@@ -564,10 +564,10 @@ QComboBox QAbstractItemView::item:selected {
               <bool>false</bool>
              </property>
              <property name="currentText">
-              <string>1</string>
+              <string>1.5x</string>
              </property>
              <property name="currentIndex">
-              <number>1</number>
+              <number>2</number>
              </property>
              <property name="sizeAdjustPolicy">
               <enum>QComboBox::AdjustToContents</enum>
@@ -580,32 +580,32 @@ QComboBox QAbstractItemView::item:selected {
              </property>
              <item>
               <property name="text">
-               <string>0.5</string>
+               <string>0.5x</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>1</string>
+               <string>1x</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>1.5</string>
+               <string>1.5x</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>2</string>
+               <string>2x</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>4</string>
+               <string>4x</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>8</string>
+               <string>8x</string>
               </property>
              </item>
             </widget>
@@ -634,7 +634,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>上一个</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>上一个</string>
@@ -663,7 +663,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>快退</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>快退</string>
@@ -692,7 +692,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>播放</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>播放</string>
@@ -724,7 +724,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>暂停</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>暂停</string>
@@ -745,32 +745,6 @@ QComboBox QAbstractItemView::item:selected {
           </widget>
          </item>
          <item>
-          <widget class="QToolButton" name="toolButton_videoStop">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="toolTip">
-            <string>停止播放</string>
-           </property>
-           <property name="toolTipDuration">
-            <number>5</number>
-           </property>
-           <property name="text">
-            <string>停止播放</string>
-           </property>
-           <property name="icon">
-            <iconset resource="../resource.qrc">
-             <normaloff>:/asset/playerControls/VideoStop.svg</normaloff>:/asset/playerControls/VideoStop.svg</iconset>
-           </property>
-           <property name="iconSize">
-            <size>
-             <width>24</width>
-             <height>24</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-         <item>
           <widget class="QToolButton" name="toolButton_fastForward">
            <property name="enabled">
             <bool>false</bool>
@@ -779,7 +753,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>快进</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>快进</string>
@@ -808,7 +782,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>下一个</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>下一个</string>
@@ -819,6 +793,32 @@ QComboBox QAbstractItemView::item:selected {
            <property name="icon">
             <iconset resource="../resource.qrc">
              <normaloff>:/asset/playerControls/ListNext.svg</normaloff>:/asset/playerControls/ListNext.svg</iconset>
+           </property>
+           <property name="iconSize">
+            <size>
+             <width>24</width>
+             <height>24</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_videoStop">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="toolTip">
+            <string>停止播放</string>
+           </property>
+           <property name="toolTipDuration">
+            <number>-1</number>
+           </property>
+           <property name="text">
+            <string>停止播放</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../resource.qrc">
+             <normaloff>:/asset/playerControls/VideoStop.svg</normaloff>:/asset/playerControls/VideoStop.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -847,7 +847,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>选择文件</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>5000</number>
            </property>
            <property name="statusTip">
             <string>选择文件</string>
@@ -873,7 +873,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>自动隐藏窗口</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>自动隐藏窗口</string>
@@ -899,7 +899,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>固定窗口</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>固定窗口</string>
@@ -937,7 +937,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>设置</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>设置</string>
@@ -969,7 +969,7 @@ QComboBox QAbstractItemView::item:selected {
             <string>全屏</string>
            </property>
            <property name="toolTipDuration">
-            <number>5</number>
+            <number>-1</number>
            </property>
            <property name="statusTip">
             <string>全屏</string>
@@ -1215,20 +1215,181 @@ QTabWidget::pane {
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_6">
            <item>
-            <widget class="QComboBox" name="comboBox">
-             <item>
+            <widget class="QComboBox" name="comboBox_updatePlayerList">
+             <property name="layoutDirection">
+              <enum>Qt::LeftToRight</enum>
+             </property>
+             <property name="editable">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLineEdit" name="lineEdit_pathPlayerList">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QTableWidget" name="tableWidget_playerList">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">/*表内空格*/
+QTableWidget { 
+	background-color: rgb(55, 71, 79);
+}
+QTableWidget::item {
+	background-color: rgb(55, 71, 79);
+}
+
+QTableWidget::item:selected { 
+	background-color: rgb(38, 50, 56);
+	color: white; 
+}
+
+/*表头设置*/
+QHeaderView::section { 
+	border: none;
+	background-color: rgb(38, 50, 56);
+ }
+
+/*表头区域的角落按钮左上角的空白区域设置*/
+QTableCornerButton::section {
+	background: transparent;
+}</string>
+             </property>
+             <property name="editTriggers">
+              <set>QAbstractItemView::NoEditTriggers</set>
+             </property>
+             <property name="selectionMode">
+              <enum>QAbstractItemView::SingleSelection</enum>
+             </property>
+             <property name="selectionBehavior">
+              <enum>QAbstractItemView::SelectRows</enum>
+             </property>
+             <property name="gridStyle">
+              <enum>Qt::SolidLine</enum>
+             </property>
+             <attribute name="horizontalHeaderVisible">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="horizontalHeaderCascadingSectionResizes">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="horizontalHeaderDefaultSectionSize">
+              <number>50</number>
+             </attribute>
+             <attribute name="horizontalHeaderHighlightSections">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="horizontalHeaderStretchLastSection">
+              <bool>true</bool>
+             </attribute>
+             <attribute name="verticalHeaderVisible">
+              <bool>false</bool>
+             </attribute>
+             <attribute name="verticalHeaderMinimumSectionSize">
+              <number>19</number>
+             </attribute>
+             <attribute name="verticalHeaderDefaultSectionSize">
+              <number>30</number>
+             </attribute>
+             <row>
               <property name="text">
-               <string>test</string>
+               <string>1</string>
               </property>
-              <property name="icon">
-               <iconset resource="../resource.qrc">
-                <normaloff>:/asset/mianWidget/videoFiles.svg</normaloff>:/asset/mianWidget/videoFiles.svg</iconset>
+             </row>
+             <row>
+              <property name="text">
+               <string>2</string>
+              </property>
+             </row>
+             <column>
+              <property name="text">
+               <string>名称</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>创建时间</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>大小</string>
+              </property>
+             </column>
+             <column>
+              <property name="text">
+               <string>时长</string>
+              </property>
+             </column>
+             <item row="0" column="0">
+              <property name="text">
+               <string>test1</string>
+              </property>
+             </item>
+             <item row="0" column="1">
+              <property name="text">
+               <string>20240403</string>
+              </property>
+             </item>
+             <item row="0" column="2">
+              <property name="text">
+               <string>1M</string>
+              </property>
+             </item>
+             <item row="0" column="3">
+              <property name="text">
+               <string>00:23</string>
+              </property>
+             </item>
+             <item row="1" column="0">
+              <property name="text">
+               <string>test2</string>
+              </property>
+             </item>
+             <item row="1" column="1">
+              <property name="text">
+               <string>20240101</string>
+              </property>
+             </item>
+             <item row="1" column="2">
+              <property name="text">
+               <string>2M</string>
+              </property>
+             </item>
+             <item row="1" column="3">
+              <property name="text">
+               <string>01:00</string>
               </property>
              </item>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit"/>
+            <spacer name="verticalSpacer_5">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>40</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -1246,6 +1407,297 @@ QTabWidget::pane {
           <attribute name="toolTip">
            <string>设置</string>
           </attribute>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <widget class="QGroupBox" name="groupBox">
+             <property name="autoFillBackground">
+              <bool>false</bool>
+             </property>
+             <property name="title">
+              <string>视频列表管理</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_9">
+              <property name="spacing">
+               <number>6</number>
+              </property>
+              <property name="leftMargin">
+               <number>9</number>
+              </property>
+              <property name="topMargin">
+               <number>9</number>
+              </property>
+              <property name="rightMargin">
+               <number>9</number>
+              </property>
+              <property name="bottomMargin">
+               <number>9</number>
+              </property>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,0">
+                <item>
+                 <widget class="QComboBox" name="comboBox_playerPath">
+                  <property name="layoutDirection">
+                   <enum>Qt::RightToLeft</enum>
+                  </property>
+                  <property name="editable">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_playerPath">
+                  <property name="placeholderText">
+                   <string>双击选择或编辑路径</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_setEditPlayerPath">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>42</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>选择</string>
+                  </property>
+                  <property name="autoRepeatDelay">
+                   <number>300</number>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_6">
+                <item>
+                 <spacer name="horizontalSpacer_4">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_playerPath_update">
+                  <property name="text">
+                   <string>更新</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_playerPath_add">
+                  <property name="text">
+                   <string>增加</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_playerPath_delete">
+                  <property name="text">
+                   <string>删除</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QGroupBox" name="horizontalGroupBox_2">
+             <property name="styleSheet">
+              <string notr="true">border-color: #263238;</string>
+             </property>
+             <property name="title">
+              <string>视频播放设置</string>
+             </property>
+             <layout class="QVBoxLayout" name="verticalLayout_7">
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_4">
+                <item>
+                 <widget class="QLabel" name="label">
+                  <property name="text">
+                   <string>快进/快退(秒)：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_playPageStep">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="placeholderText">
+                   <string>请输入整数</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_setPlayPageStep">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>42</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>设置</string>
+                  </property>
+                  <property name="autoDefault">
+                   <bool>false</bool>
+                  </property>
+                  <property name="default">
+                   <bool>false</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_3">
+                <item>
+                 <widget class="QLabel" name="label_2">
+                  <property name="text">
+                   <string>初始播放源：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_playSource">
+                  <property name="sizePolicy">
+                   <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+                    <horstretch>0</horstretch>
+                    <verstretch>0</verstretch>
+                   </sizepolicy>
+                  </property>
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="placeholderText">
+                   <string>默认播放源</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_setPlaySource">
+                  <property name="maximumSize">
+                   <size>
+                    <width>42</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>设置</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <item>
+                 <widget class="QLabel" name="label_3">
+                  <property name="text">
+                   <string>文件后缀：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLineEdit" name="lineEdit_fileExtensions">
+                  <property name="toolTip">
+                   <string>视频文件后缀，使用逗号分隔</string>
+                  </property>
+                  <property name="text">
+                   <string>.mp4,.MP4</string>
+                  </property>
+                  <property name="placeholderText">
+                   <string>视频文件后缀，使用逗号分隔</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QPushButton" name="pushButton_setFileExtensions">
+                  <property name="maximumSize">
+                   <size>
+                    <width>42</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="text">
+                   <string>设置</string>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayout_5">
+                <item>
+                 <widget class="QCheckBox" name="checkBox_autoPlay">
+                  <property name="layoutDirection">
+                   <enum>Qt::RightToLeft</enum>
+                  </property>
+                  <property name="text">
+                   <string>自动播放：</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer name="verticalSpacer_6">
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>20</width>
+               <height>176</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
          </widget>
         </widget>
        </item>

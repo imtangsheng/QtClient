@@ -2,6 +2,7 @@
 #define VIDEOWINDOW_H
 
 
+#include <QJsonObject>
 #include <QMainWindow>
 #include "ui_videowindow.h"
 
@@ -20,6 +21,9 @@ public:
     void init();
     void startShow();
     void quit();
+
+    void readAllFilesFromLocalPath(const QString &directory);
+    bool startPlay(const QString &file);
 
 public slots:
     void mouseEnterVideo();
@@ -63,13 +67,15 @@ protected slots:
         QMediaPlayer::PausedState	2	媒体播放器已暂停播放，当前曲目的播放将从播放器暂停的位置恢复。
     */
     void playbackStateChanged(QMediaPlayer::PlaybackState newState); // 播放状态变化
-
     //[9!]
     void positionChange(qint64 progress); //播放位置变化
-
     //[end]
     void bufferProgressChanged(float filled); //缓存变化，0-1
     void errorOccurred(QMediaPlayer::Error error, const QString &errorString); //错误
+
+    /*视频播放列表方法*/
+    void playerList_update();
+    void update_tableWidget_playerList(const QString &filesPath);
 
 private slots:
     void on_Button_moreWidget_isFloatable_clicked();
@@ -92,15 +98,58 @@ private slots:
 
     void on_horizontalSlider_volume_valueChanged(int value);
 
+    void on_toolButton_fastBback_clicked();
+
+    void on_toolButton_fastForward_clicked();
+
+    void on_comboBox_rate_currentIndexChanged(int index);
+
+    void on_toolButton_openFiles_clicked();
+
+    void on_pushButton_playerPath_update_clicked();
+
+    void on_comboBox_playerPath_currentIndexChanged(int index);
+    void on_comboBox_playerPath_currentTextChanged(const QString &arg1);
+
+    void on_pushButton_playerPath_add_clicked();
+
+    void on_pushButton_playerPath_delete_clicked();
+
+    void on_pushButton_setEditPlayerPath_clicked();
+
+    void on_pushButton_setPlayPageStep_clicked();
+
+    void on_pushButton_setPlaySource_clicked();
+
+    void on_checkBox_autoPlay_stateChanged(int arg1);
+
+    void on_pushButton_setFileExtensions_clicked();
+
+    void on_tableWidget_playerList_itemDoubleClicked(QTableWidgetItem *item);
+
+    void on_tableWidget_playerList_doubleClicked(const QModelIndex &index);
+
+
+
+    void on_comboBox_updatePlayerList_currentTextChanged(const QString &arg1);
+
+
+
 private:
     Ui::VideoWindow *ui;
 //    std::unique_ptr<QMediaPlayer> player;//std::unique_ptr不能直接指向已经存在的对象
+    //视频播放
     QMediaPlayer *player;
     QUrl source;
-
     qint64 m_duration;
     void updateDurationInfo(qint64 currentInfo); // 更新视频时长信息
-    void sliderMovedForPlayer(int value);
+    //视频播放文件列表
+    QString currentFilePath;
+    //定义视频文件列表方法
+    QString fileExtensions = ".mp4|.MP4|.avi|.mkv";
+    QStringList filesListLocal;
+    QJsonObject playHistoryJson;
+
 
 };
 

@@ -19,10 +19,6 @@ SubMain *SUB_MAIN;
 
 #define VARNAME(var) #var
 
-inline QString i2s(int num) {
-    return QString::number(num);
-}
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {

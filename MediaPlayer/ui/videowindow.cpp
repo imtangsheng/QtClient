@@ -2,6 +2,11 @@
 #include "AppOS.h"
 
 #include <QWindow>
+#include <QFileDialog>
+#include <QToolTip>
+#include <QDir>
+
+
 
 VideoWindow::VideoWindow(QWidget *parent) : QMainWindow(parent),
                                             ui(new Ui::VideoWindow)
@@ -82,6 +87,8 @@ void VideoWindow::init()
         ui->horizontalSlider_volume->setVisible(false);
     });
 
+    ui->toolButton_videoPause->setVisible(false);
+    ui->horizontalSlider_volume->setVisible(false);
 
     /*[end]处理设置文件，配置读取初始化*/
     AppSettings.beginGroup(objectName());
@@ -90,6 +97,7 @@ void VideoWindow::init()
     const auto geometry = AppSettings.value("geometry",QByteArray()).toByteArray(); // QByteArray 类型
     if (!geometry.isEmpty()){ui->WidgetMore->restoreGeometry(geometry);}
     AppJson = AppSettings.value("AppJson", QJsonObject()).toJsonObject();
+    playHistoryJson = AppSettings.value("PlayHistory", QJsonObject()).toJsonObject();
 
     AppSettings.endGroup();
 
@@ -98,16 +106,56 @@ void VideoWindow::init()
 
 void VideoWindow::startShow()
 {
-    ui->toolButton_videoPause->setVisible(false);
-    ui->horizontalSlider_volume->setVisible(false);
+    qDebug()<<"VideoWindow::startShow()"<<ui->comboBox_updatePlayerList->count()<<ui->comboBox_playerPath->count();
+    /*[1]视频播放列表配置初始化读取*/
+//    ui->tableWidget_playerList->resizeColumnsToContents();
+//    playerListUpdate();
+    QJsonObject playerList = AppJson["playerList"].toObject();
+    ui->comboBox_playerPath->clear();
+    ui->comboBox_updatePlayerList->clear();
+
+    qDebug()<<"VideoWindow::startShow()22222";
+    foreach (QString key, playerList.keys()) {
+        qDebug()<<"VideoWindow::playerListUpdate(): key-value"<<key<<playerList[key].toString();
+        //会发送currentTextChanged信号，报错index out of range
+        ui->comboBox_playerPath->addItem(key,playerList[key].toString());
+        qDebug()<<"VideoWindow::startShow()22222";
+        ui->comboBox_updatePlayerList->addItem(key,playerList[key].toString());
+    }
+
+    /*[2]视频播放配置初始化读取*/
+//    AppJson["playPageStep"]
+    if(AppJson.contains("playPageStep")){
+        ui->lineEdit_playPageStep->setText(i2s(AppJson["playPageStep"].toInt(10*1000)));
+    }
+    ui->lineEdit_playPageStep->setValidator(new QIntValidator(ui->lineEdit_playPageStep));
+
+    ui->checkBox_autoPlay->setChecked(AppJson["AutoPlay"].toBool(false));
+
+    if(AppJson.contains("playSource")){
+        ui->lineEdit_playSource->setText(AppJson["playSource"].toString());
+        player->setSource(QUrl(AppJson["playSource"].toString()));
+        if(AppJson["AutoPlay"].toBool(false)) {player->play();}
+    }
+
+    if(AppJson.contains("fileExtensions")){
+        ui->lineEdit_fileExtensions->setText(AppJson["fileExtensions"].toString(".mp4|.MP4"));
+    }
+
     //其他测试项目
     //    ui->video->player.setSource(QUrl::fromLocalFile("G:/data/雪花啤酒/test.mp4"));
     //    ui->video->player.setSource(QUrl("rtsp://admin:dacang80@192.168.1.99:554/Streaming/Channels/1"));
     //    ui->video->player.play();
-//    source = QUrl("rtsp://admin:dacang80@192.168.1.99:554/Streaming/Channels/2");
-    source = QUrl("G:/data/雪花啤酒/test.mp4");
-    player->setSource(source);
-    player->play();
+    //    source = QUrl("rtsp://admin:dacang80@192.168.1.153:554/Streaming/Channels/101");
+//    source = QUrl("G:/data/雪花啤酒/test.mp4");
+//    player->setSource(source);
+//    player->play();
+//    update_tableWidget_playerList("G:/data/雪花啤酒/");
+
+    ui->toolButton_listNext->setVisible(false);
+    ui->toolButton_listPrevious->setVisible(false);
+    ui->toolButton_AutoShow->setVisible(false);
+    ui->toolButton_fixedWidget->setVisible(false);
 
 }
 
@@ -117,10 +165,51 @@ void VideoWindow::quit()
     AppSettings.setValue("isFloating", ui->WidgetMore->isFloating());
     AppSettings.setValue("geometry", ui->WidgetMore->saveGeometry());
     AppSettings.setValue("AppJson", AppJson);
+    AppSettings.setValue("PlayHistory",playHistoryJson);
     AppSettings.endGroup();
     ui->video->quit();
     ui->WidgetMore->close();
     qDebug() << "VideoWindow::quit()";
+}
+
+void VideoWindow::readAllFilesFromLocalPath(const QString &directory)
+{
+    QDir dir(directory);
+    // 使用 entryInfoList() 方法获取文件和子目录的详细信息列表
+    foreach (QFileInfo fileInfo, dir.entryInfoList(QDir::Files))
+    {
+        qDebug()<<"fileInfo"<<fileInfo;//QFileInfo(G:\data\CJCS.TXT)
+        qDebug()<<"fileInfo.fileName()"<<fileInfo.fileName();
+        qDebug()<<"fileInfo.absoluteFilePath"<<fileInfo.absoluteFilePath()<<fileInfo.absoluteFilePath().remove(0,directory.length());
+        qDebug()<<"fileInfo.Path"<<fileInfo.path() <<directory.length()<<fileInfo.path().remove(0,directory.length());
+        filesListLocal << fileInfo.absoluteFilePath();
+    }
+    foreach (QFileInfo dirInfo, dir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot))
+    {
+        qDebug()<<"fileInfo dirInfo:"<<dirInfo;//QFileInfo(G:\data\)
+        readAllFilesFromLocalPath(dirInfo.absoluteFilePath());
+    }
+
+    // 使用 entryList() 方法获取文件和子目录的名称列表(只会显示名称)
+//    foreach (QString file, dir.entryList(QDir::Files)) {
+//        qDebug()<<"readAllFilesFromLocalPath file:"<<file;
+//    }
+//    foreach (QString fileDir,dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)){
+//        qDebug()<<"readAllFilesFromLocalPath file:"<<fileDir;
+//    }
+
+
+}
+
+bool VideoWindow::startPlay(const QString &file)
+{
+    qDebug() << "VideoWindow::startPlay(const QString &"<<file;
+    currentFilePath = file;
+    ui->lineEdit_playSource->setText(currentFilePath);
+    player->setSource(QUrl(currentFilePath));
+    if(AppJson["AutoPlay"].toBool(false)) {player->play();}
+
+    return true;
 }
 
 void VideoWindow::mouseEnterVideo()
@@ -184,8 +273,10 @@ void VideoWindow::showEvent(QShowEvent *event)
 
 }
 
-
-
+/*
+[1]VideoWindow::errorOccurred(QMediaPlayer::Error error, const QString &errorString) QMediaPlayer::ResourceError "Could not open file"
+[2]VideoWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status) QMediaPlayer::InvalidMedia
+*/
 void VideoWindow:: mediaStatusChanged(QMediaPlayer::MediaStatus status)
 {
     qDebug() << "VideoWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status)"<<status;
@@ -232,12 +323,22 @@ void VideoWindow::durationChanged(qint64 duration)
 
         m_duration = duration / 1000;
         ui->horizontalSlider_position->setMaximum(duration);
+        ui->toolButton_fastBback->setEnabled(true);
+        ui->toolButton_fastForward->setEnabled(true);
+
+        //保存历史读取时长
+        QJsonObject durationJson = playHistoryJson[currentFilePath].toObject();
+        durationJson["duration"] = duration;
+        playHistoryJson[currentFilePath] = durationJson;
+
     }else{
         ui->horizontalSlider_position->setVisible(false);
         ui->label_videoProgress->setVisible(false);
         disconnect(player, &QMediaPlayer::positionChanged, this, &VideoWindow::positionChange); //rstp直播流需要取消
         disconnect(ui->horizontalSlider_position,&QSlider::sliderMoved,player,&QMediaPlayer::setPosition);
         m_duration = 0;
+        ui->toolButton_fastBback->setEnabled(false);
+        ui->toolButton_fastForward->setEnabled(false);
     }
 }
 
@@ -301,6 +402,83 @@ void VideoWindow::errorOccurred(QMediaPlayer::Error error, const QString &errorS
 {
     qDebug() << "VideoWindow::errorOccurred(QMediaPlayer::Error error, const QString &errorString)"<<error<<errorString;
 }
+
+void VideoWindow::playerList_update()
+{
+    qDebug() << "VideoWindow::playerListUpdate()";
+    QJsonObject playerList = AppJson["playerList"].toObject();
+//    disconnect(ui->comboBox_playList)
+    ui->comboBox_updatePlayerList->clear();
+    foreach (QString key, playerList.keys()) {
+        qDebug()<<"VideoWindow::playerListUpdate(): key-value"<<key<<playerList[key].toString();
+        //        ui->comboBox_playerPath->addItem(key,playerList[key]);
+        ui->comboBox_updatePlayerList->addItem(key,playerList[key].toString());
+    }
+}
+
+void VideoWindow::update_tableWidget_playerList(const QString &filesPath)
+{
+    qDebug() <<"VideoWindow::update_tableWidget_playerList(const QString &"<<filesPath;
+
+    ui->lineEdit_pathPlayerList->setText(filesPath);
+    // 读取所有的文件
+    filesListLocal.clear();
+    readAllFilesFromLocalPath(filesPath);
+
+    qDebug()<<"filesListLocal:"<<filesListLocal;
+    //使用规则表达式，区分大小，字符匹配
+    filesListLocal = filesListLocal.filter(QRegularExpression(".*(" + fileExtensions + ")"));
+    qDebug()<<"filesListLocal:"<<filesListLocal;
+
+    ui->tableWidget_playerList->clearContents();
+    ui->tableWidget_playerList->setRowCount(0);
+        // 遍历文件列表
+    foreach (QString absoluteFilePath, filesListLocal)
+    {
+        QFileInfo fileInfo(absoluteFilePath);
+//        qDebug()<<"fileInfo.lastRead():"<<fileInfo.lastRead().toString()<<fileInfo.birthTime();
+
+//        int videoDuration = getVideoDuration(filePath);
+        int row = ui->tableWidget_playerList->rowCount();// 添加一行到表格中
+        ui->tableWidget_playerList->insertRow(row);
+        //0-名称 1-创建时间 2-大小
+        ui->tableWidget_playerList->setItem(row, 0, new QTableWidgetItem(fileInfo.fileName()));
+        ui->tableWidget_playerList->setItem(row, 1, new QTableWidgetItem(
+            //文件最后修改时间
+            fileInfo.lastModified().toString("yyyy/MM/dd-hh:mm:ss")));
+        ui->tableWidget_playerList->setItem(row, 2, new QTableWidgetItem(
+            i2s(fileInfo.size() / (1024 * 1024)) + " MB"));
+
+        //3-时长
+        if(playHistoryJson.contains(absoluteFilePath)){
+
+            qint64 duration = playHistoryJson[absoluteFilePath].toObject()["duration"].toInteger();
+            QTime totalTime((duration / 3600) % 60, (duration / 60) % 60, duration % 60,
+                            (duration * 1000) % 1000);
+
+            ui->tableWidget_playerList->setItem(row, 3, new QTableWidgetItem(totalTime.toString("mm:ss")));
+        }
+        // 获取视频时长（假设使用某个函数获取视频时长）
+//        QEventLoop eventLoop;
+//        QMediaPlayer mediaPlayer;
+//        QObject::connect(&mediaPlayer, &QMediaPlayer::mediaStatusChanged, [&eventLoop](QMediaPlayer::MediaStatus status){
+//            if (status == QMediaPlayer::LoadedMedia) {
+//                eventLoop.quit();
+//            }
+//        });
+//        mediaPlayer.setSource(QUrl::fromLocalFile(absoluteFilePath));
+//        eventLoop.exec();
+//        qint64 duration = mediaPlayer.duration();
+//        qDebug()<<"遍历文件列表fileInfo.lastRead():"<<fileInfo.lastRead().toString()<<fileInfo.birthTime()<<duration;
+//        ui->tableWidget_playerList->setItem(row, 3, new QTableWidgetItem(
+//            i2s(mediaPlayer.duration())));
+    }
+
+    //自适应大小
+    ui->tableWidget_playerList->resizeColumnsToContents();
+
+}
+
 
 void VideoWindow::on_Button_moreWidget_isFloatable_clicked()
 {
@@ -370,17 +548,7 @@ void VideoWindow::updateDurationInfo(qint64 currentInfo)
     ui->label_videoProgress->setText(sStr);
 }
 
-#include <QToolTip>
-void VideoWindow::sliderMovedForPlayer(int value)
-{
-    int minutes = value / 60000; // 每分钟60秒，每秒1000毫秒
-    int seconds = (value / 1000) % 60;
 
-    QToolTip::showText(
-        ui->horizontalSlider_position->mapToGlobal(QPoint(value, 0)),
-        QString("%1:%2").arg(minutes, 2, 10, QChar('0')).arg(seconds, 2, 10, QChar('0')),
-        ui->horizontalSlider_position);
-}
 
 
 void VideoWindow::on_toolButton_moreSetting_clicked()
@@ -436,4 +604,185 @@ void VideoWindow::on_horizontalSlider_volume_valueChanged(int value)
 {
     player->audioOutput()->setVolume(value);
 }
+
+
+void VideoWindow::on_toolButton_fastBback_clicked()
+{
+    if(player->position() < AppJson["playPageStep"].toInteger(10*1000)){
+        player->setPosition(0);
+    }else{
+        player->setPosition(player->position() - AppJson["playPageStep"].toInteger(10*1000));
+    }
+
+}
+
+
+void VideoWindow::on_toolButton_fastForward_clicked()
+{
+    if(player->position() < (player->duration() - AppJson["playPageStep"].toInteger(10*1000))){
+        player->setPosition(player->position() + AppJson["playPageStep"].toInteger(10*1000));
+    }
+}
+
+
+void VideoWindow::on_comboBox_rate_currentIndexChanged(int index)
+{
+    qDebug() <<"VideoWindow::on_comboBox_rate_currentIndexChanged(int "<<index<<(index <3 ? 0.5*(index+1) : std::pow(2,index-2));
+//    qreal playbackRate = index >3 ? 0.5*(index+1) : 2^(index-2);
+    player->setPlaybackRate(index < 3 ? 0.5*(index+1) : std::pow(2,index-2));
+}
+
+
+void VideoWindow::on_toolButton_openFiles_clicked()
+{
+    // 创建打开文件对话框
+    QFileDialog fileDialog(this);
+    fileDialog.setFileMode(QFileDialog::ExistingFile); // 设置对话框模式为选择已存在的文件
+
+    QString filePath = fileDialog.getOpenFileName(this, "Open File", nullptr, "Mp4 Files (*.mp4)"); // 获取选择的文件路径
+    if (!filePath.isEmpty())
+    {
+        // 在这里处理打开文件的逻辑
+        qDebug() << "Selected file: " << filePath<<QDir(filePath).absolutePath();
+        player->setSource(QUrl::fromLocalFile(filePath));
+
+        update_tableWidget_playerList(QDir(filePath).absolutePath());
+    }
+}
+
+
+
+void VideoWindow::on_comboBox_playerPath_currentIndexChanged(int index)
+{
+    qDebug()<<"VideoWindow::on_comboBox_playerPath_currentIndexChanged(int "<<index<<ui->comboBox_playerPath->currentText();
+}
+
+void VideoWindow::on_comboBox_playerPath_currentTextChanged(const QString &arg1)
+{
+    qDebug()<<"void VideoWindow::on_comboBox_playerPath_currentTextChanged(const QString &"<<arg1;
+    ui->lineEdit_playerPath->setText(AppJson["playerList"].toObject()[arg1].toString());
+}
+
+void VideoWindow::on_pushButton_setEditPlayerPath_clicked()
+{
+    qDebug()<<"VideoWindow::on_lineEdit_playerPath_selectionChanged()";
+    // 打开文件对话框，选择目录
+    QString directory = QFileDialog::getExistingDirectory(this, "选择播放文件目录");
+    if (!directory.isEmpty()){
+        // 阻止信号的发射
+//        ui->lineEdit_playerPath->blockSignals(true);
+        ui->lineEdit_playerPath->setText(directory);
+//        // 恢复信号的发射
+//        ui->lineEdit_playerPath->blockSignals(false);
+    }
+
+
+}
+
+
+void VideoWindow::on_pushButton_playerPath_update_clicked()
+{
+    QJsonObject playerList = AppJson["playerList"].toObject();
+    QString key = ui->comboBox_playerPath->currentText();
+    if(!playerList.contains(key)){
+        QToolTip::showText(ui->pushButton_playerPath_update->mapToGlobal(QPoint(0, 0)),
+            "要更改的键值不存在，请先增加键值",
+            ui->pushButton_playerPath_update);
+        return;
+    }
+    playerList.insert(key,ui->lineEdit_playerPath->text());
+    AppJson["playerList"] = playerList;
+    playerList_update();
+}
+
+
+void VideoWindow::on_pushButton_playerPath_add_clicked()
+{
+    QJsonObject playerList = AppJson["playerList"].toObject();
+    QString key = ui->comboBox_playerPath->currentText();
+    if(playerList.contains(key)){
+        QToolTip::showText(ui->pushButton_playerPath_add->mapToGlobal(QPoint(0, 0)),
+                           "要增加的键值已存在，请使用修改功能",
+                           ui->pushButton_playerPath_add);
+        return;
+    }
+    if(ui->comboBox_playerPath->findText(key) == -1){
+        QToolTip::showText(ui->pushButton_playerPath_add->mapToGlobal(QPoint(0, 0)),
+                           "要增加的键值尚未保存，请修改完键值后输入Enter确认添加",
+                           ui->pushButton_playerPath_add);
+        return;
+    }
+    playerList.insert(key,ui->lineEdit_playerPath->text());
+    AppJson["playerList"] = playerList;
+    playerList_update();
+}
+
+
+void VideoWindow::on_pushButton_playerPath_delete_clicked()
+{
+    QJsonObject playerList = AppJson["playerList"].toObject();
+    QString key = ui->comboBox_playerPath->currentText();
+    if(!playerList.contains(key)){
+        QToolTip::showText(ui->pushButton_playerPath_update->mapToGlobal(QPoint(0, 0)),
+                           "要删除的键值不存在，请确认该键值已经生效",
+                           ui->pushButton_playerPath_update);
+        return;
+    }
+    playerList.remove(key);
+    ui->comboBox_playerPath->removeItem(ui->comboBox_playerPath->currentIndex());
+    AppJson["playerList"] = playerList;
+    playerList_update();
+}
+
+
+void VideoWindow::on_pushButton_setPlayPageStep_clicked()
+{
+    AppJson["playPageStep"] = ui->lineEdit_playPageStep->text().toInt() * 1000;
+}
+
+
+void VideoWindow::on_pushButton_setPlaySource_clicked()
+{
+    AppJson["playSource"] = ui->lineEdit_playSource->text();
+    player->setSource(QUrl(AppJson["playSource"].toString()));
+}
+
+
+void VideoWindow::on_checkBox_autoPlay_stateChanged(int arg1)
+{
+    if(arg1 == Qt::Checked){
+        AppJson["AutoPlay"] = true;
+    }else{
+        AppJson["AutoPlay"] = false;
+    }
+}
+
+
+void VideoWindow::on_pushButton_setFileExtensions_clicked()
+{
+    AppJson["fileExtensions"] = ui->lineEdit_fileExtensions->text();
+}
+
+
+void VideoWindow::on_tableWidget_playerList_itemDoubleClicked(QTableWidgetItem *item)
+{
+    qDebug()<<"VideoWindow::on_tableWidget_playerList_itemDoubleClicked(QTableWidgetItem *"<<item->text();
+}
+
+
+void VideoWindow::on_tableWidget_playerList_doubleClicked(const QModelIndex &index)
+{
+    qDebug()<<"VideoWindow::on_tableWidget_playerList_doubleClicked(const QModelIndex &"<<index.row()<<filesListLocal.at(index.row());
+    startPlay(filesListLocal.at(index.row()));
+}
+
+
+
+
+void VideoWindow::on_comboBox_updatePlayerList_currentTextChanged(const QString &arg1)
+{
+    qDebug()<<"VideoWindow::on_comboBox_updatePlayerList_currentTextChanged(const QString &"<<arg1<<ui->comboBox_updatePlayerList->currentData();
+    update_tableWidget_playerList(ui->comboBox_updatePlayerList->currentData().toString());
+}
+
 
