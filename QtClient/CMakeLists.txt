@@ -139,10 +139,11 @@ target_include_directories(QtClient PRIVATE
 if(QT6_IS_SHARED_LIBS_BUILD)
     # Build the shared plugin too when building this example target.
 #    add_dependencies(QtClient DataView MediaPlayer)
-     add_dependencies(QtClient MediaPlayer)
+     add_dependencies(QtClient DataView)
 else()
     # Link the echoplugin if Qt is built statically.
     target_link_libraries(QtClient PRIVATE
-        DataView MediaPlayer
+        DataView
     )
 endif()
+#MediaPlayer

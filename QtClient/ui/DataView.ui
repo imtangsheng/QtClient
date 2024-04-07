@@ -14,7 +14,7 @@
    <string>Form</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../resource.qrc">
+   <iconset>
     <normaloff>:/asset/Home/DataView.svg</normaloff>:/asset/Home/DataView.svg</iconset>
   </property>
   <property name="styleSheet">
@@ -319,7 +319,7 @@
            <string>电流</string>
           </property>
           <property name="icon">
-           <iconset resource="../resource.qrc">
+           <iconset>
             <normaloff>:/asset/dataview/current.svg</normaloff>:/asset/dataview/current.svg</iconset>
           </property>
           <property name="checked">
@@ -342,7 +342,7 @@
            <string>电压</string>
           </property>
           <property name="icon">
-           <iconset resource="../resource.qrc">
+           <iconset>
             <normaloff>:/asset/dataview/voltage.svg</normaloff>:/asset/dataview/voltage.svg</iconset>
           </property>
           <property name="checked">
@@ -365,7 +365,7 @@
            <string>气压</string>
           </property>
           <property name="icon">
-           <iconset resource="../resource.qrc">
+           <iconset>
             <normaloff>:/asset/dataview/pressure.svg</normaloff>:/asset/dataview/pressure.svg</iconset>
           </property>
           <property name="checked">
@@ -388,7 +388,7 @@
            <string>温度</string>
           </property>
           <property name="icon">
-           <iconset resource="../resource.qrc">
+           <iconset>
             <normaloff>:/asset/dataview/Temperature.svg</normaloff>:/asset/dataview/Temperature.svg</iconset>
           </property>
           <property name="checked">
@@ -415,7 +415,7 @@
            <string>缩小</string>
           </property>
           <property name="icon">
-           <iconset resource="../resource.qrc">
+           <iconset>
             <normaloff>:/asset/dataview/ZoomOut.svg</normaloff>:/asset/dataview/ZoomOut.svg</iconset>
           </property>
          </widget>
@@ -426,7 +426,7 @@
            <string>放大</string>
           </property>
           <property name="icon">
-           <iconset resource="../resource.qrc">
+           <iconset>
             <normaloff>:/asset/dataview/ZoomIn.svg</normaloff>:/asset/dataview/ZoomIn.svg</iconset>
           </property>
          </widget>
@@ -437,7 +437,7 @@
            <string>缩放重置</string>
           </property>
           <property name="icon">
-           <iconset resource="../resource.qrc">
+           <iconset>
             <normaloff>:/asset/dataview/ZoomReset.svg</normaloff>:/asset/dataview/ZoomReset.svg</iconset>
           </property>
          </widget>
@@ -481,7 +481,7 @@
         </property>
         <widget class="QWidget" name="tab_filesOptions">
          <attribute name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/dataview/DataAnalysis.svg</normaloff>:/asset/dataview/DataAnalysis.svg</iconset>
          </attribute>
          <attribute name="title">
@@ -615,7 +615,7 @@
         </widget>
         <widget class="QWidget" name="tab_filesLocal">
          <attribute name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/dataview/DataAnalysis.svg</normaloff>:/asset/dataview/DataAnalysis.svg</iconset>
          </attribute>
          <attribute name="title">
@@ -648,7 +648,7 @@
         </widget>
         <widget class="QWidget" name="tab_dataViewSetting">
          <attribute name="icon">
-          <iconset resource="../resource.qrc">
+          <iconset>
            <normaloff>:/asset/dataview/Tools.svg</normaloff>:/asset/dataview/Tools.svg</iconset>
          </attribute>
          <attribute name="title">
@@ -687,9 +687,7 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources>
-  <include location="../resource.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>widget_dataView</sender>

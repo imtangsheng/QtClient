@@ -18,10 +18,18 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui LinguistTools Widgets
 include_directories("./")
 include_directories(${PROJECT_SOURCE_DIR})
 
-file(GLOB_RECURSE PUBLIC ../public/*)
 file(GLOB UI_HEADERS ./ui/*.h)
 file(GLOB UI_SOURCES ./ui/*.cpp)
 file(GLOB UI ./ui/*.ui)
+
+#file(GLOB_RECURSE PUBLIC ../public/*)
+set(PUBLIC
+    ../public/PluginInterface.h
+    ../public/AppOS.h
+    ../public/widgets/slider.h ../public/widgets/slider.cpp
+    ../public/widgets/toolbutton.h ../public/widgets/toolbutton.cpp
+    ../public/widgets/videowidget.h ../public/widgets/videowidget.cpp
+)
 
 set(RESOURCES
 #    "${PROJECT_SOURCE_DIR}/../README.md"
@@ -32,7 +40,7 @@ set(RESOURCES
 set(TS_FILES MediaPlayer_zh_CN.ts)
 
 source_group("UI" FILES ${UI} ${UI_HEADERS} ${UI_SOURCES})
-source_group("Resource" FILES ${RESOURCES} TS_FILES)
+source_group("Resource" FILES ${RESOURCES})
 source_group("Public" FILES ${PUBLIC})
 # 添加当前目录的源文件
 #LIBRARY_OUTPUT_DIRECTORY是一个属性，用于指定目标生成的库文件（DLL）的输出目录
@@ -49,6 +57,7 @@ qt_add_plugin(MediaPlayer SHARED
     mediaplayer.cpp
     mediaplayer.h
     MediaPlayer.json
+    ${TS_FILES}
 )
 
 
@@ -63,7 +72,6 @@ target_sources(MediaPlayer PRIVATE
 #    ../public/widgets/slipcheckbox.h ../public/widgets/slipcheckbox.cpp
     ${UI} ${UI_HEADERS} ${UI_SOURCES}
     ${PUBLIC} ${RESOURCES}
-
 
 )
 
