@@ -63,9 +63,15 @@ void SnowBeerWindow::downloadFilesListFromNetworkLinks(QStringList linksFilesLis
         qDebug()<<"downloadFilesListFromNetworkLinks(QStringList:"<< link;
         // 定义一个正则表达式模式，用于匹配网络下载链接 Qt::CaseSensitive区分大小写
         FilesUtil *fileItem = new FilesUtil();
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
         if(fileItem->startDownloadFileFromLink(AppJson["pathSnowBeerWindowNetwork"].toString() + link,\
                                                                                                      AppJson["pathSnowBeerWindow"].toString() +link)){
             ui->verticalLayout_download->addWidget(fileItem->getLayoutDownloadFile());
+========
+        if(fileItem->startDownloadFileFromLink(AppJson["pathDataViewNetwork"].toString() + link,\
+                                                                                                     AppJson["pathDataView"].toString() +link)){
+            SUB_MAIN->ui->verticalLayout_download->addWidget(fileItem->getLayoutDownloadFile());
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
         }
 
 //        SUB_WINDOW->ui->gridLayout->addWidget(fileItem->getLayoutDownloadFile(),key,0);key++;
@@ -180,7 +186,11 @@ void SnowBeerWindow::init_filesView()
     ui->treeView_files->setModel(m_fileSystemModel);
     ui->treeView_files->setWindowTitle("Directories");
     // 设置文件浏览视图的根目录
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
     ui->lineEdit_rootPath->setText(AppJson["pathSnowBeerWindow"].toString());
+========
+    ui->lineEdit_rootPath->setText(AppJson["pathDataView"].toString());
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
 
 //    m_fileModel_SnowBeerWindow->setRootPath(m_fileModel_SnowBeerWindow->myComputer().toString());
     m_fileSystemModel->setRootPath(ui->lineEdit_rootPath->text());
@@ -192,7 +202,11 @@ void SnowBeerWindow::init_filesView()
 
     // 设置网络浏览视图的根目录
     ui->listView_filesNetwork->setWindowTitle("Directories Network");
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
     ui->lineEdit_rootPath_filesNetwork->setText(AppJson["pathSnowBeerWindowNetwork"].toString());
+========
+    ui->lineEdit_rootPath_filesNetwork->setText(AppJson["pathDataViewNetwork"].toString());
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
 //    m_networkFileModel->setRootPath(ui->lineEdit_rootPath_filesNetwork->text());
 //    m_networkFileModel->setRootUrl(ui->lineEdit_rootPath_filesNetwork->text());
 
@@ -455,13 +469,22 @@ void SnowBeerWindow::on_pushButton_test_clicked()
 void SnowBeerWindow::on_lineEdit_rootPath_editingFinished()
 {
     qDebug()<<"on_lineEdit_rootPath_editingFinished()";
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
         qDebug()<<ui->lineEdit_rootPath->text()<<AppJson["pathSnowBeerWindow"].toString();
+========
+        qDebug()<<ui->lineEdit_rootPath->text()<<AppJson["pathDataView"].toString();
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
     if(!QDir(ui->lineEdit_rootPath->text()).exists()){
         // 路径不存在
         QMessageBox::warning(this, "路径验证", "文件路径不存在!");
     }
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
     AppJson["pathSnowBeerWindow"] = ui->lineEdit_rootPath->text();
     ui->treeView_files->setRootIndex(m_fileSystemModel->index(ui->lineEdit_rootPath->text()));
+========
+    AppJson["pathDataView"] = ui->lineEdit_rootPath->text();
+    ui->treeView_files->setRootIndex(m_fileModel_dataView->index(ui->lineEdit_rootPath->text()));
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
 }
 
 void SnowBeerWindow::on_pushButton_downloadNetworkFile_clicked()
@@ -542,15 +565,26 @@ void SnowBeerWindow::on_lineEdit_rootPath_filesNetwork_editingFinished()
 
 void SnowBeerWindow::on_pushButton_updateLocalFiles_clicked()
 {
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
     qDebug()<<"on_pushButton_updateNetworkFiles_clicked():"<<AppJson["pathSnowBeerWindow"].toString();
 
 //    qDebug()<<QRegularExpression(".*(" + fileExtensions.join("|") + ")");
     filesListLocal = m_filesUtil->getFilesListLocalPath(AppJson["pathSnowBeerWindow"].toString());
+========
+    qDebug()<<"on_pushButton_updateNetworkFiles_clicked():"<<AppJson["pathDataView"].toString();
+
+//    qDebug()<<QRegularExpression(".*(" + fileExtensions.join("|") + ")");
+    filesListLocal = m_filesUtil->getFilesListLocalPath(AppJson["pathDataView"].toString());
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
     qDebug()<<"filesListLocal:"<<filesListLocal;
     //使用规则表达式，区分大小，字符匹配
     filesListLocal = filesListLocal.filter(QRegularExpression(".*(" + fileExtensions.join("|") + ")"));
     qDebug()<<"filesListLocal:"<<filesListLocal;
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
     m_filesListModelNetwork->setStringList(filesListLocal.replaceInStrings(AppJson["pathSnowBeerWindow"].toString(),""));
+========
+    m_filesListModelNetwork->setStringList(filesListLocal.replaceInStrings(AppJson["pathDataView"].toString(),""));
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
 }
 
 
@@ -589,7 +623,11 @@ void SnowBeerWindow::on_listView_filesNetwork_clicked(const QModelIndex &index)
 {
     qDebug()<<"on_listView_filesNetwork_clicked(QModelIndex index)"<<index<<index.row();
     qDebug()<<index.data(Qt::DisplayRole).toString();
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
     m_currentFilePathDir = AppJson["pathSnowBeerWindow"].toString() + index.data(Qt::DisplayRole).toString();
+========
+    m_currentFilePathDir = AppJson["pathDataView"].toString() + index.data(Qt::DisplayRole).toString();
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
 }
 
 
@@ -597,7 +635,11 @@ void SnowBeerWindow::on_listView_filesNetwork_doubleClicked(const QModelIndex &i
 {
     qDebug()<<"on_listView_filesNetwork_doubleClicked(QModelIndex index)"<<index<<index.row();
     qDebug()<<index.data(Qt::DisplayRole).toString();
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
     m_currentFilePathDir = AppJson["pathSnowBeerWindow"].toString() + index.data(Qt::DisplayRole).toString();
+========
+    m_currentFilePathDir = AppJson["pathDataView"].toString() + index.data(Qt::DisplayRole).toString();
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
 }
 
 
@@ -610,7 +652,11 @@ void SnowBeerWindow::on_pushButton_downloadedFiles_clicked()
             filesListDownloaded.append(element);
         }
     }
+<<<<<<<< HEAD:DataView/ui/snowbeerwindow.cpp
     m_filesListModelNetwork->setStringList(filesListDownloaded.replaceInStrings(AppJson["pathSnowBeerWindow"].toString(),""));
+========
+    m_filesListModelNetwork->setStringList(filesListDownloaded.replaceInStrings(AppJson["pathDataView"].toString(),""));
+>>>>>>>> 978fb7a4a8d78b50afc3685cef265ccf40765196:QtClient/ui/DataView.cpp
 
 }
 
