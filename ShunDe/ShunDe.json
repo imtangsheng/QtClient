@@ -1,0 +1,8 @@
+{
+    "Keys" : ["ShunDe_iid" ],
+    "ID":1,
+    "Name":"ShunDe",
+    "Version":"0.1",
+    "Description":"This is an example Qt plugin",
+    "Author":"tang"
+}
