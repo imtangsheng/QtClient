@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QJsonObject>
 #include "ui/TitleBar.h"
-#include "public/AppSystem.h"
 #include <QMap>
 #include "PluginInterface.h"
 
@@ -58,13 +57,10 @@ protected:
 private slots:
     void jump_ShowMainTabWidget(int index,QString name);
 
-    void on_Button_dataView_clicked();
-
     void on_toolButton_WidgetStatus_isFloatable_clicked();
 
     void on_toolButton_WidgetStatus_isStaysOnTopHint_clicked();
 
-    void on_toolButton_3_clicked();
 
 private:
     QJsonObject jsonMainConfig;
@@ -79,7 +75,7 @@ private:
 
     int currentTabNum;
     int tabCloseLastShowNum = 0;
-    void addTabWidget(TabWindow window);
+    void addTabWidget(int window);
     void TabCloseRequested(int index);
     void TabCurrentChanged(int index);
 

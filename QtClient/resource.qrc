@@ -1,25 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>asset/video_playback/Movie_Active.svg</file>
-        <file>asset/video_playback/Play_Icon.svg</file>
-        <file>asset/video_playback/Stop_Icon.svg</file>
-        <file>asset/video_playback/Shadow.png</file>
-        <file>asset/video_playback/Rate_Icon.svg</file>
-        <file>asset/video_playback/Volume_Icon.svg</file>
-        <file>asset/media/VideoPause.svg</file>
-        <file>asset/media/VideoPlay.svg</file>
-        <file>asset/video_playback/FullScreen_Icon.svg</file>
-        <file>asset/video_playback/Mute_Icon.svg</file>
-        <file>asset/video_playback/Settings_Icon.svg</file>
-        <file>asset/video_playback/Movie_Icon.svg</file>
-        <file>asset/media/VideoPause_notAvailable.svg</file>
-        <file>asset/media/VideoPlay_notAvailable.svg</file>
-        <file>asset/video_playback/Playlist_Active.svg</file>
-        <file>asset/video_playback/Playlist_Icon.svg</file>
-        <file>asset/media/FullScreen.svg</file>
-        <file>asset/media/Setting.svg</file>
-        <file>asset/media/Operation.svg</file>
-        <file>asset/media/Audio.svg</file>
         <file>asset/dataview/DataAnalysis.svg</file>
         <file>asset/dataview/MoreFilled.svg</file>
         <file>asset/dataview/Tools.svg</file>
@@ -32,14 +12,12 @@
         <file>asset/dataview/voltage.svg</file>
         <file>asset/dataview/ZoomReset.svg</file>
         <file>asset/Home/More.svg</file>
-        <file>asset/media/VideoWidget_backgroundImage.jpeg</file>
         <file>i18n/QtClient_zh_CN.qm</file>
         <file>asset/Home/Close.svg</file>
         <file>asset/Home/Minus.svg</file>
         <file>asset/Home/User.svg</file>
         <file>asset/Home/window-maximize.svg</file>
         <file>asset/Home/window-restore.svg</file>
-        <file>asset/Home/playback.svg</file>
         <file>asset/Home/DataView.svg</file>
         <file>asset/Home/logo.png</file>
         <file>asset/favicon.png</file>

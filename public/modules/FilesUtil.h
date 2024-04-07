@@ -75,7 +75,7 @@ private:
     std::unique_ptr<QFile> file;
 
     QScopedPointer<QNetworkReply, QScopedPointerDeleteLater> networkReply;
-    std::unique_ptr<QFile> fileNetwork; // 被赋值或移动后,原有对象的智能指针管理将自动解除 自动管理QFile对象的内存
+//    std::unique_ptr<QFile> fileNetwork; // 被赋值或移动后,原有对象的智能指针管理将自动解除 自动管理QFile对象的内存
     bool hasHttpRequest = false;        // http 终止标志
 
     void NetworkReplyFinished();

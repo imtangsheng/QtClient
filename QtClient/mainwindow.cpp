@@ -6,10 +6,9 @@
 #include <QIcon>
 #include <QTabBar>
 #include <QPluginLoader>
-
+#include "public/AppSystem.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "ui/DataView.h"
 
 #define TIMEMS QTime::currentTime().toString("hh:mm:ss zzz")
 
@@ -132,7 +131,7 @@ void MainWindow::_Start()
         QJsonObject objKey = jsonMainConfig["TabWindow"].toObject()[key].toObject();
         switch (objKey["type"].toInt()) {
         case TabWindowType_Self:
-            addTabWidget(TabWindow(objKey["window"].toInt()));
+            addTabWidget(objKey["window"].toInt());
             break;
         case TabWindowType_Plugin:
             //判断加载的插件中是否有这个插件名称object name
@@ -177,13 +176,13 @@ void MainWindow::test()
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
-    qDebug() << "MainWindow::mousePressEvent(QMouseEvent *"<<event->button();
+//    qDebug() << "MainWindow::mousePressEvent(QMouseEvent *"<<event->button();
     return QMainWindow::mousePressEvent(event);
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
-    qDebug() << "MainWindow::resizeEvent(QResizeEvent"<<event->size();
+//    qDebug() << "MainWindow::resizeEvent(QResizeEvent"<<event->size();
     QMainWindow::resizeEvent(event);
     geometryChanged(this->pos());
 
@@ -265,32 +264,32 @@ void MainWindow::jump_ShowMainTabWidget(int index, QString name)
     }
 }
 
-void MainWindow::on_Button_dataView_clicked()
-{
-    qDebug() << "on_pushButton_dataview_clicked";
-    QWidget* existingTab = ui->tabWidget_mainWindow->findChild<QWidget*>(TabWindowMap()[TabWindow_DataView]);
-    if(existingTab){
-        ui->tabWidget_mainWindow->setCurrentWidget(existingTab);
-    }else{
-        addTabWidget(TabWindow_DataView);
-        ui->tabWidget_mainWindow->setCurrentIndex(ui->tabWidget_mainWindow->count() - 1);
-    }
-}
+//void MainWindow::on_Button_dataView_clicked()
+//{
+//    qDebug() << "on_pushButton_dataview_clicked";
+//    QWidget* existingTab = ui->tabWidget_mainWindow->findChild<QWidget*>(TabWindowMap()[TabWindow_DataView]);
+//    if(existingTab){
+//        ui->tabWidget_mainWindow->setCurrentWidget(existingTab);
+//    }else{
+//        addTabWidget(TabWindow_DataView);
+//        ui->tabWidget_mainWindow->setCurrentIndex(ui->tabWidget_mainWindow->count() - 1);
+//    }
+//}
 
 
-void MainWindow::addTabWidget(TabWindow window)
+void MainWindow::addTabWidget(int window)
 {
     QJsonObject tabJson = jsonMainConfig["TabWindow"].toObject();
     QWidget * addWidget;
     QIcon icon;
     QString name;
     switch (window) {
-    case TabWindow_DataView:{
-        DataView *ui_DataView = new DataView(SUB_MAIN);
-        addWidget = ui_DataView->getDataView();
-        icon = QIcon(":/asset/Home/DataView.svg");
-        name = tr("数据图表");
-        break;}
+//    case TabWindow_DataView:{
+//        DataView *ui_DataView = new DataView(SUB_MAIN);
+//        addWidget = ui_DataView->getDataView();
+//        icon = QIcon(":/asset/Home/DataView.svg");
+//        name = tr("数据图表");
+//        break;}
     default:
         qWarning()<<"window 没有定义对应的ui"<<window;
         return;
@@ -426,6 +425,8 @@ void MainWindow::on_toolButton_WidgetStatus_isFloatable_clicked()
 //    qDebug() << "MainWindow::on_toolButton_isStaysOnTopHint_clicked()置顶"<<ui->statusBar->geometry()<<ui->widget_statusBarTitle->geometry();
 }
 
+#include <QMouseEvent>
+#include <QResizeEvent>
 #include <QWindow>
 void MainWindow::on_toolButton_WidgetStatus_isStaysOnTopHint_clicked()
 {
@@ -535,10 +536,3 @@ bool MainWindow::pluginTabInsertMainWindow(int index,QString name)
     jsonMainConfig["TabWindow"] = tabJson;
     return true;
 }
-
-void MainWindow::on_toolButton_3_clicked()
-{
-    qDebug() << "pluginInterface界面Widget： 不存在";
-        emit quit();//不会触发退出事件
-}
-

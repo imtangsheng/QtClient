@@ -1,6 +1,7 @@
-#ifndef DATAVIEW_H
-#define DATAVIEW_H
+#ifndef SNOWBEERWINDOW_H
+#define SNOWBEERWINDOW_H
 
+#include <QMainWindow>
 #include <QWidget>
 #include <QDateTime>
 #include <QFile>
@@ -12,27 +13,23 @@
 #include <QStringListModel>
 
 #include "modules/FilesUtil.h"
-
-namespace Ui
-{
-    class DataView;
+namespace Ui {
+class SnowBeerWindow;
 }
 
-class DataView : public QWidget
+class SnowBeerWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit DataView(QWidget *parent = nullptr);
-    ~DataView();
+    explicit SnowBeerWindow(QWidget *parent = nullptr);
+    ~SnowBeerWindow();
 
     void init();
-    void test();
-
+    void quit();
     void parseData(const QString &line);
     bool parseDataFromFile(const QString filePath);
 
-    QWidget *getDataView();
     void downloadFilesListFromNetworkLinks(QStringList linksFilesList);
 
 public slots:
@@ -88,7 +85,7 @@ private slots:
     void on_pushButton_fileDelete_clicked();
 
 private:
-    Ui::DataView *ui;
+    Ui::SnowBeerWindow *ui;
 
     // 展示在QChartView部件上
     void init_chartView();
@@ -111,7 +108,7 @@ private:
 
     QStringListModel *m_filesListModelNetwork;
 
-    QFileSystemModel *m_fileModel_dataView;
+    QFileSystemModel *m_fileSystemModel;
     QString m_currentFilePathDir;
     void fileModelSelection(QModelIndex index);
     void fileBrowserDoubleClicked(QModelIndex index);
@@ -122,4 +119,4 @@ private:
     QStringList filesListNotDownloaded;
 };
 
-#endif // DATAVIEW_H
+#endif // SNOWBEERWINDOW_H

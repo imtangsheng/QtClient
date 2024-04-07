@@ -19,7 +19,6 @@ include_directories("./")
 include_directories(${PROJECT_SOURCE_DIR})
 
 file(GLOB_RECURSE UI ./ui/*.*)
-file(GLOB_RECURSE MODULES ./modules/*.*)
 file(GLOB_RECURSE PRIVATRE_PUBLIC ./public/*.*)
 
 set(PUBLIC
@@ -38,7 +37,6 @@ set(TS_FILES QtClient_zh_CN.ts)
 source_group("UI" FILES ${UI})
 source_group("Resource" FILES ${RESOURCES} TS_FILES)
 source_group("Public" FILES ${PUBLIC} ${PRIVATRE_PUBLIC})
-source_group("Modules" FILES ${MODULES})
 set(PROJECT_SOURCES
         main.cpp
         mainwindow.cpp mainwindow.h mainwindow.ui
@@ -50,14 +48,7 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         MANUAL_FINALIZATION
         ${PROJECT_SOURCES}
         FirstShowWidget.h FirstShowWidget.cpp FirstShowWidget.ui
-#        public/AppSystem.h public/AppSystem.cpp
-#        public/AppOS.h
-#        ui/TitleBar.h ui/TitleBar.cpp ui/TitleBar.ui
-#        ui/SubMain.h ui/SubMain.cpp ui/SubMain.ui
-#        ui/VideoPlayback.h ui/VideopPayback.cpp ui/VideoPlayback.ui
-#        ui/DataView.h ui/DataView.cpp ui/DataView.ui
-#        modules/FilesUtil.h modules/FilesUtil.cpp modules/FilesUtil.ui
-        ${PUBLIC} ${PRIVATRE_PUBLIC} ${MODULES}
+        ${PUBLIC} ${PRIVATRE_PUBLIC}
         ${UI}
         ${RESOURCES}
 
@@ -139,10 +130,11 @@ target_include_directories(QtClient PRIVATE
 if(QT6_IS_SHARED_LIBS_BUILD)
     # Build the shared plugin too when building this example target.
 #    add_dependencies(QtClient DataView MediaPlayer)
-     add_dependencies(QtClient MediaPlayer)
+     add_dependencies(QtClient ShunDe)
 else()
     # Link the echoplugin if Qt is built statically.
     target_link_libraries(QtClient PRIVATE
-        DataView MediaPlayer
+        ShunDe
     )
 endif()
+#MediaPlayer

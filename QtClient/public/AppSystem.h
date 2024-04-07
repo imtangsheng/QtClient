@@ -88,17 +88,4 @@ extern QString PATH_EXE_CONFIG;
 extern QString PATH_APP_SETTINGS;
 extern QString PATH_LOG;
 
-/*定义功能集*/
-enum TabWindow
-{
-    TabWindow_DataView
-};
-
-//使用[[maybe_unused]]属性或__attribute__((unused))属性来标记未使用的函数，以告诉编译器忽略这个警告
- __attribute__((unused)) static std::map<int, QString>& TabWindowMap() {
-    static std::map<int, QString> tab;
-    tab[TabWindow_DataView] = "widget_dataView";
-    return tab;
-}
-
 #endif // APPSYSTEM_H
