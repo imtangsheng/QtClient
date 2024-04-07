@@ -1200,7 +1200,7 @@ QTabWidget::pane {
 */</string>
          </property>
          <property name="currentIndex">
-          <number>0</number>
+          <number>1</number>
          </property>
          <widget class="QWidget" name="tab_videofiles">
           <attribute name="icon">
@@ -1214,6 +1214,21 @@ QTabWidget::pane {
            <string>播放列表</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_6">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>9</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QComboBox" name="comboBox_updatePlayerList">
              <property name="layoutDirection">
@@ -1408,29 +1423,61 @@ QTableCornerButton::section {
            <string>设置</string>
           </attribute>
           <layout class="QVBoxLayout" name="verticalLayout_8">
+           <property name="spacing">
+            <number>0</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>24</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
            <item>
             <widget class="QGroupBox" name="groupBox">
+             <property name="palette">
+              <palette>
+               <active/>
+               <inactive/>
+               <disabled/>
+              </palette>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
              <property name="autoFillBackground">
               <bool>false</bool>
              </property>
+             <property name="styleSheet">
+              <string notr="true">QGroupBox {
+	border:none;
+}</string>
+             </property>
              <property name="title">
-              <string>视频列表管理</string>
+              <string>视频列表管理:</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_9">
               <property name="spacing">
-               <number>6</number>
+               <number>0</number>
               </property>
               <property name="leftMargin">
-               <number>9</number>
+               <number>0</number>
               </property>
               <property name="topMargin">
-               <number>9</number>
+               <number>24</number>
               </property>
               <property name="rightMargin">
-               <number>9</number>
+               <number>0</number>
               </property>
               <property name="bottomMargin">
-               <number>9</number>
+               <number>12</number>
               </property>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,0">
@@ -1446,8 +1493,11 @@ QTableCornerButton::section {
                 </item>
                 <item>
                  <widget class="QLineEdit" name="lineEdit_playerPath">
+                  <property name="styleSheet">
+                   <string notr="true">border: 2px solid #263238;</string>
+                  </property>
                   <property name="placeholderText">
-                   <string>双击选择或编辑路径</string>
+                   <string>编辑路径</string>
                   </property>
                  </widget>
                 </item>
@@ -1518,19 +1568,59 @@ QTableCornerButton::section {
            </item>
            <item>
             <widget class="QGroupBox" name="horizontalGroupBox_2">
+             <property name="font">
+              <font>
+               <pointsize>12</pointsize>
+              </font>
+             </property>
              <property name="styleSheet">
-              <string notr="true">border-color: #263238;</string>
+              <string notr="true">QGroupBox {
+	border:none;
+}</string>
              </property>
              <property name="title">
-              <string>视频播放设置</string>
+              <string>视频播放设置:</string>
              </property>
              <layout class="QVBoxLayout" name="verticalLayout_7">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>24</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>12</number>
+              </property>
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_4">
                 <item>
                  <widget class="QLabel" name="label">
+                  <property name="minimumSize">
+                   <size>
+                    <width>90</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>90</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
+                  <property name="layoutDirection">
+                   <enum>Qt::LeftToRight</enum>
+                  </property>
                   <property name="text">
                    <string>快进/快退(秒)：</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1541,6 +1631,9 @@ QTableCornerButton::section {
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">border: 2px solid #263238;</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1581,8 +1674,23 @@ QTableCornerButton::section {
                <layout class="QHBoxLayout" name="horizontalLayout_3">
                 <item>
                  <widget class="QLabel" name="label_2">
+                  <property name="minimumSize">
+                   <size>
+                    <width>90</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>90</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>初始播放源：</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1593,6 +1701,9 @@ QTableCornerButton::section {
                     <horstretch>0</horstretch>
                     <verstretch>0</verstretch>
                    </sizepolicy>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">border: 2px solid #263238;</string>
                   </property>
                   <property name="text">
                    <string/>
@@ -1621,8 +1732,23 @@ QTableCornerButton::section {
                <layout class="QHBoxLayout" name="horizontalLayout_8">
                 <item>
                  <widget class="QLabel" name="label_3">
+                  <property name="minimumSize">
+                   <size>
+                    <width>90</width>
+                    <height>0</height>
+                   </size>
+                  </property>
+                  <property name="maximumSize">
+                   <size>
+                    <width>90</width>
+                    <height>16777215</height>
+                   </size>
+                  </property>
                   <property name="text">
                    <string>文件后缀：</string>
+                  </property>
+                  <property name="alignment">
+                   <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                   </property>
                  </widget>
                 </item>
@@ -1630,6 +1756,9 @@ QTableCornerButton::section {
                  <widget class="QLineEdit" name="lineEdit_fileExtensions">
                   <property name="toolTip">
                    <string>视频文件后缀，使用逗号分隔</string>
+                  </property>
+                  <property name="styleSheet">
+                   <string notr="true">border: 2px solid #263238;</string>
                   </property>
                   <property name="text">
                    <string>.mp4,.MP4</string>
@@ -1661,8 +1790,25 @@ QTableCornerButton::section {
                   <property name="layoutDirection">
                    <enum>Qt::RightToLeft</enum>
                   </property>
+                  <property name="styleSheet">
+                   <string notr="true">/*
+QCheckBox::indicator {
+	background-color: rgb(38, 50, 56);
+	border: 2px solid #1296db;
+	border-radius: 5px;
+}
+
+QCheckBox::indicator:checked {
+	background-color: rgb(18, 150, 219);
+}
+*/
+background-color: rgb(55, 71, 79);</string>
+                  </property>
                   <property name="text">
                    <string>自动播放：</string>
+                  </property>
+                  <property name="checked">
+                   <bool>false</bool>
                   </property>
                  </widget>
                 </item>
@@ -1692,7 +1838,7 @@ QTableCornerButton::section {
              <property name="sizeHint" stdset="0">
               <size>
                <width>20</width>
-               <height>176</height>
+               <height>217</height>
               </size>
              </property>
             </spacer>

@@ -26,6 +26,7 @@ file(GLOB UI ./ui/*.ui)
 set(RESOURCES
 #    "${PROJECT_SOURCE_DIR}/../README.md"
     "resource.qrc"
+    readme.md
 )
 
 set(TS_FILES MediaPlayer_zh_CN.ts)
@@ -62,6 +63,7 @@ target_sources(MediaPlayer PRIVATE
 #    ../public/widgets/slipcheckbox.h ../public/widgets/slipcheckbox.cpp
     ${UI} ${UI_HEADERS} ${UI_SOURCES}
     ${PUBLIC} ${RESOURCES}
+
 
 )
 

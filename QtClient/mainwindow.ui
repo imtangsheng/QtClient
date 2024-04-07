@@ -41,7 +41,7 @@
    <string>客户端程序</string>
   </property>
   <property name="windowIcon">
-   <iconset>
+   <iconset resource="resource.qrc">
     <normaloff>:/asset/favicon.png</normaloff>:/asset/favicon.png</iconset>
   </property>
   <property name="toolTip">
@@ -194,7 +194,7 @@ QTabBar::tab{
         <string notr="true">background-color:transparent;</string>
        </property>
        <attribute name="icon">
-        <iconset>
+        <iconset resource="resource.qrc">
          <normaloff>:/asset/Home/Menu.svg</normaloff>:/asset/Home/Menu.svg</iconset>
        </attribute>
        <attribute name="title">
@@ -219,63 +219,6 @@ QTabBar::tab{
         <property name="bottomMargin">
          <number>9</number>
         </property>
-        <item>
-         <widget class="QGroupBox" name="groupBox_video">
-          <property name="styleSheet">
-           <string notr="true">border:none;</string>
-          </property>
-          <property name="title">
-           <string>视频应用</string>
-          </property>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <property name="leftMargin">
-            <number>16</number>
-           </property>
-           <property name="topMargin">
-            <number>36</number>
-           </property>
-           <property name="rightMargin">
-            <number>16</number>
-           </property>
-           <property name="bottomMargin">
-            <number>24</number>
-           </property>
-           <item>
-            <widget class="QToolButton" name="Button_videoPlayback">
-             <property name="text">
-              <string>视频回放</string>
-             </property>
-             <property name="icon">
-              <iconset>
-               <normaloff>:/asset/Home/playback.svg</normaloff>:/asset/Home/playback.svg</iconset>
-             </property>
-             <property name="iconSize">
-              <size>
-               <width>48</width>
-               <height>48</height>
-              </size>
-             </property>
-             <property name="toolButtonStyle">
-              <enum>Qt::ToolButtonTextUnderIcon</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
         <item>
          <widget class="QGroupBox" name="groupBox_data">
           <property name="styleSheet">
@@ -324,7 +267,7 @@ QTabBar::tab{
               <string>数据图表</string>
              </property>
              <property name="icon">
-              <iconset>
+              <iconset resource="resource.qrc">
                <normaloff>:/asset/Home/DataView.svg</normaloff>:/asset/Home/DataView.svg</iconset>
              </property>
              <property name="iconSize">
@@ -545,7 +488,7 @@ QTabBar::tab{
            <string>置顶</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="resource.qrc">
             <normaloff>:/asset/Home/on_top.svg</normaloff>:/asset/Home/on_top.svg</iconset>
           </property>
           <property name="checkable">
@@ -577,7 +520,7 @@ QTabBar::tab{
            <string>浮动</string>
           </property>
           <property name="icon">
-           <iconset>
+           <iconset resource="resource.qrc">
             <normaloff>:/asset/Home/double-arrow-top.svg</normaloff>:/asset/Home/double-arrow-top.svg</iconset>
           </property>
          </widget>
@@ -912,6 +855,8 @@ background-color: rgb(85, 0, 255);
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections/>
 </ui>

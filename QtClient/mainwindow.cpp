@@ -9,7 +9,6 @@
 
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "ui/VideoPlayback.h"
 #include "ui/DataView.h"
 
 #define TIMEMS QTime::currentTime().toString("hh:mm:ss zzz")
@@ -179,7 +178,6 @@ void MainWindow::test()
 void MainWindow::mousePressEvent(QMouseEvent *event)
 {
     qDebug() << "MainWindow::mousePressEvent(QMouseEvent *"<<event->button();
-    showMessage("MainWindow::mousePressEvent(QMouseEvent *");
     return QMainWindow::mousePressEvent(event);
 }
 
@@ -267,20 +265,6 @@ void MainWindow::jump_ShowMainTabWidget(int index, QString name)
     }
 }
 
-void MainWindow::on_Button_videoPlayback_clicked()
-{
-    qDebug() << "on_pushButton_video_playback_clicked()";
-    // 判断是否存在指定名称的Tab页
-    QWidget* existingTab = ui->tabWidget_mainWindow->findChild<QWidget*>(TabWindowMap()[TabWindow_VideoPlayback]);
-    if(existingTab){
-        qDebug() << "MainWindow::on_Button_videoPlayback_clicked()) TabWindowMap*"<<existingTab->objectName();
-        ui->tabWidget_mainWindow->setCurrentWidget(existingTab);
-    }else{
-        addTabWidget(TabWindow_VideoPlayback);
-        ui->tabWidget_mainWindow->setCurrentIndex(ui->tabWidget_mainWindow->count() - 1);
-    }
-}
-
 void MainWindow::on_Button_dataView_clicked()
 {
     qDebug() << "on_pushButton_dataview_clicked";
@@ -301,12 +285,6 @@ void MainWindow::addTabWidget(TabWindow window)
     QIcon icon;
     QString name;
     switch (window) {
-    case TabWindow_VideoPlayback:{
-        VideoPlayback* ui_VideoPlayback = new VideoPlayback(SUB_MAIN);
-        addWidget = ui_VideoPlayback->getVideoPaly();
-        icon = QIcon(":/asset/Home/playback.svg");
-        name = tr("视频回放");
-        break;} //以限定变量的作用域
     case TabWindow_DataView:{
         DataView *ui_DataView = new DataView(SUB_MAIN);
         addWidget = ui_DataView->getDataView();
@@ -538,7 +516,6 @@ bool MainWindow::pluginTabInsertMainWindow(int index,QString name)
         qDebug() << "pluginInterface下标：" << index << " 不存在";
         return false;
     }
-    
     QWidget * addWidget = pluginList.at(index)->getWidgetByName(name);
     if(!addWidget){
         qDebug() << "pluginInterface界面Widget：" << name << " 不存在";

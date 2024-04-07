@@ -1,7 +1,7 @@
 #include "mediaplayer.h"
 #include "AppOS.h"
 
-QSettings AppSettings("config/MediaPlayer.ini",QSettings::IniFormat);
+QSettings AppSettings("config/MediaPlayer.ini", QSettings::IniFormat);
 QJsonObject AppJson;
 
 MediaPlayer::MediaPlayer(QObject *parent) : QObject(parent)
@@ -27,8 +27,8 @@ QObject *MediaPlayer::instance()
 
 bool MediaPlayer::Start()
 {
-    qDebug() << "bool MediaPlayer::Start()"<<ObjectName;
-//    AppSettings.setPath(QSettings::IniFormat, QSettings::UserScope,"config/"+ObjectName+".ini");
+    qDebug() << "bool MediaPlayer::Start()" << ObjectName;
+    //    AppSettings.setPath(QSettings::IniFormat, QSettings::UserScope,"config/"+ObjectName+".ini");
     return true;
 }
 
@@ -37,9 +37,14 @@ QString MediaPlayer::getObjectNane() const
     return ObjectName;
 }
 
-QWidget *MediaPlayer::getWidgetByName(QString name)
+QWidget *MediaPlayer::getWidgetByName(QString name, int *type)
 {
-    if(name == HomeMain_TabWidgetName){
+    if (name == HomeMain_TabWidgetName)
+    {
+        if(type != nullptr){
+            *type = PluginType_Video;
+        }
+
         return videoWindow;
     }
     return widgets->findChild<QWidget *>(name);
@@ -56,11 +61,6 @@ bool MediaPlayer::widgetReturnAfterRemoved(QWidget *widget)
         return true;
     }
     return false;
-}
-
-QWidget *MediaPlayer::getHomeTiler()
-{
-    return widgets->ui->HomeMenu;
 }
 
 void MediaPlayer::quit()
@@ -89,7 +89,7 @@ void MediaPlayer::jumpTabWidget()
 
 MediaPlayer::~MediaPlayer()
 {
-//    delete widgets;
-//    delete videoWindow;
+    //    delete widgets;
+    //    delete videoWindow;
     qDebug() << "MediaPlayer::~MediaPlayer()";
 }

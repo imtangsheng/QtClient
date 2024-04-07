@@ -3,41 +3,23 @@
 #include <QMessageBox>
 #include <QSettings>
 
-// QSettings Config("config/config.ini",QSettings::IniFormat); //无编码配置，已经移除，使用UTF-8
-
 MediaWidgets::MediaWidgets(QWidget *parent) : QWidget(parent),
-    ui(new Ui::HomeMainWidget)
+                                              ui(new Ui::HomeMainWidget)
 {
     ui->setupUi(this);
     setAttribute(Qt::WA_DeleteOnClose);
-//    this->installEventFilter(this);
+    //    this->installEventFilter(this);
     init();
 }
 
-
-
 MediaWidgets::~MediaWidgets()
 {
-
-    // 创建一个事件循环
-    //    QEventLoop loop; 需要app没有在销毁前
-    //    // 连接停止信号和事件循环的退出槽
-    //    QObject::connect(player, &QMediaPlayer::playbackStateChanged, [&loop](QMediaPlayer::PlaybackState state){
-    //        if (state == QMediaPlayer::StoppedState) {
-    //            loop.quit();
-    //        }
-    //    });
-
-    // 等待停止操作完成
-    //    loop.quit();
-    //    loop.exec();
     delete ui;
     qDebug() << "MediaWidgets::~MediaWidgets() 释放 成功" << objectName();
 }
 
 void MediaWidgets::init()
 {
-
 }
 
 void MediaWidgets::quit()

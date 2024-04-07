@@ -1,13 +1,13 @@
 #ifndef VIDEOWINDOW_H
 #define VIDEOWINDOW_H
 
-
 #include <QJsonObject>
 #include <QMainWindow>
 #include "ui_videowindow.h"
 
-namespace Ui {
-class VideoWindow;
+namespace Ui
+{
+    class VideoWindow;
 }
 
 class VideoWindow : public QMainWindow
@@ -34,8 +34,7 @@ public slots:
     bool PlayExecuteCmd(int command);
 
 protected:
-
-    void showEvent(QShowEvent *event) override; //在控件第一次显示时以及每次从隐藏状态恢复到显示状态时都会被触发
+    void showEvent(QShowEvent *event) override; // 在控件第一次显示时以及每次从隐藏状态恢复到显示状态时都会被触发
 
 protected slots:
     /*视频播放信号连接*/
@@ -51,15 +50,15 @@ protected slots:
         QMediaPlayer::EndOfMedia	6	播放已到达当前媒体的末尾。玩家在 StoppedState.
         QMediaPlayer::InvalidMedia	7	无法播放当前媒体。玩家在 StoppedState.
     */
-    void mediaStatusChanged(QMediaPlayer::MediaStatus status); //媒体状态变化
+    void mediaStatusChanged(QMediaPlayer::MediaStatus status); // 媒体状态变化
     //[2!]
-    void sourceChanged(const QUrl &media); //播放源变化
+    void sourceChanged(const QUrl &media); // 播放源变化
     //[3!]
-    void durationChanged(qint64 duration); //总时长变化
+    void durationChanged(qint64 duration); // 总时长变化
     //[4!]
-    void tracksChanged(); //曲目变化
+    void tracksChanged(); // 曲目变化
     //[5!] Signals from player
-    void hasVideoChanged(bool videoAvailable); //表示视觉内容的可用性已更改为
+    void hasVideoChanged(bool videoAvailable); // 表示视觉内容的可用性已更改为
     //[7!]
     /*  enum QMediaPlayer::PlaybackState        定义媒体播放器的当前状态。
         QMediaPlayer::StoppedState	0	媒体播放器未播放内容，播放将从当前曲目的开头开始。
@@ -68,10 +67,10 @@ protected slots:
     */
     void playbackStateChanged(QMediaPlayer::PlaybackState newState); // 播放状态变化
     //[9!]
-    void positionChange(qint64 progress); //播放位置变化
+    void positionChange(qint64 progress); // 播放位置变化
     //[end]
-    void bufferProgressChanged(float filled); //缓存变化，0-1
-    void errorOccurred(QMediaPlayer::Error error, const QString &errorString); //错误
+    void bufferProgressChanged(float filled);                                  // 缓存变化，0-1
+    void errorOccurred(QMediaPlayer::Error error, const QString &errorString); // 错误
 
     /*视频播放列表方法*/
     void playerList_update();
@@ -108,7 +107,7 @@ private slots:
 
     void on_pushButton_playerPath_update_clicked();
 
-    void on_comboBox_playerPath_currentIndexChanged(int index);
+    //void on_comboBox_playerPath_currentIndexChanged(int index);
     void on_comboBox_playerPath_currentTextChanged(const QString &arg1);
 
     void on_pushButton_playerPath_add_clicked();
@@ -129,28 +128,22 @@ private slots:
 
     void on_tableWidget_playerList_doubleClicked(const QModelIndex &index);
 
-
-
     void on_comboBox_updatePlayerList_currentTextChanged(const QString &arg1);
-
-
 
 private:
     Ui::VideoWindow *ui;
-//    std::unique_ptr<QMediaPlayer> player;//std::unique_ptr不能直接指向已经存在的对象
-    //视频播放
+    //    std::unique_ptr<QMediaPlayer> player;//std::unique_ptr不能直接指向已经存在的对象
+    // 视频播放
     QMediaPlayer *player;
     QUrl source;
     qint64 m_duration;
     void updateDurationInfo(qint64 currentInfo); // 更新视频时长信息
-    //视频播放文件列表
-    QString currentFilePath;
-    //定义视频文件列表方法
+    // 视频播放文件列表
+    QString currentPlaySource;
+    // 定义视频文件列表方法
     QString fileExtensions = ".mp4|.MP4|.avi|.mkv";
     QStringList filesListLocal;
     QJsonObject playHistoryJson;
-
-
 };
 
 #endif // VIDEOWINDOW_H

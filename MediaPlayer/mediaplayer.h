@@ -23,9 +23,8 @@ public:
     bool Start() override;
 
     QString getObjectNane() const override;
-    QWidget *getWidgetByName(QString name) override;
+    QWidget *getWidgetByName(QString name,int *type = nullptr) override;
     bool widgetReturnAfterRemoved(QWidget *widget) override;
-    QWidget *getHomeTiler() override;
 
     MediaWidgets *widgets;
     VideoWindow *videoWindow;

@@ -12,7 +12,7 @@
 
 namespace Ui
 {
-class HomeMainWidget;
+    class HomeMainWidget;
 }
 
 class MediaWidgets : public QWidget
@@ -34,12 +34,8 @@ private slots:
     void on_Button_videoPlayback_clicked();
 
 private:
-
 protected:
-
 protected slots:
-
-
 };
 
 #endif // MEDIAWIDGETS_H

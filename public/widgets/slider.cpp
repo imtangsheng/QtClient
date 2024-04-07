@@ -15,8 +15,8 @@ void Slider::mousePressEvent(QMouseEvent *event)
     int position = QStyle::sliderValueFromPosition(minimum(), maximum(), event->pos().x(), width());
 
     // 设置Slider的值为点击位置的值
-    setValue(position);
-
+//    setValue(position);
+    emit sliderMoved(position);
     // 调用基类的mousePressEvent处理其他事件
     return QSlider::mousePressEvent(event);
 }

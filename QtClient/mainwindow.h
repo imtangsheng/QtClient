@@ -58,8 +58,6 @@ protected:
 private slots:
     void jump_ShowMainTabWidget(int index,QString name);
 
-    void on_Button_videoPlayback_clicked();
-
     void on_Button_dataView_clicked();
 
     void on_toolButton_WidgetStatus_isFloatable_clicked();
