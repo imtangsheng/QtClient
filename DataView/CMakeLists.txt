@@ -54,7 +54,6 @@ target_sources(DataView PRIVATE
     ${UI} ${UI_HEADERS} ${UI_SOURCES}
     ${PUBLIC} ${RESOURCES}
 )
-)
 
 set_target_properties(DataView PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/../plugins"

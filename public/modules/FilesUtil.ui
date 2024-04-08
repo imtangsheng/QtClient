@@ -70,7 +70,7 @@
          </size>
         </property>
         <property name="styleSheet">
-         <string notr="true">image: url(:/asset/video_playback/Movie_Active.svg);</string>
+         <string notr="true">image: url(:/asset/titler/DataView.svg);</string>
         </property>
         <property name="text">
          <string>图标</string>

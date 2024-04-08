@@ -35,7 +35,7 @@ set(RESOURCES
 set(TS_FILES QtClient_zh_CN.ts)
 
 source_group("UI" FILES ${UI})
-source_group("Resource" FILES ${RESOURCES} TS_FILES)
+source_group("Resource" FILES ${RESOURCES})
 source_group("Public" FILES ${PUBLIC} ${PRIVATRE_PUBLIC})
 set(PROJECT_SOURCES
         main.cpp

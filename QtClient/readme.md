@@ -1,6 +1,7 @@
 # Developing 开发文档
 
 ## 更新日志
+* <span style="color:red;">**提交要求，不得修改上次提交代码**</span>
     
 + 日期: 2024/3/22
     - 1.在nativeEvent函数中处理无边框窗口的缩放问题

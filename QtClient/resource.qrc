@@ -1,16 +1,6 @@
 <RCC>
     <qresource prefix="/">
-        <file>asset/dataview/DataAnalysis.svg</file>
-        <file>asset/dataview/MoreFilled.svg</file>
-        <file>asset/dataview/Tools.svg</file>
-        <file>asset/dataview/ZoomIn.svg</file>
-        <file>asset/dataview/ZoomOut.svg</file>
         <file>asset/Home/Menu.svg</file>
-        <file>asset/dataview/current.svg</file>
-        <file>asset/dataview/pressure.svg</file>
-        <file>asset/dataview/Temperature.svg</file>
-        <file>asset/dataview/voltage.svg</file>
-        <file>asset/dataview/ZoomReset.svg</file>
         <file>asset/Home/More.svg</file>
         <file>i18n/QtClient_zh_CN.qm</file>
         <file>asset/Home/Close.svg</file>
