@@ -81,6 +81,14 @@ Qt::Window | Qt::FramelessWindowHint
 */
 void MainWindow::_Awake()
 {
+    // 定义文件路径
+    QString faviconFilePath = "favicon.png";
+    // 判断文件是否存在
+    if (QFile(faviconFilePath).exists()) {
+        // 文件存在，加载并显示图像
+        setWindowIcon(QIcon(faviconFilePath));
+    }
+
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 //    setWindowFlags( Qt::FramelessWindowHint);
 //    setWindowFlags(Qt::CustomizeWindowHint);

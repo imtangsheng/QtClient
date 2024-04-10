@@ -9,12 +9,13 @@
         <file>asset/Home/window-maximize.svg</file>
         <file>asset/Home/window-restore.svg</file>
         <file>asset/Home/DataView.svg</file>
-        <file>asset/Home/logo.png</file>
         <file>asset/favicon.png</file>
         <file>asset/Home/Close_Orange.svg</file>
         <file>asset/Home/double-arrow-down.svg</file>
         <file>asset/Home/double-arrow-top.svg</file>
         <file>asset/Home/on_top.svg</file>
         <file>asset/Home/on_top_cancel.svg</file>
+        <file>asset/favicon.ico</file>
+        <file>asset/logo.png</file>
     </qresource>
 </RCC>

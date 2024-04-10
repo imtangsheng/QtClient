@@ -10,8 +10,8 @@ find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets)
 qt_standard_project_setup()
 
 add_subdirectory(QtClient)
-#add_subdirectory(MediaPlayer)
-#add_subdirectory(DataView)
+add_subdirectory(MediaPlayer)
+add_subdirectory(DataView)
 add_subdirectory(ShunDe)
 #add_library(QtClientStudio SHARED
 #    readme.md

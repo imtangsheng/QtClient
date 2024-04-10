@@ -42,7 +42,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>:/asset/favicon.png</normaloff>:/asset/favicon.png</iconset>
+    <normaloff>:/asset/favicon.ico</normaloff>:/asset/favicon.ico</iconset>
   </property>
   <property name="toolTip">
    <string>工具提示</string>
@@ -198,7 +198,7 @@ QTabBar::tab{
          <normaloff>:/asset/Home/Menu.svg</normaloff>:/asset/Home/Menu.svg</iconset>
        </attribute>
        <attribute name="title">
-        <string>主界面</string>
+        <string/>
        </attribute>
        <attribute name="toolTip">
         <string>主界面</string>
