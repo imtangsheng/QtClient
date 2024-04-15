@@ -1,0 +1,1 @@
+#include "ellipsewidget.h"
