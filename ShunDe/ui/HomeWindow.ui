@@ -430,19 +430,37 @@
           <number>0</number>
          </property>
          <item>
-          <widget class="QWidget" name="widget_device_1" native="true">
-           <layout class="QVBoxLayout" name="verticalLayout_7">
+          <layout class="QVBoxLayout" name="LayoutDevice"/>
+         </item>
+         <item>
+          <widget class="QWidget" name="widget_device_management" native="true">
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>0</number>
+            </property>
             <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <layout class="QHBoxLayout" name="horizontalLayout_7">
               <item>
-               <widget class="QWidget" name="widget_2" native="true">
+               <widget class="QWidget" name="widget_3" native="true">
                 <property name="maximumSize">
                  <size>
-                  <width>36</width>
-                  <height>24</height>
+                  <width>16777215</width>
+                  <height>16777215</height>
                  </size>
                 </property>
-                <layout class="QHBoxLayout" name="horizontalLayout_8">
+                <layout class="QHBoxLayout" name="horizontalLayout_9">
                  <property name="spacing">
                   <number>0</number>
                  </property>
@@ -459,15 +477,21 @@
                   <number>0</number>
                  </property>
                  <item>
-                  <widget class="QToolButton" name="toolButton_widget_cameraChannel_isShow">
+                  <widget class="QToolButton" name="toolButton_device_management_isShow">
                    <property name="sizePolicy">
                     <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                      <horstretch>0</horstretch>
                      <verstretch>0</verstretch>
                     </sizepolicy>
                    </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
                    <property name="text">
-                    <string>展开</string>
+                    <string>设备管理</string>
                    </property>
                   </widget>
                  </item>
@@ -475,14 +499,7 @@
                </widget>
               </item>
               <item>
-               <widget class="QLabel" name="label_robot_name">
-                <property name="text">
-                 <string>机器人1</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_6">
+               <spacer name="horizontalSpacer_7">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
                 </property>
@@ -494,67 +511,14 @@
                 </property>
                </spacer>
               </item>
-              <item>
-               <widget class="QLabel" name="label_robot_state">
-                <property name="text">
-                 <string>状态:</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_robot_status">
-                <property name="minimumSize">
-                 <size>
-                  <width>16</width>
-                  <height>16</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16</width>
-                  <height>16</height>
-                 </size>
-                </property>
-                <property name="styleSheet">
-                 <string notr="true">background-color: rgb(197, 200, 206);
-border-radius: 8px;</string>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_robot_batteryLevel">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>24</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string/>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QLabel" name="label_robot_pose">
-                <property name="text">
-                 <string>坐标(米)：0</string>
-                </property>
-               </widget>
-              </item>
              </layout>
             </item>
             <item>
-             <widget class="QWidget" name="widget_cameraChannel" native="true">
-              <layout class="QVBoxLayout" name="verticalLayout_6">
+             <widget class="QWidget" name="widget_device_add" native="true">
+              <layout class="QVBoxLayout" name="verticalLayout_9">
+               <property name="spacing">
+                <number>0</number>
+               </property>
                <property name="leftMargin">
                 <number>0</number>
                </property>
@@ -568,42 +532,93 @@ border-radius: 8px;</string>
                 <number>0</number>
                </property>
                <item>
-                <widget class="QToolButton" name="toolButton_cameraChannel02">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
+                <layout class="QHBoxLayout" name="horizontalLayout_18">
+                 <property name="spacing">
+                  <number>0</number>
                  </property>
-                 <property name="text">
-                  <string>热成像预览</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QToolButton" name="toolButton_cameraChannel01">
-                 <property name="sizePolicy">
-                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                   <horstretch>0</horstretch>
-                   <verstretch>0</verstretch>
-                  </sizepolicy>
-                 </property>
-                 <property name="text">
-                  <string>可见光预览</string>
-                 </property>
-                </widget>
+                 <item>
+                  <widget class="QLabel" name="label_3">
+                   <property name="text">
+                    <string>ID</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboBox_device_add_id">
+                   <property name="maximumSize">
+                    <size>
+                     <width>36</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>2</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="label_11">
+                   <property name="text">
+                    <string>类型</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="comboBox_device_add_type">
+                   <property name="maximumSize">
+                    <size>
+                     <width>36</width>
+                     <height>16777215</height>
+                    </size>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <spacer name="horizontalSpacer_16">
+                   <property name="orientation">
+                    <enum>Qt::Horizontal</enum>
+                   </property>
+                   <property name="sizeHint" stdset="0">
+                    <size>
+                     <width>40</width>
+                     <height>20</height>
+                    </size>
+                   </property>
+                  </spacer>
+                 </item>
+                 <item>
+                  <widget class="QToolButton" name="toolButton_device_add">
+                   <property name="text">
+                    <string>添加</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QToolButton" name="toolButton_device_update">
+                   <property name="text">
+                    <string>修改</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QToolButton" name="toolButton_device_delete">
+                   <property name="text">
+                    <string>删除</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
                </item>
               </layout>
              </widget>
-            </item>
-            <item>
-             <layout class="QVBoxLayout" name="LayoutDevice"/>
             </item>
            </layout>
           </widget>
          </item>
          <item>
-          <spacer name="verticalSpacer">
+          <spacer name="verticalSpacer_7">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
@@ -1907,7 +1922,7 @@ background-color: darkGray;
                 <item>
                  <widget class="QToolButton" name="toolButton_robot_move_goto">
                   <property name="text">
-                   <string>手动移动</string>
+                   <string>移动</string>
                   </property>
                  </widget>
                 </item>

@@ -11,6 +11,7 @@ HomeWidgets::HomeWidgets(QWidget *parent) :
 HomeWidgets::~HomeWidgets()
 {
     delete ui;
+    qDebug()<<"创建的插件ShunDe HomeWidgets::~HomeWidgets()";
 }
 
 void HomeWidgets::init()

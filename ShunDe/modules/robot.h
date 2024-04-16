@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QTcpServer>
 #include <QTcpSocket>
+#include <QJsonObject>
 #include "ui_robot.h"
 
 #define Robot_CMD_Header 0x5A   //命令 头
@@ -83,6 +84,7 @@ typedef union{
 enum DeviceType {
    DeviceType_Other,
    DeviceType_Robot,
+   DeviceType_Robot_test,
 
 };
 
@@ -107,6 +109,7 @@ public:
     explicit Robot(QWidget *parent = nullptr);
     ~Robot();
 
+    QJsonObject config;
     Ui::Robot *ui;
     void init();
     void quit();
@@ -117,11 +120,10 @@ public:
     bool isCmdState();
     bool isCmdCharging();
 
+    int id = -1;
     QTcpSocket *client;
     RobotRecvPacket* data;
-
     void updateDataShow();
-
     QMap<int, RobotRecvPacket*> robotDataMap; // 使用QMap
 
 private:
@@ -129,13 +131,15 @@ private:
     //QString ipAddress = "127.0.0.1"; // 服务器IP地址
     //quint16 port = 12345; // 服务器端口号
 signals:
-    void setCameraWidgetPlay(const QUrl &source);
+    void setCameraWidgetPlay(const int &id,const QUrl &source);
 
 private slots:
     void on_toolButton_widget_cameraChannel_isShow_clicked();
     void on_toolButton_channel01_video_play_clicked();
     void on_toolButton_channel02_thermal_play_clicked();
 
+    void on_toolButton_robto_config_save_clicked();
+    void on_pushButton_robot_clicked();
 };
 
 #endif // ROBOT_H

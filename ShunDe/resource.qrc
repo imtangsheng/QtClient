@@ -39,5 +39,6 @@
         <file>asset/HomeWindow/RealPlay_capture.svg</file>
         <file>asset/HomeWindow/RealPlay_Camera.svg</file>
         <file>asset/HomeWindow/RealPlay_Camera_Cancel.svg</file>
+        <file>asset/Robot/Robot.svg</file>
     </qresource>
 </RCC>

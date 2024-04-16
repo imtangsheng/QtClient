@@ -16,9 +16,9 @@
   <widget class="QWidget" name="widgetMenu" native="true">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>40</y>
-     <width>241</width>
+     <x>10</x>
+     <y>0</y>
+     <width>221</width>
      <height>81</height>
     </rect>
    </property>
@@ -94,9 +94,19 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_robot_name">
+       <widget class="QPushButton" name="pushButton_robot">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="text">
          <string>机器人1</string>
+        </property>
+        <property name="icon">
+         <iconset resource="../resource.qrc">
+          <normaloff>:/asset/Robot/Robot.svg</normaloff>:/asset/Robot/Robot.svg</iconset>
         </property>
        </widget>
       </item>
@@ -134,13 +144,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="label_robot_state">
-        <property name="text">
-         <string>状态:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="label_robot_status">
         <property name="minimumSize">
          <size>
@@ -166,7 +169,7 @@ border-radius: 8px;</string>
       <item>
        <widget class="QLabel" name="label_robot_pose">
         <property name="text">
-         <string>坐标(米)：0</string>
+         <string>0mm</string>
         </property>
        </widget>
       </item>
@@ -268,8 +271,8 @@ border-radius: 8px;</string>
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>270</y>
+     <x>20</x>
+     <y>100</y>
      <width>131</width>
      <height>171</height>
     </rect>
@@ -420,7 +423,341 @@ border-radius: 8px;</string>
     </item>
    </layout>
   </widget>
+  <widget class="QWidget" name="widgetSetting" native="true">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>10</y>
+     <width>381</width>
+     <height>421</height>
+    </rect>
+   </property>
+   <property name="palette">
+    <palette>
+     <active>
+      <colorrole role="Text">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>85</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>144</red>
+         <green>164</green>
+         <blue>174</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </active>
+     <inactive>
+      <colorrole role="Text">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>0</red>
+         <green>85</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>144</red>
+         <green>164</green>
+         <blue>174</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </inactive>
+     <disabled/>
+    </palette>
+   </property>
+   <layout class="QVBoxLayout" name="verticalLayout_3">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_4">
+      <property name="spacing">
+       <number>18</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label_6">
+        <property name="text">
+         <string>设备名称</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="lineEdit_robot_name">
+        <property name="styleSheet">
+         <string notr="true">border: 2px solid #263238;</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="styleSheet">
+       <string notr="true">QGroupBox {
+	border:none;
+}</string>
+      </property>
+      <property name="title">
+       <string>可见光配置</string>
+      </property>
+      <layout class="QFormLayout" name="formLayout_2">
+       <property name="topMargin">
+        <number>24</number>
+       </property>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>用户名</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>密码</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label">
+         <property name="text">
+          <string>IP地址</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEdit_channel01_video_ip">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="lineEdit_channel01_video_username">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="lineEdit_channel01_video_password">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="text">
+          <string>播放码流</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QComboBox" name="comboBox_channel01_video_stream">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>101</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>显示名称</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit_channel01_video_name">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <widget class="QGroupBox" name="groupBox_4">
+      <property name="styleSheet">
+       <string notr="true">QGroupBox {
+	border:none;
+}</string>
+      </property>
+      <property name="title">
+       <string>热成像配置</string>
+      </property>
+      <layout class="QFormLayout" name="formLayout_5">
+       <property name="topMargin">
+        <number>24</number>
+       </property>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>用户名</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>密码</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>IP地址</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLineEdit" name="lineEdit_channel02_thermal_ip">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLineEdit" name="lineEdit_channel02_thermal_username">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QLineEdit" name="lineEdit_channel02_thermal_password">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>播放码流</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QComboBox" name="comboBox_channel02_thermal_stream">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+         <item>
+          <property name="text">
+           <string>0</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="lineEdit_channel02_thermal_name">
+         <property name="styleSheet">
+          <string notr="true">border: 2px solid #263238;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>显示名称</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <spacer name="horizontalSpacer_3">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_robto_config_save">
+        <property name="styleSheet">
+         <string notr="true"/>
+        </property>
+        <property name="text">
+         <string>保存</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QLabel" name="label_robot_name">
+   <property name="geometry">
+    <rect>
+     <x>100</x>
+     <y>330</y>
+     <width>43</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>机器人1</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_robot_state">
+   <property name="geometry">
+    <rect>
+     <x>40</x>
+     <y>330</y>
+     <width>27</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>状态:</string>
+   </property>
+  </widget>
  </widget>
+ <tabstops>
+  <tabstop>lineEdit_robot_name</tabstop>
+  <tabstop>lineEdit_channel01_video_name</tabstop>
+  <tabstop>lineEdit_channel01_video_ip</tabstop>
+  <tabstop>lineEdit_channel01_video_username</tabstop>
+  <tabstop>lineEdit_channel01_video_password</tabstop>
+  <tabstop>comboBox_channel01_video_stream</tabstop>
+  <tabstop>lineEdit_channel02_thermal_name</tabstop>
+  <tabstop>lineEdit_channel02_thermal_ip</tabstop>
+  <tabstop>lineEdit_channel02_thermal_username</tabstop>
+  <tabstop>lineEdit_channel02_thermal_password</tabstop>
+  <tabstop>comboBox_channel02_thermal_stream</tabstop>
+  <tabstop>toolButton_robto_config_save</tabstop>
+  <tabstop>toolButton_widget_cameraChannel_isShow</tabstop>
+  <tabstop>pushButton_robot</tabstop>
+  <tabstop>toolButton_robot_batteryLevel</tabstop>
+  <tabstop>toolButton_channel01_video_play</tabstop>
+  <tabstop>toolButton_channel02_thermal_play</tabstop>
+ </tabstops>
  <resources>
   <include location="../resource.qrc"/>
  </resources>

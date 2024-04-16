@@ -4,10 +4,10 @@
 QSettings AppSettings("config/ShunDe.ini",QSettings::IniFormat);
 QJsonObject AppJson;
 
+
+
 ShunDe::ShunDe(QObject *parent) : QObject(parent)
 {
-    widgets = new HomeWidgets;
-    window = new HomeWindow(widgets);
     init();
 }
 
@@ -18,10 +18,19 @@ ShunDe::~ShunDe()
 
 void ShunDe::init()
 {
+    widgets = new HomeWidgets;
+
     ObjectName = widgets->objectName();
     WindowIcon = QIcon(":/asset/titler/ShunDe.svg");
     WindowTitle = tr("主页预览");
     connect(widgets, &HomeWidgets::homeMune_jump_TabWidget, this, &ShunDe::jumpTabWidget);
+
+    AppSettings.beginGroup(ObjectName);
+    AppJson = AppSettings.value("AppJson", QJsonObject()).toJsonObject();
+    AppSettings.endGroup();
+
+    window = new HomeWindow(widgets);
+
     qDebug()<<"创建的插件ShunDe::init()";
 }
 
@@ -29,8 +38,11 @@ void ShunDe::quit()
 {
     window->quit();
     widgets->quit();
-    AppSettings.sync();
 
+    AppSettings.beginGroup(ObjectName);
+    AppSettings.setValue("AppJson", AppJson);
+    AppSettings.endGroup();
+    AppSettings.sync();
     qDebug()<<"ShunDe::quit()";
 
 }

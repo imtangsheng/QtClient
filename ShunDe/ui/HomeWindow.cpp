@@ -3,6 +3,7 @@
 
 #include <QMessageBox>
 #include <QTimer>
+#include <QToolTip>
 #include "AppOS.h"
 
 HomeWindow::HomeWindow(QWidget *parent) :
@@ -21,20 +22,37 @@ HomeWindow::~HomeWindow()
 
 void HomeWindow::init()
 {
+    config = AppJson["HomeWindow"].toObject();
+    QJsonObject devices = config["devices"].toObject();
+
+    foreach (QString key, devices.keys()) {
+        QJsonObject device = devices[key].toObject();
+        int id = key.toInt();
+        deviceMap[id].id = key.toInt();
+        deviceMap[id].robot = new Robot();
+        deviceMap[id].robot->config = device["config"].toObject();
+        deviceMap[id].robot->init();//配置读取，摄像头数据 通道号等
+        deviceMap[id].type = DeviceType(device["type"].toInt());
+
+        ui->LayoutDevice->addWidget(deviceMap[id].robot->ui->widgetMenu);
+        connect(deviceMap[id].robot,&Robot::setCameraWidgetPlay,this,&HomeWindow::CameraWidgetPlay);
+
+        ui->comboBox_device_add_id->addItem(key,id);
+    }
+    ui->comboBox_device_add_type->addItem("1云台I代",DeviceType_Other);
+    ui->comboBox_device_add_type->addItem("2云台II",DeviceType_Robot);
+    ui->comboBox_device_add_type->addItem("3云台I代",DeviceType_Robot_test);
+//    for (DeviceType type : DeviceType) {
+
+//    }
+    qDebug()<<"void HomeWindow::init()"<<config["devices"].isNull()<<devices.isEmpty();
+    qDebug()<<"void HomeWindow::init()"<<config;
+
     deviceId = 0;
-
-    //for(int i=0;i<1;i++){
-    //deviceMap[deviceId].robot = new Robot(this);
-        deviceMap[deviceId].robot->init();
-
-        ui->LayoutDevice->addWidget(deviceMap[deviceId].robot->ui->widgetMenu);
-        connect(deviceMap[deviceId].robot,&Robot::setCameraWidgetPlay,this,&HomeWindow::CameraWidgetPlay);
-    //}
 
     RelayoutCameraWidget();
 //    cameraWidgets.resize(cameraWidgetsNum);
     RelayoutPTZControlWidget();
-
     //startTcpServerListen("0.0.0.0", 12345);
     qDebug()<<"void HomeWindow::init()";
     //接收到机器人数据
@@ -43,6 +61,29 @@ void HomeWindow::init()
 void HomeWindow::quit()
 {
 
+    //QMap<int, Device> deviceMap; // 使用QMap
+//    foreach (const Device& device, deviceMap) {
+//        device.robot->quit();
+//    }
+    //config = AppJson["HomeWindow"].toObject();
+    QJsonObject devices = config["devices"].toObject();
+    foreach (QString key, devices.keys()) {
+        QJsonObject device = devices[key].toObject();
+        int id = key.toInt();
+        deviceMap[id].robot->quit();
+//        deviceMap[id].id = key.toInt();
+//        deviceMap[id].robot = new Robot();
+//        deviceMap[id].robot->config = device["config"].toObject();
+//        deviceMap[id].robot->init();//配置读取，摄像头数据 通道号等
+//        deviceMap[id].type = DeviceType(device["type"].toInt());
+        device["type"] =  deviceMap[id].type;
+        device["config"] = deviceMap[id].robot->config;
+        devices[key] = device;
+    }
+    config["devices"] = devices;
+
+    AppJson["HomeWindow"] = config;
+    qDebug()<<"void HomeWindow::quit()";
 }
 
 void HomeWindow::RelayoutCameraWidget()
@@ -131,8 +172,9 @@ bool HomeWindow::startTcpServerListen(const QString &ipAddress, const quint16 &p
     return true;
 }
 
-bool HomeWindow::CameraWidgetPlay(const QUrl &source)
+bool HomeWindow::CameraWidgetPlay(const int &id, const QUrl &source)
 {
+    deviceId = id;
     if(currentItemCameraWidget == -1){
         return false;
     }
@@ -153,32 +195,6 @@ void HomeWindow::MouseButtonPressCameraWidget(int index)
         cameraWidgets.at(lastItemCameraWidget)->setContentsMargins(0,0,0,0);//显示边框
     }
     cameraWidgets.at(index)->setContentsMargins(1,1,1,1);//显示边框
-}
-
-
-void HomeWindow::on_toolButton_cameraChannel02_clicked()
-{
-    if(currentItemCameraWidget == -1){
-        return;
-    }
-
-    QUrl source = QUrl("rtsp://admin:dacang80@192.168.1.38:554/Streaming/Channels/201");
-
-    cameraWidgets.at(currentItemCameraWidget)->player.setSource(source);
-    cameraWidgets.at(currentItemCameraWidget)->player.play();
-}
-
-
-void HomeWindow::on_toolButton_cameraChannel01_clicked()
-{
-    if(currentItemCameraWidget == -1){
-        return;
-    }
-
-    QUrl source = QUrl("rtsp://admin:dacang80@192.168.1.38:554/Streaming/Channels/101");
-
-    cameraWidgets.at(currentItemCameraWidget)->player.setSource(source);
-    cameraWidgets.at(currentItemCameraWidget)->player.play();
 }
 
 
@@ -436,4 +452,105 @@ void HomeWindow::on_toolButton_robot_time_set_clicked()
     deviceMap[deviceId].robot->sendMessage(byteArray);
 }
 
+
+
+void HomeWindow::on_toolButton_device_management_isShow_clicked()
+{
+    ui->widget_device_add->setVisible(!ui->widget_device_add->isVisible());
+}
+
+
+void HomeWindow::on_toolButton_device_add_clicked()
+{
+    QJsonObject devices = config["devices"].toObject();
+    QString key = ui->comboBox_device_add_id->currentText();
+    if (devices.contains(key))
+    {
+        QToolTip::showText(ui->toolButton_device_add->mapToGlobal(QPoint(0, 0)),
+                           "要增加的键值已存在，请使用修改功能",
+                           ui->toolButton_device_add);
+        return;
+    }
+
+    int id = key.toInt();
+    deviceMap[id].id = 0;
+    deviceMap[id].robot = new Robot();
+    //deviceMap[id].robot->config = device["config"].toObject();
+    deviceMap[id].robot->init();//配置读取，摄像头数据 通道号等
+    deviceMap[id].type = DeviceType(DeviceType_Robot_test);
+
+    QJsonObject device;
+    device["type"]= ui->comboBox_device_add_type->currentText().toInt();
+    devices[i2s(id)] = device;
+    config["devices"] = devices;
+
+    ui->LayoutDevice->addWidget(deviceMap[id].robot->ui->widgetMenu);
+    connect(deviceMap[id].robot,&Robot::setCameraWidgetPlay,this,&HomeWindow::CameraWidgetPlay);
+}
+
+
+void HomeWindow::on_toolButton_device_update_clicked()
+{
+    QJsonObject devices = config["devices"].toObject();
+    QString key = ui->comboBox_device_add_id->currentText();
+    if (!devices.contains(key))
+    {
+        QToolTip::showText(ui->toolButton_device_update->mapToGlobal(QPoint(0, 0)),
+                           "要修改的键值不存在，请使用增加功能",
+                           ui->toolButton_device_update);
+        return;
+    }
+
+    int id = key.toInt();
+    QJsonObject device;
+    device["type"] = ui->comboBox_device_add_type->currentData().toInt();
+    devices[i2s(id)] = device;
+    config["devices"] = devices;
+
+}
+
+
+void HomeWindow::on_toolButton_device_delete_clicked()
+{
+    QJsonObject devices = config["devices"].toObject();
+    QString key = ui->comboBox_device_add_id->currentText();
+    if (!devices.contains(key))
+    {
+        QToolTip::showText(ui->toolButton_device_delete->mapToGlobal(QPoint(0, 0)),
+                           "要删除的键值不存在",
+                           ui->toolButton_device_delete);
+        return;
+    }
+
+    int id = key.toInt();
+    ui->LayoutDevice->removeWidget(deviceMap[id].robot->ui->widgetMenu);
+    disconnect(deviceMap[id].robot,&Robot::setCameraWidgetPlay,this,&HomeWindow::CameraWidgetPlay);
+
+    devices.remove(i2s(id));
+
+    deviceMap[id].robot->config = QJsonObject();
+    deviceMap[id].robot->quit();
+    deviceMap.remove(id);
+
+    config["devices"] = devices;
+
+}
+
+
+void HomeWindow::on_comboBox_device_add_id_currentTextChanged(const QString &arg1)
+{
+    QJsonObject devices = config["devices"].toObject();
+    if (devices.contains(arg1))
+    {
+        int type = devices[arg1].toObject()["type"].toInt(-1);
+        if (type != -1)
+        {
+            int index = ui->comboBox_device_add_type->findData(type);
+            if (index != -1)
+            {
+                ui->comboBox_device_add_type->setCurrentIndex(index);
+            }
+        }
+    }
+}
 
