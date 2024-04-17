@@ -89,7 +89,7 @@ void MainWindow::_Awake()
         setWindowIcon(QIcon(faviconFilePath));
     }
 
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);//可以任务栏图标点击最小化
 //    setWindowFlags( Qt::FramelessWindowHint);
 //    setWindowFlags(Qt::CustomizeWindowHint);
 //    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
