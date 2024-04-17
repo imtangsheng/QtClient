@@ -20,18 +20,6 @@
         <file>asset/HomeWindow/Move_Stop.svg</file>
         <file>asset/HomeWindow/Speed_Add.svg</file>
         <file>asset/HomeWindow/Speed_Sub.svg</file>
-        <file>asset/HomeWindow/Battery_Level_1.svg</file>
-        <file>asset/HomeWindow/Battery_Level_2.svg</file>
-        <file>asset/HomeWindow/Battery_Level_3.svg</file>
-        <file>asset/HomeWindow/Battery_Level_4.svg</file>
-        <file>asset/HomeWindow/Robot_Auto.svg</file>
-        <file>asset/HomeWindow/Robot_Battered.svg</file>
-        <file>asset/HomeWindow/Robot_Battering.svg</file>
-        <file>asset/HomeWindow/Robot_cmd.svg</file>
-        <file>asset/HomeWindow/Robot_Offline.svg</file>
-        <file>asset/HomeWindow/Robot_Setting.svg</file>
-        <file>asset/HomeWindow/Robot_tip.svg</file>
-        <file>asset/HomeWindow/Robot_warning.svg</file>
         <file>asset/Robot/Robot_menu_hide.svg</file>
         <file>asset/Robot/Robot_menu_show.svg</file>
         <file>asset/Robot/Camera_thermal.svg</file>
@@ -40,5 +28,17 @@
         <file>asset/HomeWindow/RealPlay_Camera.svg</file>
         <file>asset/HomeWindow/RealPlay_Camera_Cancel.svg</file>
         <file>asset/Robot/Robot.svg</file>
+        <file>asset/Robot/Battery_Level_1.svg</file>
+        <file>asset/Robot/Battery_Level_2.svg</file>
+        <file>asset/Robot/Battery_Level_3.svg</file>
+        <file>asset/Robot/Battery_Level_4.svg</file>
+        <file>asset/Robot/Robot_Auto.svg</file>
+        <file>asset/Robot/Robot_BattereGo.svg</file>
+        <file>asset/Robot/Robot_Battering.svg</file>
+        <file>asset/Robot/Robot_cmd.svg</file>
+        <file>asset/Robot/Robot_Offline.svg</file>
+        <file>asset/Robot/Robot_Setting.svg</file>
+        <file>asset/Robot/Robot_tip.svg</file>
+        <file>asset/Robot/Robot_warning.svg</file>
     </qresource>
 </RCC>

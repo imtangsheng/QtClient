@@ -22,7 +22,6 @@ public:
         CameraType_selfDeveloped,
         CameraType_laureii,
         CameraType_hikvison,
-
     };
 
     void init();

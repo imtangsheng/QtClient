@@ -6,19 +6,20 @@
 #include <QTcpServer>
 #include "ui/camerawidget.h"
 #include "modules/robot.h"
+#include <QtConcurrent/QtConcurrent>
 
-struct Device {
+struct Device
+{
     int id = -1;
     DeviceType type = DeviceType_Other;
     Robot *robot = new Robot();
     QString ipAddress = "";
     bool isOnline = false;
-    QTcpSocket *client = nullptr;
 };
 
-
-namespace Ui {
-class HomeWindow;
+namespace Ui
+{
+    class HomeWindow;
 }
 
 class HomeWindow : public QMainWindow
@@ -33,11 +34,16 @@ public:
     void RelayoutCameraWidget();
 
     QTcpServer server;
-    QMap<int, Device> deviceMap; // 使用QMap
-    bool startTcpServerListen(const QString &ipAddress = "0.0.0.0",const quint16 &port = 12345);
+    int DeviceId = -1;
+    QMap<int, Device> DeviceMap; // 使用QMap
+    bool addRobotDevice(int id);
+
+    QFuture<int> future;
+    bool startTcpServerListen(const QString &ipAddress = "0.0.0.0", const quint16 &port = 12345);
+    int ProcessNewConnection(QTcpSocket *socket);
 
 public slots:
-    bool CameraWidgetPlay(const int &id,const QUrl &source);
+    bool CameraWidgetPlay(const int &id, const QUrl &source);
 
     void MouseButtonPressCameraWidget(int index);
 
@@ -63,7 +69,6 @@ private slots:
     void on_toolButton_robot_move_goto_cancel_clicked();
     void on_toolButton_robot_time_set_clicked();
 
-
     void on_toolButton_device_management_isShow_clicked();
 
     void on_toolButton_device_add_clicked();
@@ -78,13 +83,11 @@ private:
     QJsonObject config;
     Ui::HomeWindow *ui;
     int cameraWidgetsNum = 4; // 自定义的cameraWidgets列表的大小
-    QList<CameraWidget*> cameraWidgets;
+    QList<CameraWidget *> cameraWidgets;
     int currentItemCameraWidget = -1;
     int lastItemCameraWidget = -1;
 
     void RelayoutPTZControlWidget();
-
-    int deviceId = 0;
 };
 
 #endif // HOMEWINDOW_H
