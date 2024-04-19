@@ -32,6 +32,7 @@ public:
 
 signals:
     void signalShowMainWidget(int index, QString name) override;
+    void signalShowMessage(const int& level,const QString& message) override;
 };
 
 #endif // SHUNDE_H

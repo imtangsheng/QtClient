@@ -55,6 +55,8 @@ protected:
     bool nativeEvent(const QByteArray &eventType,void *message, qintptr *result) override; //qt5使用loog
 
 private slots:
+    void show_message(const int& level = -1,const QString& message = "");
+
     void jump_ShowMainTabWidget(int index,QString name);
 
     void on_toolButton_WidgetStatus_isFloatable_clicked();

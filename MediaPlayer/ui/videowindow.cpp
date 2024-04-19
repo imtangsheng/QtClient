@@ -233,7 +233,7 @@ bool VideoWindow::startPlay(const QString &file)
         player->setSource(QUrl(currentPlaySource)); // rtsp:视频流协议
         ui->horizontalSlider_position->setVisible(false);
         ui->label_videoProgress->setVisible(false);
-        disconnect(player, &QMediaPlayer::positionChanged, this, &VideoWindow::positionChange); // rstp直播流需要取消
+        disconnect(player, &QMediaPlayer::positionChanged, this, &VideoWindow::positionChange); // rtsp直播流需要取消
         disconnect(ui->horizontalSlider_position, &QSlider::sliderMoved, player, &QMediaPlayer::setPosition);
     }
     else
@@ -355,7 +355,7 @@ void VideoWindow::durationChanged(qint64 duration)
     {
         ui->horizontalSlider_position->setVisible(true);
         ui->label_videoProgress->setVisible(true);
-        connect(player, &QMediaPlayer::positionChanged, this, &VideoWindow::positionChange); // rstp直播流需要取消
+        connect(player, &QMediaPlayer::positionChanged, this, &VideoWindow::positionChange); // rtsp直播流需要取消
         connect(ui->horizontalSlider_position, &QSlider::sliderMoved, player, &QMediaPlayer::setPosition);
 
         m_duration = duration / 1000;
@@ -373,7 +373,7 @@ void VideoWindow::durationChanged(qint64 duration)
     {
         ui->horizontalSlider_position->setVisible(false);
         ui->label_videoProgress->setVisible(false);
-        disconnect(player, &QMediaPlayer::positionChanged, this, &VideoWindow::positionChange); // rstp直播流需要取消
+        disconnect(player, &QMediaPlayer::positionChanged, this, &VideoWindow::positionChange); // rtsp直播流需要取消
         disconnect(ui->horizontalSlider_position, &QSlider::sliderMoved, player, &QMediaPlayer::setPosition);
         m_duration = 0;
         ui->toolButton_fastBback->setEnabled(false);
