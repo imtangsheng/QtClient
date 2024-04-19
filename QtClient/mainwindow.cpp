@@ -14,7 +14,8 @@
 
 #include "ui/SubMain.h"
 SubMain *SUB_MAIN;
-
+#include "modules/sqlite.h"
+SQLite* SQL;
 #define VARNAME(var) #var
 
 MainWindow::MainWindow(QWidget *parent)
@@ -32,7 +33,9 @@ MainWindow::MainWindow(QWidget *parent)
 //    connect(ui->statusBar,&QStatusBar::showMessage,this,&MainWindow::showMessage);
 //    connect(ui->statusBar,&QStatusBar::clearMessage,this,&MainWindow::clearMessage);
     SUB_MAIN = new SubMain;
+    SQL = new SQLite;
     _Awake();
+
 }
 
 void MainWindow::showUI()
@@ -56,6 +59,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     AppSettings.endGroup();
     emit quit();
     delete SUB_MAIN;
+    delete SQL;
 //    deleteLater();//直接使用会奔溃
     qDebug() << "MainWindow::closeEvent(QCloseEvent *event) END";
 }
@@ -78,6 +82,7 @@ Qt::Widget | Qt::CustomizeWindowHint
 Qt::Window | Qt::CustomizeWindowHint
 Qt::FramelessWindowHint 无边框和标题，【只有右下角可以缩放】，【不能拖动】，不能双击放大
 Qt::Window | Qt::FramelessWindowHint
+Qt::WindowMinimizeButtonHint 可以任务栏最大最小化
 */
 void MainWindow::_Awake()
 {
@@ -89,10 +94,13 @@ void MainWindow::_Awake()
         setWindowIcon(QIcon(faviconFilePath));
     }
 
-    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);//可以任务栏图标点击最小化
-//    setWindowFlags( Qt::FramelessWindowHint);
-//    setWindowFlags(Qt::CustomizeWindowHint);
-//    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
+    //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);//可以任务栏图标点击最小化,但是不可以触发调节大小
+    //setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
+    // 启用窗口可调整大小
+//    setWindowFlags(Qt::WindowMinimizeButtonHint | Qt::FramelessWindowHint);
+    //setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+//    setWindowFlags( Qt::FramelessWindowHint);//可以调节大小,但是不可以触发任务栏图标点击最小化
+    setWindowFlags(windowFlags() | Qt::CustomizeWindowHint);//不知道为啥会没有顶部白线，有nativeEvent 处理后
 
     ui->toolButton_WidgetStatus_isStaysOnTopHint->setVisible(false);
 //    ui->toolButton_WidgetStatus_isStaysOnTopHint->setParent(ui->WidgetStatus); //无用，还是会不显示
@@ -180,6 +188,12 @@ void MainWindow::test()
     //    SUB_MAIN->show();
 //    addDockWidget(Qt::TopDockWidgetArea,SUB_MAIN->ui->dockWidget);
     //    setCorner(Qt::BottomLeftCorner,Qt::BottomDockWidgetArea);
+
+    SQL->initDb();
+    SQL->init_events();
+    SQL->updata_eventsView();
+    ui->verticalLayoutWidgetStatus->addWidget(SQL->ui->EventCenterWidget);
+
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)
@@ -215,7 +229,7 @@ void MainWindow::changeEvent(QEvent *event)
 #endif
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr *result)
 {
-//    qDebug() << "MainWindow::nativeEvent(const QByteArray &"<<eventType<<message<<*result;
+    //qDebug() << "MainWindow::nativeEvent(const QByteArray &"<<eventType<<message<<*result;
     // 检查事件类型是否为窗口大小变化事件
     //windows_generic_MSG表示通用的Windows消息，包括诸如鼠标、键盘、窗口大小调整等各种类型的消息
     //windows_dispatcher_MSG表示分发器消息，用于在Qt的事件循环中分发和处理Windows消息
@@ -223,12 +237,16 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr
     if (eventType == "windows_generic_MSG" || eventType == "windows_dispatcher_MSG")
     {
         MSG* msg = static_cast<MSG*>(message);
-//        qDebug()<<TIMEMS<<"nativeEvent"<<msg->wParam<<msg->message;
+        //qDebug()<<TIMEMS<<"nativeEvent"<<msg->wParam<<msg->message;
         if(msg->message == WM_NCCALCSIZE) {
             //WM_NCCALCSIZE是一个Windows消息，用于通知窗口系统计算非客户区（non-client area）的大小和位置。非客户区包括窗口的边框、标题栏、系统菜单和窗口装饰等。
             *result = 0;return true;
-        } else if (msg->message == WM_NCHITTEST)
+        } else if (msg->message == WM_NCHITTEST || msg->message == WM_NCMOUSEMOVE)
         {
+            //qDebug()<<TIMEMS<<"nativeEvent 鼠标在窗口移动的事件"<<msg->wParam<<msg->message<<WM_NCMOUSEMOVE;
+            //WM_NCMOUSEMOVE是一个Windows消息，用于通知窗口鼠标在窗口的非客户区（非工作区）移动的事件。
+            //WM_NCHITTEST：当鼠标在窗口的非客户区（非工作区）移动时，系统会发送这个消息给窗口。该消息用于确定鼠标指针在非客户区的哪个部分。例如拖动窗口或调整窗口大小。
+            //WM_MOUSEMOVE：当鼠标在窗口内移动时，系统会发送这个消息给窗口。该消息用于通知窗口鼠标的当前位置。例如更新鼠标指针的样式或响应鼠标移动事件。
             //WM_NCHITTEST是一个Windows消息，用于确定鼠标在窗口的非客户区（non-client area）的哪个部分进行了点击或者悬停。
             // 判断鼠标位置是否在窗口边界
             const int width = this->width();
@@ -243,9 +261,15 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr
             else if (localPos.y() < borderSize) {*result = HTTOP;}
             else if (localPos.y() > height - borderSize) {*result = HTBOTTOM;}
 
+            //qDebug()<<TIMEMS<<"*result:"<<*result;
             if (*result != 0) {return true;}
-            //HTCAPTION是一个Windows消息中的返回值，用于指示鼠标位于窗口的标题栏上,可以触发与标题栏相关的操作，例如拖动窗口或者处理特定的鼠标事件。
-        }
+
+        }/*else if (msg->message == WM_LBUTTONDOWN) {
+            // WM_LBUTTONDOWN（消息代码：0x0201）：当用户在任务栏上的应用程序按钮上按下鼠标左键时，系统会发送这个消息给应用程序的主窗口。
+            qDebug() << "Clicked on taskbar";
+            // 在这里执行你想要的操作
+        }*/
+
     }
 #endif //win平台结束
 
@@ -257,6 +281,18 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr
     if(eventType == "xcb_generic_event_t") {}
 #endif
     return QMainWindow::nativeEvent(eventType, message, result);// 如果不需要处理该事件，调用基类的nativeEvent函数
+}
+
+void MainWindow::show_message(const int &level, const QString &message)
+{
+    switch (level) {
+    case 0:
+        showMessage(message,5000);
+        break;
+    default:
+        showMessage(message);
+        break;
+    }
 }
 
 void MainWindow::jump_ShowMainTabWidget(int index, QString name)
@@ -505,6 +541,8 @@ bool MainWindow::pluginLoad()
                 //2.不使用括号：从 Qt 5 开始，你也可以在连接信号和槽函数时不使用括号。这意味着你直接使用函数指针来指示信号和槽函数。这种方式更加直观和类型安全，因为它在编译时进行了检查。
                 connect(this,SIGNAL(quit()),plugin,SLOT(quit()));
                 connect(plugin,SIGNAL(signalShowMainWidget(int,QString)),this,SLOT(jump_ShowMainTabWidget(int,QString)));
+                //新增信息通知方法
+                connect(plugin,SIGNAL(signalShowMessage(int,QString)),this,SLOT(show_message(int,QString)));
 //                connect(this,SIGNAL(quit),plugin,SLOT(quit));//不会触发该信号
                 //记录插件对应的lilst下标
                 qDebug()<<"加载插件Window::"<<pluginList.count()<<inter->id<<inter->ObjectName<<inter->getObjectNane();
