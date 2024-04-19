@@ -42,6 +42,7 @@ public:
     virtual void quit() = 0;
 /**声明信号函数的声明，在信号连接器中使用字符串的信号连接模式**/
     virtual void signalShowMainWidget(int index = -1,QString name = HomeMain_TabWidgetName) = 0;
+    virtual void signalShowMessage(const int& level = -1,const QString& message = "") = 0;
 
 /**声明定义变量**/
     QString ObjectName; //该插件类的唯一标识名称
