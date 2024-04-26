@@ -40,5 +40,8 @@
         <file>asset/Robot/Robot_Setting.svg</file>
         <file>asset/Robot/Robot_tip.svg</file>
         <file>asset/Robot/Robot_warning.svg</file>
+        <file>asset/titler/Home.svg</file>
+        <file>asset/titler/Robot.svg</file>
+        <file>asset/titler/RobotMaster.svg</file>
     </qresource>
 </RCC>

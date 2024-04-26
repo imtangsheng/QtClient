@@ -336,11 +336,13 @@ void Robot::on_toolButton_channel01_video_play_clicked()
 void Robot::on_toolButton_channel02_thermal_play_clicked()
 {
     QJsonObject camera = config["camera"].toObject();
+    //0 是通道号
+    //主码流"rtspUrlMain": "rtsp://192.168.1.19:554/0/main", 子码流 "rtspUrlSub": "rtsp://192.168.1.19:554/0/sub"
     QUrl source = QUrl("rtsp://" +
                        camera["thermal_username"].toString() + ":" +
                        camera["thermal_password"].toString() + "@" +
-                       camera["thermal_ip"].toString() + "/" +
-                       camera["thermal_stream"].toString() + "/main");
+                       camera["thermal_ip"].toString() + "/0/" +
+                       camera["thermal_stream"].toString() );
     emit setCameraWidgetPlay(id, source);
 }
 
@@ -374,7 +376,7 @@ void Robot::on_toolButton_robto_config_save_clicked()
 void Robot::on_pushButton_robot_clicked()
 {
     ui->widgetSetting->setWindowFlags(Qt::Dialog);
-    ui->widgetSetting->setWindowTitle(this->objectName());
+    ui->widgetSetting->setWindowTitle(config["camera"].toObject()["name"].toString(objectName()));
     ui->widgetSetting->setWindowIcon(QIcon(":/asset/Robot/Robot.svg"));
     ui->widgetSetting->setAttribute(Qt::WA_ShowModal, true);
     ui->widgetSetting->setParent(this);

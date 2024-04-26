@@ -18,10 +18,12 @@ public:
     void quit();
 
 signals:
-    void homeMune_jump_TabWidget();
+    void signals_show_widget_by_name(const QString& name);
 
 private slots:
-   void on_Button_homeWindow_clicked();
+    void on_Button_HomeWindow_clicked();
+
+    void on_Button_MasterWindow_clicked();
 
 private:
     Ui::HomeWidgets *ui;

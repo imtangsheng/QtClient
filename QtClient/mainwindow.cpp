@@ -190,9 +190,23 @@ void MainWindow::test()
     //    setCorner(Qt::BottomLeftCorner,Qt::BottomDockWidgetArea);
 
     SQL->initDb();
-    SQL->init_events();
-    SQL->updata_eventsView();
-    ui->verticalLayoutWidgetStatus->addWidget(SQL->ui->EventCenterWidget);
+
+    QSqlError error = SQL->init_EventCenter();
+    if(error.isValid()){
+        // 初始化失败
+        qWarning() << "Failed to initialize Event Center:" << error.text();
+        //return ;
+    }
+
+    ui->tableView_events->setModel(SQL->EventCenter_Model);
+    ui->tableView_events->resizeColumnsToContents();
+    ui->tableView_events->setSortingEnabled(true);
+    ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+//    SQL->init_events();
+//    SQL->updata_eventsView();
+//    SQL->ui->tableView_events->resizeColumnsToContents();
+//    ui->verticalLayoutWidgetStatus->addWidget(SQL->ui->EventCenterWidget);
 
 }
 
@@ -576,8 +590,8 @@ bool MainWindow::pluginTabInsertMainWindow(int index,QString name)
     objPlugin["object"] = pluginList.at(index)->ObjectName;
     
     pluginList.at(index)->indexTabBar = indexTab;
-    ui->tabWidget_mainWindow->insertTab(indexTab,addWidget,pluginList.at(index)->WindowIcon,pluginList.at(index)->WindowTitle);
-
+    //ui->tabWidget_mainWindow->insertTab(indexTab,addWidget,pluginList.at(index)->WindowIcon,pluginList.at(index)->WindowTitle);
+    ui->tabWidget_mainWindow->insertTab(indexTab,addWidget,addWidget->windowIcon(),addWidget->windowTitle());
     tabJson[i2s(indexTab)] = objPlugin;
     jsonMainConfig["TabWindow"] = tabJson;
     return true;

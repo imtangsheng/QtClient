@@ -45,7 +45,7 @@
      <number>24</number>
     </property>
     <item>
-     <widget class="QToolButton" name="Button_homeWindow">
+     <widget class="QToolButton" name="Button_HomeWindow">
       <property name="focusPolicy">
        <enum>Qt::StrongFocus</enum>
       </property>
@@ -69,7 +69,45 @@
       </property>
       <property name="icon">
        <iconset resource="../resource.qrc">
-        <normaloff>:/asset/titler/ShunDe.svg</normaloff>:/asset/titler/ShunDe.svg</iconset>
+        <normaloff>:/asset/titler/Home.svg</normaloff>:/asset/titler/Home.svg</iconset>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>48</width>
+        <height>48</height>
+       </size>
+      </property>
+      <property name="toolButtonStyle">
+       <enum>Qt::ToolButtonTextUnderIcon</enum>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QToolButton" name="Button_MasterWindow">
+      <property name="focusPolicy">
+       <enum>Qt::StrongFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>数据图表</string>
+      </property>
+      <property name="statusTip">
+       <string>数据图表</string>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QPushButton::icon {
+  top: -2px;
+  position: relative;
+}</string>
+      </property>
+      <property name="text">
+       <string> 设备中心</string>
+      </property>
+      <property name="icon">
+       <iconset resource="../resource.qrc">
+        <normaloff>:/asset/titler/RobotMaster.svg</normaloff>:/asset/titler/RobotMaster.svg</iconset>
       </property>
       <property name="iconSize">
        <size>

@@ -4,7 +4,7 @@
 #include <QJsonObject>
 #include <QMainWindow>
 #include <QTcpServer>
-#include "ui/camerawidget.h"
+#include "modules/camerawidget.h"
 #include "modules/robot.h"
 #include <QtConcurrent/QtConcurrent>
 

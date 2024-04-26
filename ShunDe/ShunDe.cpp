@@ -23,20 +23,22 @@ void ShunDe::init()
     ObjectName = widgets->objectName();
     WindowIcon = QIcon(":/asset/titler/ShunDe.svg");
     WindowTitle = tr("主页预览");
-    connect(widgets, &HomeWidgets::homeMune_jump_TabWidget, this, &ShunDe::jumpTabWidget);
+    connect(widgets, &HomeWidgets::signals_show_widget_by_name, this, &ShunDe::jumpTabWidget);
 
     AppSettings.beginGroup(ObjectName);
     AppJson = AppSettings.value("AppJson", QJsonObject()).toJsonObject();
     AppSettings.endGroup();
 
-    window = new HomeWindow(widgets);
+    homeWindow = new HomeWindow(widgets);
 
+    masterWindow = new MasterWindow(widgets);
     qDebug()<<"创建的插件ShunDe::init()";
 }
 
 void ShunDe::quit()
 {
-    window->quit();
+    homeWindow->quit();
+    masterWindow->quit();
     widgets->quit();
 
     AppSettings.beginGroup(ObjectName);
@@ -47,9 +49,9 @@ void ShunDe::quit()
 
 }
 
-void ShunDe::jumpTabWidget()
+void ShunDe::jumpTabWidget(const QString& name)
 {
-    emit signalShowMainWidget(id,HomeMain_TabWidgetName);
+    emit signalShowMainWidget(id,name);
 }
 
 QObject *ShunDe::instance()
@@ -75,7 +77,7 @@ QWidget *ShunDe::getWidgetByName(QString name, int *type)
             *type = 11;
         }
         
-        return window;
+        return homeWindow;
     }
     return widgets->findChild<QWidget *>(name);
 }

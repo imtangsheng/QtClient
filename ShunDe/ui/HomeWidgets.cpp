@@ -24,8 +24,13 @@ void HomeWidgets::quit()
 
 }
 
-void HomeWidgets::on_Button_homeWindow_clicked()
+void HomeWidgets::on_Button_HomeWindow_clicked()
 {
-     emit homeMune_jump_TabWidget();
+    emit signals_show_widget_by_name("HomeWindow");
 }
 
+
+void HomeWidgets::on_Button_MasterWindow_clicked()
+{
+    emit signals_show_widget_by_name("MasterWindow");
+}

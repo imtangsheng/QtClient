@@ -640,9 +640,27 @@
          <property name="styleSheet">
           <string notr="true">border: 2px solid #263238;</string>
          </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
          <item>
           <property name="text">
            <string>101</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>102</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>201</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>202</string>
           </property>
          </item>
         </widget>
@@ -732,9 +750,17 @@
          <property name="styleSheet">
           <string notr="true">border: 2px solid #263238;</string>
          </property>
+         <property name="editable">
+          <bool>true</bool>
+         </property>
          <item>
           <property name="text">
-           <string>0</string>
+           <string>main</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>sub</string>
           </property>
          </item>
         </widget>

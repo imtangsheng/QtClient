@@ -8,8 +8,8 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Gui LinguistTools Widgets MultimediaWidgets)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui LinguistTools Widgets MultimediaWidgets)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Gui LinguistTools Widgets MultimediaWidgets Sql)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Gui LinguistTools Widgets MultimediaWidgets Sql)
 
 include_directories("./")
 include_directories(${PROJECT_SOURCE_DIR})
@@ -22,6 +22,7 @@ set(PUBLIC
     ../public/AppOS.h
     ../public/widgets/videowidget.cpp ../public/widgets/videowidget.h
     ../public/widgets/ellipsewidget.cpp ../public/widgets/ellipsewidget.h
+    ../public/modules/sqlite.h ../public/modules/sqlite.cpp ../public/modules/sqlite.ui
 )
 set(RESOURCES
     readme.md
@@ -46,7 +47,7 @@ qt_add_plugin(ShunDe SHARED
 target_sources(ShunDe PRIVATE
     ${UI} ${Modules}
     ${PUBLIC} ${RESOURCES}
-
+    ui/MasterWindow.h ui/MasterWindow.cpp ui/MasterWindow.ui
 )
 
 set_target_properties(ShunDe PROPERTIES
@@ -59,6 +60,7 @@ target_link_libraries(ShunDe PRIVATE
   Qt${QT_VERSION_MAJOR}::Gui
   Qt${QT_VERSION_MAJOR}::Widgets
   Qt${QT_VERSION_MAJOR}::MultimediaWidgets
+  Qt${QT_VERSION_MAJOR}::Sql
 )
 
 target_compile_definitions(ShunDe PRIVATE SHUNDE_LIBRARY)

@@ -4,6 +4,7 @@
 #include "PluginInterface.h"
 #include "ui/HomeWidgets.h"
 #include "ui/HomeWindow.h"
+#include "ui/MasterWindow.h"
 
 #define ShunDe_iid "org.qt-project.Qt.Examples.ShunDe"
 class ShunDe : public QObject, PluginInterface
@@ -23,11 +24,12 @@ public:
 
 public slots:
     void quit() override;
-    void jumpTabWidget();
+    void jumpTabWidget(const QString& name);
 
 public:
     HomeWidgets *widgets;
-    HomeWindow *window;
+    HomeWindow *homeWindow;
+    MasterWindow *masterWindow;
     void init();
 
 signals:

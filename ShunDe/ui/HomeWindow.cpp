@@ -213,7 +213,7 @@ bool HomeWindow::CameraWidgetPlay(const int &id, const QUrl &source)
     {
         return false;
     }
-
+    //存在同源奔溃后无法重新连接的问题，暂时未测
     // QUrl source = QUrl("rtsp://admin:dacang80@192.168.1.38:554/Streaming/Channels/101");
     cameraWidgets.at(currentItemCameraWidget)->player.setSource(source);
     cameraWidgets.at(currentItemCameraWidget)->player.play();
