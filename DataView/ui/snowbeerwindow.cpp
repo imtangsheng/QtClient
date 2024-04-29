@@ -514,9 +514,9 @@ void SnowBeerWindow::on_pushButton_fileDelete_clicked()
 void SnowBeerWindow::on_pushButton_axisYsetRange_clicked()
 {
     qDebug()<<"on_pushButton_axisYsetRange_clicked():";
-    qDebug()<<ui->spinBox_axisYRangeMin->value();
-    qDebug()<<ui->spinBox_axisYRangeMax->value();
-    m_axisY->setRange(ui->spinBox_axisYRangeMin->value(),ui->spinBox_axisYRangeMax->value());
+    qDebug()<<ui->doubleSpinBox_axisYRangeMin->value();
+    qDebug()<<ui->doubleSpinBox_axisYRangeMax->value();
+    m_axisY->setRange(ui->doubleSpinBox_axisYRangeMin->value(),ui->doubleSpinBox_axisYRangeMax->value());
 }
 
 void SnowBeerWindow::on_pushButton_updateNetworkFiles_clicked()
