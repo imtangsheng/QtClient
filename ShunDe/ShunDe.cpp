@@ -33,8 +33,12 @@ void ShunDe::init()
     AppJson = AppSettings.value("AppJson", QJsonObject()).toJsonObject();
     AppSettings.endGroup();
 
-    homeWindow = new HomeWindow(widgets);
     masterWindow = new MasterWindow(widgets);
+    homeWindow = new HomeWindow(widgets);
+
+    masterWindow->start();
+    homeWindow->start();
+
     qDebug()<<"创建的插件ShunDe::init()";
 }
 

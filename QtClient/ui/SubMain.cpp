@@ -1,4 +1,5 @@
 #include "SubMain.h"
+SubMain *SUB_MAIN;
 
 SubMain::SubMain(QWidget *parent) : QMainWindow(parent),
                                     ui(new Ui::SubMain)

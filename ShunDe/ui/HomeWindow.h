@@ -5,17 +5,7 @@
 #include <QMainWindow>
 #include <QTcpServer>
 #include "modules/camerawidget.h"
-#include "modules/robot.h"
 #include <QtConcurrent/QtConcurrent>
-
-struct Device
-{
-    int id = -1;
-    DeviceType type = DeviceType_Other;
-    Robot *robot = new Robot();
-    QString ipAddress = "";
-    bool isOnline = false;
-};
 
 namespace Ui
 {
@@ -29,13 +19,13 @@ class HomeWindow : public QMainWindow
 public:
     explicit HomeWindow(QWidget *parent = nullptr);
     ~HomeWindow();
-    void init();
+    void start();
     void quit();
     void RelayoutCameraWidget();
 
     QTcpServer server;
     int DeviceId = -1;
-    QMap<int, Device> DeviceMap; // 使用QMap
+
     bool addRobotDevice(int id);
 
     QFuture<int> future;
@@ -90,4 +80,5 @@ private:
     void RelayoutPTZControlWidget();
 };
 
+extern HomeWindow *homeWindow;
 #endif // HOMEWINDOW_H

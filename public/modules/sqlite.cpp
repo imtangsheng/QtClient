@@ -1,5 +1,6 @@
 #include "sqlite.h"
 
+SQLite* SQL;
 
 #include <QTimeEdit>
 #define EventCenter "EventCenter"

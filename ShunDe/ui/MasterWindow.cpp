@@ -1,11 +1,10 @@
 #include "MasterWindow.h"
-#include "ui_MasterWindow.h"
 #include "modules/sqlite.h"
-SQLite* SQL;
 #include <QTabWidget>
 #include <QStyledItemDelegate>
 #include <QToolTip>
 
+MasterWindow *masterWindow;
 //#include <QProxyStyle>
 //#include <QStyleOptionTab>
 //class CustomTabStyle : public QProxyStyle
@@ -48,7 +47,7 @@ MasterWindow::MasterWindow(QWidget *parent) :
 
     SQL=new SQLite();
 
-    init();
+    start();
 }
 
 MasterWindow::~MasterWindow()
@@ -57,7 +56,7 @@ MasterWindow::~MasterWindow()
     qDebug()<<"MasterWindow::~MasterWindow()";
 }
 
-void MasterWindow::init()
+void MasterWindow::start()
 {
     SQL->initDb("test.db");
 //    SQL->initDb();
@@ -172,18 +171,5 @@ void MasterWindow::on_toolButton_inspection_query_time_clicked()
                            "筛选失败，错误信息:"+SQL->inspectionTasksModel->lastError().text(),
                            ui->toolButton_inspection_query_time);
     }
-}
-
-
-void MasterWindow::on_toolButton_inspection_time_end_clicked()
-{
-
-}
-
-
-void MasterWindow::on_toolButton_inspection_time_begin_clicked()
-{
-    //ui->dateTimeEdit_inspection_time_begin->setCalendarPopup(true);
-    //ui->dateTimeEdit_inspection_time_begin->showDropDown();
 }
 

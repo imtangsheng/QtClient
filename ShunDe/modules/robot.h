@@ -139,6 +139,7 @@ public:
 
     /**机器人数据读取**/
     int id = -1;
+    QString name;
     QTcpSocket *client;
     RobotRecvPacket *data;
     int pose;

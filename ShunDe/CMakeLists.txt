@@ -16,10 +16,12 @@ include_directories(${PROJECT_SOURCE_DIR})
 
 file(GLOB_RECURSE UI ./ui/*.*)
 file(GLOB_RECURSE Modules ./modules/*.*)
+file(GLOB_RECURSE Function ./function/*.*)
 
 set(PUBLIC
     ../public/PluginInterface.h
     ../public/AppOS.h
+    ../public/AppUtil.h ../public/AppUtil.cpp
     ../public/widgets/videowidget.cpp ../public/widgets/videowidget.h
     ../public/widgets/ellipsewidget.cpp ../public/widgets/ellipsewidget.h
     ../public/modules/sqlite.h ../public/modules/sqlite.cpp ../public/modules/sqlite.ui
@@ -34,6 +36,7 @@ set(TS_FILES ShunDe_zh_CN.ts)
 
 source_group("UI" FILES ${UI})
 source_group("Modules" FILES ${Modules})
+source_group("Function" FILES ${Function})
 source_group("Resource" FILES ${RESOURCES})
 source_group("Public" FILES ${PUBLIC})
 
@@ -45,9 +48,9 @@ qt_add_plugin(ShunDe SHARED
 )
 
 target_sources(ShunDe PRIVATE
-    ${UI} ${Modules}
+    ${UI} ${Modules} ${Function}
     ${PUBLIC} ${RESOURCES}
-    ui/MasterWindow.h ui/MasterWindow.cpp ui/MasterWindow.ui
+
 )
 
 set_target_properties(ShunDe PROPERTIES

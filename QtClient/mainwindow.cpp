@@ -13,9 +13,9 @@
 #define TIMEMS QTime::currentTime().toString("hh:mm:ss zzz")
 
 #include "ui/SubMain.h"
-SubMain *SUB_MAIN;
+
 #include "modules/sqlite.h"
-SQLite* SQL;
+
 #define VARNAME(var) #var
 
 MainWindow::MainWindow(QWidget *parent)

@@ -25,7 +25,7 @@ void Robot::init()
     if (config.contains("camera"))
     {
         QJsonObject camera = config["camera"].toObject();
-        ui->lineEdit_robot_name->setText(camera["name"].toString());
+
 
         ui->lineEdit_channel01_video_name->setText(camera["video_name"].toString());
         ui->lineEdit_channel01_video_username->setText(camera["video_username"].toString());
@@ -42,7 +42,7 @@ void Robot::init()
         //名称显示
         ui->label_channel01_video_name->setText(camera["video_name"].toString());
         ui->label_channel02_thermal_name->setText(camera["thermal_name"].toString());
-        ui->pushButton_robot->setText(camera["name"].toString("机器人设备"+i2s(id)));
+
     }else{
         ui->pushButton_robot->setText("机器人设备 配置不存在"+i2s(id));
     }
@@ -50,6 +50,12 @@ void Robot::init()
     if (config.contains("inspection")){
         inspection.config = config["inspection"].toObject();
     }
+
+    name = config["name"].toString("机器人设备"+i2s(id));
+    ui->lineEdit_robot_name->setText(name);
+    ui->pushButton_robot->setText(name);
+    ui->label_robot_name->setText(name);
+    inspection.ui->label_robot_name->setText(name);
     ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
 
     start();
@@ -360,7 +366,7 @@ void Robot::on_toolButton_robto_config_save_clicked()
 {
 
     QJsonObject camera = config["camera"].toObject();
-    camera["name"] = ui->lineEdit_robot_name->text();
+    config["name"] = ui->lineEdit_robot_name->text();
 
     camera["video_name"] = ui->lineEdit_channel01_video_name->text();
     camera["video_username"] = ui->lineEdit_channel01_video_username->text();
@@ -378,9 +384,14 @@ void Robot::on_toolButton_robto_config_save_clicked()
     ui->widgetSetting->close();
     //更新名称
     //init()
+    name = config["name"].toString();
+    ui->lineEdit_robot_name->setText(name);
+    ui->pushButton_robot->setText(name);
+    ui->label_robot_name->setText(name);
+    inspection.ui->label_robot_name->setText(name);
+
     ui->label_channel01_video_name->setText(camera["video_name"].toString());
     ui->label_channel02_thermal_name->setText(camera["thermal_name"].toString());
-    ui->pushButton_robot->setText(camera["name"].toString("机器人设备"+i2s(id)));
 }
 
 void Robot::on_pushButton_robot_clicked()

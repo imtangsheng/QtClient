@@ -1,25 +1,35 @@
 #include "HomeWindow.h"
 #include "ui_HomeWindow.h"
-
 #include <QMessageBox>
 #include <QTimer>
 #include <QToolTip>
 #include "AppOS.h"
+#include "ui/MasterWindow.h"
+
+#include "modules/robot.h"
+
+HomeWindow *homeWindow;
 
 HomeWindow::HomeWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::HomeWindow)
 {
     ui->setupUi(this);
-    init();
 }
 
 HomeWindow::~HomeWindow()
 {
     delete ui;
+    /*DeviceMap是在栈上分配的，它会在其作用域结束时自动释放，你不需要手动释放内存*/
+//    // 释放DeviceMap中的每个Device对象
+//    for (auto it = DeviceMap.begin(); it != DeviceMap.end(); ++it) {
+//        delete it.value().robot;
+//    }
+//    // 清空DeviceMap中的元素
+//    DeviceMap.clear();
     qDebug() << "HomeWindow::~HomeWindow()";
 }
 
-void HomeWindow::init()
+void HomeWindow::start()
 {
     config = AppJson["HomeWindow"].toObject();
     QJsonObject devices = config["devices"].toObject();
@@ -53,12 +63,6 @@ void HomeWindow::init()
 
 void HomeWindow::quit()
 {
-
-    // QMap<int, Device> deviceMap; // 使用QMap
-    //    foreach (const Device& device, deviceMap) {
-    //        device.robot->quit();
-    //    }
-    // config = AppJson["HomeWindow"].toObject();
     QJsonObject devices = config["devices"].toObject();
     foreach (QString key, devices.keys())
     {
@@ -123,7 +127,9 @@ bool HomeWindow::addRobotDevice(int id)
     }
     DeviceMap[id].robot->id = id;
     DeviceMap[id].robot->init(); // 配置读取，摄像头数据 通道号等
-    ui->LayoutDevice->addWidget(DeviceMap[id].robot->ui->widgetMenu);
+    ui->LayoutDevice->addWidget(DeviceMap[id].robot->ui->widgetMenu);//机器人设备菜单
+    masterWindow->ui->LayoutDeviceConfigSettings->insertWidget(id,DeviceMap[id].robot->ui->widgetConfig);//机器人参数设置ui
+    masterWindow->ui->LayoutDeviceInspectionSettings->insertWidget(id,DeviceMap[id].robot->inspection.ui->widgetInspectionSetting);//机器人巡检设置ui
     connect(DeviceMap[id].robot, &Robot::setCameraWidgetPlay, this, &HomeWindow::CameraWidgetPlay);
     ui->comboBox_device_add_id->addItem(i2s(id), id);
     return true;
