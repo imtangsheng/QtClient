@@ -1,10 +1,11 @@
 #include "ShunDe.h"
 #include "AppOS.h"
 
+#include "ui/HomeWindow.h"
+#include "ui/MasterWindow.h"
+
 QSettings AppSettings("config/ShunDe.ini",QSettings::IniFormat);
 QJsonObject AppJson;
-
-
 
 ShunDe::ShunDe(QObject *parent) : QObject(parent)
 {
@@ -13,6 +14,9 @@ ShunDe::ShunDe(QObject *parent) : QObject(parent)
 
 ShunDe::~ShunDe()
 {
+//    delete homeWindow;
+//    delete masterWindow;
+    delete widgets;
     qDebug()<<"创建的插件ShunDe::~ShunDe()释放";
 }
 
@@ -30,7 +34,6 @@ void ShunDe::init()
     AppSettings.endGroup();
 
     homeWindow = new HomeWindow(widgets);
-
     masterWindow = new MasterWindow(widgets);
     qDebug()<<"创建的插件ShunDe::init()";
 }

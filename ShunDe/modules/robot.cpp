@@ -4,6 +4,8 @@
 #include <QToolTip>
 #include "AppOS.h"
 
+QMap<int, Device> DeviceMap;
+
 Robot::Robot(QWidget *parent) : QWidget(parent),
                                 ui(new Ui::Robot)
 {
@@ -44,14 +46,19 @@ void Robot::init()
     }else{
         ui->pushButton_robot->setText("机器人设备 配置不存在"+i2s(id));
     }
+
+    if (config.contains("inspection")){
+        inspection.config = config["inspection"].toObject();
+    }
     ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
+
+    start();
     qDebug() << "void Robot::init()"<<config;
 }
 
 void Robot::start()
 {
-
-
+    inspection.start();
 }
 
 void Robot::clientOffline()
@@ -66,9 +73,12 @@ void Robot::clientOffline()
 
 void Robot::quit()
 {
+    inspection.quit();
+    config["inspection"] = inspection.config;
     QJsonObject devices = AppJson[this->objectName()].toObject();
     devices[i2s(id)] = config;
     AppJson[this->objectName()] = devices;
+    deleteLater();//自动释放
     qDebug() << "void Robot::quit()";
 }
 

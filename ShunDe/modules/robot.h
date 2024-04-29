@@ -8,6 +8,7 @@
 #include <QTcpSocket>
 #include <QJsonObject>
 #include "ui_robot.h"
+#include "function/inspection.h"
 
 #define Robot_CMD_Header 0x5A // 命令 头
 
@@ -136,11 +137,10 @@ public:
     bool isCmdState();
     bool isCmdCharging();
 
-
+    /**机器人数据读取**/
     int id = -1;
     QTcpSocket *client;
     RobotRecvPacket *data;
-
     int pose;
     int robotBatteryLevel = -1;
     RobotRunningStatus robotStatus = RobotRunningStatus_Null;
@@ -149,7 +149,8 @@ public:
     int camera_tilt;
     bool updateCameraPose_Pan_Tilt(int pan, int tilt);
 
-    QMap<int, RobotRecvPacket *> robotDataMap; // 使用QMap
+    /**巡检**/
+    Inspection inspection;//巡检声明
 
 private:
     // QString ipAddress = "127.0.0.1"; // 服务器IP地址
@@ -168,4 +169,15 @@ private slots:
     void on_toolButton_robot_status_clicked();
 };
 
+struct Device
+{
+    int id = -1;
+    DeviceType type = DeviceType_Other;
+    Robot *robot = new Robot();
+    QString ipAddress = "";
+    bool isOnline = false;
+};
+
+
+extern QMap<int, Device> DeviceMap; // 使用QMap
 #endif // ROBOT_H

@@ -3,8 +3,7 @@
 
 #include "PluginInterface.h"
 #include "ui/HomeWidgets.h"
-#include "ui/HomeWindow.h"
-#include "ui/MasterWindow.h"
+
 
 #define ShunDe_iid "org.qt-project.Qt.Examples.ShunDe"
 class ShunDe : public QObject, PluginInterface
@@ -28,8 +27,6 @@ public slots:
 
 public:
     HomeWidgets *widgets;
-    HomeWindow *homeWindow;
-    MasterWindow *masterWindow;
     void init();
 
 signals:
