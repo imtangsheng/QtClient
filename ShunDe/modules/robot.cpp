@@ -10,6 +10,7 @@ Robot::Robot(QWidget *parent) : QWidget(parent),
                                 ui(new Ui::Robot)
 {
     ui->setupUi(this);
+//    inspection.setParent(this);
 }
 
 Robot::~Robot()
@@ -55,8 +56,13 @@ void Robot::init()
     ui->lineEdit_robot_name->setText(name);
     ui->pushButton_robot->setText(name);
     ui->label_robot_name->setText(name);
-    inspection.ui->label_robot_name->setText(name);
     ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
+
+    inspection.ui->label_robot_name->setText(name);
+    connect(inspection.ui->toolButton_point_position_get,&QToolButton::clicked,this,[=](){
+        qDebug() << "toolButton_point_position_get,&QToolButton::clicked"<<pose;
+        inspection.ui->doubleSpinBox_poiont_position->setValue(pose/1000);//mm->m
+    });
 
     start();
     qDebug() << "void Robot::init()"<<config;

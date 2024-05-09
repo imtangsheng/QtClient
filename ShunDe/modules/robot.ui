@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>705</width>
-    <height>459</height>
+    <width>1586</width>
+    <height>423</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -319,166 +319,11 @@
     </item>
    </layout>
   </widget>
-  <widget class="QGroupBox" name="groupBox_3">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>100</y>
-     <width>131</width>
-     <height>171</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>机器人1</string>
-   </property>
-   <layout class="QFormLayout" name="formLayout_4">
-    <property name="labelAlignment">
-     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-    </property>
-    <property name="horizontalSpacing">
-     <number>6</number>
-    </property>
-    <property name="verticalSpacing">
-     <number>6</number>
-    </property>
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
-     <number>0</number>
-    </property>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_32">
-      <property name="text">
-       <string>CO(PPM):</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="0">
-     <widget class="QLabel" name="label_33">
-      <property name="text">
-       <string>温度(℃):</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="label_34">
-      <property name="text">
-       <string>湿度(%):</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="0">
-     <widget class="QLabel" name="label_35">
-      <property name="text">
-       <string>H2S(PPM):</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="0">
-     <widget class="QLabel" name="label_36">
-      <property name="text">
-       <string>O2(%):</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0">
-     <widget class="QLabel" name="label_37">
-      <property name="text">
-       <string>CH4(%):</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="0">
-     <widget class="QLabel" name="label_robot_smoke_label">
-      <property name="text">
-       <string>烟雾(PPM):</string>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="1">
-     <widget class="QLabel" name="label_robot_temperature">
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-    </item>
-    <item row="2" column="1">
-     <widget class="QLabel" name="label_robot_CO">
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-    </item>
-    <item row="1" column="1">
-     <widget class="QLabel" name="label_robot_humidity">
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-    </item>
-    <item row="3" column="1">
-     <widget class="QLabel" name="label_robot_H2S">
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="1">
-     <widget class="QLabel" name="label_robot_O2">
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1">
-     <widget class="QLabel" name="label_robot_CH4">
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-    </item>
-    <item row="6" column="1">
-     <widget class="QLabel" name="label_robot_smoke">
-      <property name="text">
-       <string>0</string>
-      </property>
-     </widget>
-    </item>
-   </layout>
-  </widget>
   <widget class="QWidget" name="widgetSetting" native="true">
    <property name="geometry">
     <rect>
-     <x>280</x>
-     <y>10</y>
+     <x>240</x>
+     <y>0</y>
      <width>381</width>
      <height>421</height>
     </rect>
@@ -811,65 +656,104 @@
     </item>
    </layout>
   </widget>
-  <widget class="QLabel" name="label_robot_name">
+  <widget class="QWidget" name="widgetConfig" native="true">
    <property name="geometry">
     <rect>
-     <x>100</x>
-     <y>330</y>
-     <width>43</width>
-     <height>23</height>
+     <x>640</x>
+     <y>0</y>
+     <width>351</width>
+     <height>361</height>
     </rect>
    </property>
-   <property name="text">
-    <string>机器人1</string>
+   <property name="maximumSize">
+    <size>
+     <width>360</width>
+     <height>16777215</height>
+    </size>
    </property>
-  </widget>
-  <widget class="QLabel" name="label_robot_state">
-   <property name="geometry">
-    <rect>
-     <x>40</x>
-     <y>330</y>
-     <width>27</width>
-     <height>24</height>
-    </rect>
+   <property name="styleSheet">
+    <string notr="true"/>
    </property>
-   <property name="text">
-    <string>状态:</string>
-   </property>
-  </widget>
-  <widget class="QWidget" name="horizontalLayoutWidget_14">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>380</y>
-     <width>136</width>
-     <height>25</height>
-    </rect>
-   </property>
-   <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="0,10,0">
+   <layout class="QVBoxLayout" name="verticalLayout_4">
     <item>
-     <widget class="QLabel" name="label_13">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="text">
-       <string>速度</string>
-      </property>
-     </widget>
+     <layout class="QHBoxLayout" name="horizontalLayout_5">
+      <item>
+       <widget class="QLabel" name="label_robot_name">
+        <property name="text">
+         <string>机器人1</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label_robot_state">
+        <property name="text">
+         <string>状态:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
     <item>
-     <widget class="QSlider" name="horizontalSlider_robot_speed">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QSlider::groove:horizontal {
+     <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="0,0,0,0">
+      <item>
+       <widget class="QLabel" name="label_robot_state_3">
+        <property name="text">
+         <string>速度:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboBox_robot_speed">
+        <item>
+         <property name="text">
+          <string>速度挡位1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>速度挡位2</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>速度挡位3</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>速度挡位4</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>速度挡位5</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSlider" name="horizontalSlider_robot_speed">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QSlider::groove:horizontal {
 	height: 8px;
 	background-color: transparent;
 }
@@ -893,46 +777,567 @@ QSlider::add-page:horizontal {
 QSlider::sub-page:horizontal {
     background:#1296db;
 }</string>
+        </property>
+        <property name="minimum">
+         <number>0</number>
+        </property>
+        <property name="maximum">
+         <number>4</number>
+        </property>
+        <property name="pageStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>2</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_6">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_6">
+      <item>
+       <widget class="QLabel" name="label_robot_state_2">
+        <property name="text">
+         <string>气体检测报警值设置：</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget_gas_alarm_setting" native="true">
+      <property name="styleSheet">
+       <string notr="true">QSpinBox::down-button {
+subcontrol-origin: border;
+subcontrol-position: left;
+width: 16px;
+height: 16px;
+border-image: url(:/asset/HomeWindow/Speed_Sub.svg);
+border-width: 1px;
+}
+QSpinBox::up-button {
+subcontrol-origin: border;
+subcontrol-position: right;
+width: 16px;
+height: 16px;
+border-image: url(:/asset/HomeWindow/Speed_Add.svg);
+border-width: 1px;
+}
+</string>
       </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>5</number>
-      </property>
-      <property name="pageStep">
-       <number>1</number>
-      </property>
-      <property name="value">
-       <number>3</number>
-      </property>
-      <property name="orientation">
-       <enum>Qt::Horizontal</enum>
-      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="topMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item row="1" column="4">
+        <widget class="QSpinBox" name="spinBox_robot_humidity_set_max"/>
+       </item>
+       <item row="2" column="1">
+        <widget class="QLabel" name="label_robot_CO_set_min">
+         <property name="text">
+          <string>最小值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_robot_CH4_set">
+         <property name="text">
+          <string>CH4(%):</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="QLabel" name="label_robot_O2_set_min">
+         <property name="text">
+          <string>最小值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QLabel" name="label_robot_CH4_set_min">
+         <property name="text">
+          <string>最小值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_robot_temperature_set">
+         <property name="text">
+          <string>温度(℃):</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="5">
+        <spacer name="horizontalSpacer_5">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="2">
+        <widget class="QSpinBox" name="spinBox_robot_temperature_set_min">
+         <property name="minimumSize">
+          <size>
+           <width>64</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QLabel" name="label_robot_smoke_set_min">
+         <property name="text">
+          <string>最小值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="QSpinBox" name="spinBox_robot_O2_set_min"/>
+       </item>
+       <item row="1" column="2">
+        <widget class="QSpinBox" name="spinBox_robot_humidity_set_min"/>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="label_robot_temperature_set_min">
+         <property name="text">
+          <string>最小值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="QSpinBox" name="spinBox_robot_CH4_set_min"/>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="label_robot_temperature_set_max">
+         <property name="text">
+          <string>最大值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="QSpinBox" name="spinBox_robot_CO_set_min"/>
+       </item>
+       <item row="1" column="3">
+        <widget class="QLabel" name="label_robot_humidity_set_max">
+         <property name="text">
+          <string>最大值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QLabel" name="label_robot_H2S_set_min">
+         <property name="text">
+          <string>最小值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="5">
+        <spacer name="horizontalSpacer_14">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="2" column="4">
+        <widget class="QSpinBox" name="spinBox_robot_CO_set_max"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_robot_humidity_set">
+         <property name="text">
+          <string>湿度(%):</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_robot_O2_set">
+         <property name="text">
+          <string>O2(%):</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="QSpinBox" name="spinBox_robot_H2S_set_min"/>
+       </item>
+       <item row="2" column="3">
+        <widget class="QLabel" name="label_robot_CO_set_max">
+         <property name="text">
+          <string>最大值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="5">
+        <spacer name="horizontalSpacer_7">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="4">
+        <widget class="QSpinBox" name="spinBox_robot_temperature_set_max">
+         <property name="minimumSize">
+          <size>
+           <width>64</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_robot_H2S_set">
+         <property name="text">
+          <string>H2S(PPM):</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="label_robot_humidity_set_min">
+         <property name="text">
+          <string>最小值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_robot_CO_set">
+         <property name="text">
+          <string>CO(PPM):</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_robot_smoke_set">
+         <property name="text">
+          <string>烟雾(PPM):</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="2">
+        <widget class="QSpinBox" name="spinBox_robot_smoke_set_min"/>
+       </item>
+       <item row="4" column="3">
+        <widget class="QLabel" name="label_robot_H2S_set_max">
+         <property name="text">
+          <string>最大值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="4">
+        <widget class="QSpinBox" name="spinBox_robot_H2S_set_max"/>
+       </item>
+       <item row="5" column="3">
+        <widget class="QLabel" name="label_robot_O2_set_max">
+         <property name="text">
+          <string>最大值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="3">
+        <widget class="QLabel" name="label_robot_CH4_set_max">
+         <property name="text">
+          <string>最大值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="3">
+        <widget class="QLabel" name="label_robot_smoke_set_max">
+         <property name="text">
+          <string>最大值</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="4">
+        <widget class="QSpinBox" name="spinBox_robot_O2_set_max"/>
+       </item>
+       <item row="6" column="4">
+        <widget class="QSpinBox" name="spinBox_robot_CH4_set_max"/>
+       </item>
+       <item row="7" column="4">
+        <widget class="QSpinBox" name="spinBox_robot_smoke_set_max"/>
+       </item>
+       <item row="4" column="5">
+        <spacer name="horizontalSpacer_10">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="5" column="5">
+        <spacer name="horizontalSpacer_12">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="6" column="5">
+        <spacer name="horizontalSpacer_13">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="7" column="5">
+        <spacer name="horizontalSpacer_11">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
     </item>
     <item>
-     <widget class="QLineEdit" name="lineEdit_robot_speed">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
+     <spacer name="verticalSpacer">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-      <property name="minimumSize">
+      <property name="sizeHint" stdset="0">
        <size>
-        <width>16</width>
-        <height>0</height>
+        <width>20</width>
+        <height>40</height>
        </size>
       </property>
-      <property name="maximumSize">
-       <size>
-        <width>16</width>
-        <height>16777215</height>
-       </size>
-      </property>
+     </spacer>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>100</y>
+     <width>191</width>
+     <height>161</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>机器人1</string>
+   </property>
+   <layout class="QFormLayout" name="formLayout_4">
+    <property name="labelAlignment">
+     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+    </property>
+    <property name="horizontalSpacing">
+     <number>6</number>
+    </property>
+    <property name="verticalSpacing">
+     <number>6</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_32">
       <property name="text">
-       <string>4</string>
+       <string>CO(PPM):</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_33">
+      <property name="text">
+       <string>温度(℃):</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_34">
+      <property name="text">
+       <string>湿度(%):</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_35">
+      <property name="text">
+       <string>H2S(PPM):</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_36">
+      <property name="text">
+       <string>O2(%):</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_37">
+      <property name="text">
+       <string>CH4(%):</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="0">
+     <widget class="QLabel" name="label_robot_smoke_label">
+      <property name="text">
+       <string>烟雾(PPM):</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1">
+     <widget class="QLabel" name="label_robot_temperature">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="1">
+     <widget class="QLabel" name="label_robot_CO">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QLabel" name="label_robot_humidity">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="1">
+     <widget class="QLabel" name="label_robot_H2S">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="1">
+     <widget class="QLabel" name="label_robot_O2">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLabel" name="label_robot_CH4">
+      <property name="text">
+       <string>0</string>
+      </property>
+     </widget>
+    </item>
+    <item row="6" column="1">
+     <widget class="QLabel" name="label_robot_smoke">
+      <property name="text">
+       <string>0</string>
       </property>
      </widget>
     </item>

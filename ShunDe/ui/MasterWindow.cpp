@@ -72,10 +72,12 @@ void MasterWindow::start()
         qWarning() << "Failed to initialize inspection tasks:" << error.text();
     }else{
         ui->tableView_inspection_data->setModel(SQL->inspectionTasksModel);
-        ui->tableView_inspection_data->resizeColumnsToContents();
         ui->tableView_inspection_data->setColumnHidden(0,true);
         ui->tableView_inspection_data->setSortingEnabled(true);//排序
-        ui->tableView_inspection_data->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        //ui->tableView_inspection_data->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        // 设置标题栏可以交互式调整宽度
+        ui->tableView_inspection_data->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+        ui->tableView_inspection_data->resizeColumnsToContents();
     }
 
     error = SQL->init_inspectionCheckpoints();
@@ -88,7 +90,7 @@ void MasterWindow::start()
         ui->tableView_inspectionCheckpoints->setColumnHidden(1,true);
         ui->tableView_inspectionCheckpoints->setSortingEnabled(true);//排序
         ui->tableView_inspectionCheckpoints->setItemDelegateForColumn(3,new ImageDelegate);
-        ui->tableView_inspectionCheckpoints->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        ui->tableView_inspectionCheckpoints->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     }
 
     ui->dateTimeEdit_inspection_time_begin->setDateTime(QDateTime::currentDateTime().date().startOfDay());
