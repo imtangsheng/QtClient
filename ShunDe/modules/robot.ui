@@ -18,8 +18,8 @@
     <rect>
      <x>10</x>
      <y>0</y>
-     <width>221</width>
-     <height>81</height>
+     <width>223</width>
+     <height>197</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -313,6 +313,26 @@
           </widget>
          </item>
         </layout>
+       </item>
+       <item>
+        <widget class="QWidget" name="widget_inspection" native="true">
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <item>
+           <widget class="QPushButton" name="pushButton_start_inspection_task">
+            <property name="text">
+             <string>启动巡检</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_inspection_info">
+            <property name="text">
+             <string>TextLabel</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -1191,8 +1211,8 @@ border-width: 1px;
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>100</y>
+     <x>20</x>
+     <y>250</y>
      <width>191</width>
      <height>161</height>
     </rect>

@@ -9,6 +9,7 @@
 #include "modules/robot.h"
 
 HomeWindow *homeWindow;
+QMap<int, Device> DeviceMap;
 
 HomeWindow::HomeWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::HomeWindow)
@@ -21,9 +22,9 @@ HomeWindow::~HomeWindow()
     delete ui;
     /*DeviceMap是在栈上分配的，它会在其作用域结束时自动释放，你不需要手动释放内存*/
 //    // 释放DeviceMap中的每个Device对象
-//    for (auto it = DeviceMap.begin(); it != DeviceMap.end(); ++it) {
-//        delete it.value().robot;
-//    }
+    for (auto it = DeviceMap.begin(); it != DeviceMap.end(); ++it) {
+        delete it.value().robot;
+    }
 //    // 清空DeviceMap中的元素
 //    DeviceMap.clear();
     qDebug() << "HomeWindow::~HomeWindow()";

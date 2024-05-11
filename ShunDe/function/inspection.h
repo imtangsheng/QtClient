@@ -117,10 +117,6 @@ private slots:
 
     void on_listWidget_task_point_action_currentRowChanged(int currentRow);
 
-
-
-
-
 private:
 
 };

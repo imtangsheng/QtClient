@@ -3,8 +3,8 @@
 #include <QScreen>
 #include <QToolTip>
 #include "AppOS.h"
+#include "function/worker_inspection_thread.h"
 
-QMap<int, Device> DeviceMap;
 
 Robot::Robot(QWidget *parent) : QWidget(parent),
                                 ui(new Ui::Robot)
@@ -16,6 +16,7 @@ Robot::Robot(QWidget *parent) : QWidget(parent),
 Robot::~Robot()
 {
     delete ui;
+    delete worker_inspection_thread;
     qDebug() << "Robot::~Robot()";
 }
 
@@ -65,12 +66,16 @@ void Robot::init()
     });
 
     start();
+
     qDebug() << "void Robot::init()"<<config;
 }
 
 void Robot::start()
 {
     inspection.start();
+    worker_inspection_thread = new WorkerInspectionThread(this);
+    //qDebug() << "worker_inspection_thread:"<<QThread::currentThreadId();
+
 }
 
 void Robot::clientOffline()
@@ -90,7 +95,17 @@ void Robot::quit()
     QJsonObject devices = AppJson[this->objectName()].toObject();
     devices[i2s(id)] = config;
     AppJson[this->objectName()] = devices;
-    deleteLater();//自动释放
+
+    if(worker_inspection_thread->isRunning()){
+        qDebug() << "void Robot::quit() worker_inspection_thread->isRunning() "<<worker_inspection_thread->isRunning();
+        worker_inspection_thread->quit();//会请求线程退出,但不会立即退出
+        //worker_inspection_thread->wait();//会阻塞当前的程序,直到目标线程退出。
+        worker_inspection_thread->terminate();
+        //QThread::terminate() 会立即终止线程的执行。这是一个强制性的退出方式,可能会导致资源泄漏或其他问题
+
+    }
+    //worker_inspection_thread->deleteLater();
+    //deleteLater();//自动释放
     qDebug() << "void Robot::quit()";
 }
 
@@ -309,7 +324,7 @@ bool Robot::updateCameraPose_Pan_Tilt(int pan, int tilt)
                      {
         authenticator->setUser(username);
         authenticator->setPassword(password);
-        qDebug() << "Response:处理认证"; });
+        qDebug() << "Response:处理认证"<<reply; });
     QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
     loop.exec();
     // 检查请求是否成功
@@ -328,6 +343,7 @@ bool Robot::updateCameraPose_Pan_Tilt(int pan, int tilt)
     reply->deleteLater();
     return true;
 }
+
 
 void Robot::on_toolButton_widget_cameraChannel_isShow_clicked()
 {
@@ -485,4 +501,17 @@ void Robot::on_toolButton_robot_status_clicked()
                            ui->toolButton_robot_status);
         break;
     }
+}
+
+
+
+void Robot::on_pushButton_start_inspection_task_clicked()
+{
+    worker_inspection_thread->current_task = inspection.config["tasks"].toObject()[inspection.ui->comboBox_task_name->currentText()].toObject();
+    //thread_task.start();
+    worker_inspection_thread->start();
+    //worker_inspection_thread->run();
+    //QMetaObject::invokeMethod(worker_inspection_thread, "start", Qt::QueuedConnection);
+    qDebug() << "on_pushButton_start_inspection_task_clicked():"<<QThread::currentThreadId();
+
 }

@@ -9,6 +9,7 @@
 #include <QJsonObject>
 #include "ui_robot.h"
 #include "function/inspection.h"
+class WorkerInspectionThread;
 
 #define Robot_CMD_Header 0x5A // 命令 头
 
@@ -142,7 +143,7 @@ public:
     QString name;
     QTcpSocket *client;
     RobotRecvPacket *data;
-    int pose;
+    int pose=0;
     int robotBatteryLevel = -1;
     RobotRunningStatus robotStatus = RobotRunningStatus_Null;
     void updateDataShow();
@@ -152,6 +153,9 @@ public:
 
     /**巡检**/
     Inspection inspection;//巡检声明
+
+    //定义一个定时巡检线程，使用线程，可手动结束，等待机器人就位，支持多任务多时间触发
+    WorkerInspectionThread* worker_inspection_thread;
 
 private:
     // QString ipAddress = "127.0.0.1"; // 服务器IP地址
@@ -163,11 +167,11 @@ private slots:
     void on_toolButton_widget_cameraChannel_isShow_clicked();
     void on_toolButton_channel01_video_play_clicked();
     void on_toolButton_channel02_thermal_play_clicked();
-
     void on_toolButton_robto_config_save_clicked();
     void on_pushButton_robot_clicked();
     void on_toolButton_robot_batteryLevel_clicked();
     void on_toolButton_robot_status_clicked();
+    void on_pushButton_start_inspection_task_clicked();
 };
 
 struct Device
@@ -179,6 +183,4 @@ struct Device
     bool isOnline = false;
 };
 
-
-extern QMap<int, Device> DeviceMap; // 使用QMap
 #endif // ROBOT_H

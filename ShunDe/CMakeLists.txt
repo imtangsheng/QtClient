@@ -50,7 +50,6 @@ qt_add_plugin(ShunDe SHARED
 target_sources(ShunDe PRIVATE
     ${UI} ${Modules} ${Function}
     ${PUBLIC} ${RESOURCES}
-
 )
 
 set_target_properties(ShunDe PROPERTIES
