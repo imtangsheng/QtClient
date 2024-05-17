@@ -11,12 +11,15 @@ public:
     explicit WorkerInspectionThread(Robot *robot,QObject *parent = nullptr);
     ~WorkerInspectionThread();
 
+    QMap<QString, QList<QTimer*>> tasksTimers;
+
     QJsonObject current_task;
 //    void start_inspection_task();
     void run() override;
 signals:
 
-
+public slots:
+    void updata_task_run_time(const QString &taskName);
     // QThread interface
 protected:
 

@@ -57,9 +57,10 @@ void Robot::init()
     ui->lineEdit_robot_name->setText(name);
     ui->pushButton_robot->setText(name);
     ui->label_robot_name->setText(name);
+    ui->pushButton_robot_gas_isShow->setText(name);
     ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
 
-    inspection.ui->label_robot_name->setText(name);
+    inspection.ui->pushButton_robot_name->setText(name);
     connect(inspection.ui->toolButton_point_position_get,&QToolButton::clicked,this,[=](){
         qDebug() << "toolButton_point_position_get,&QToolButton::clicked"<<pose;
         inspection.ui->doubleSpinBox_poiont_position->setValue(pose/1000);//mm->m
@@ -72,10 +73,12 @@ void Robot::init()
 
 void Robot::start()
 {
-    inspection.start();
+
     worker_inspection_thread = new WorkerInspectionThread(this);
     //qDebug() << "worker_inspection_thread:"<<QThread::currentThreadId();
+    connect(&inspection,&Inspection::updata_task_run_time,worker_inspection_thread,&WorkerInspectionThread::updata_task_run_time);
 
+    inspection.start();
 }
 
 void Robot::clientOffline()
@@ -410,7 +413,8 @@ void Robot::on_toolButton_robto_config_save_clicked()
     ui->lineEdit_robot_name->setText(name);
     ui->pushButton_robot->setText(name);
     ui->label_robot_name->setText(name);
-    inspection.ui->label_robot_name->setText(name);
+    ui->pushButton_robot_gas_isShow->setText(name);
+    inspection.ui->pushButton_robot_name->setText(name);
 
     ui->label_channel01_video_name->setText(camera["video_name"].toString());
     ui->label_channel02_thermal_name->setText(camera["thermal_name"].toString());
@@ -515,3 +519,9 @@ void Robot::on_pushButton_start_inspection_task_clicked()
     qDebug() << "on_pushButton_start_inspection_task_clicked():"<<QThread::currentThreadId();
 
 }
+
+void Robot::on_pushButton_robot_gas_isShow_clicked()
+{
+    ui->widget_gas_show->setVisible(!ui->widget_gas_show->isVisible());
+}
+

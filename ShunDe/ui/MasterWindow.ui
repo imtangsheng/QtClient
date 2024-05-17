@@ -156,68 +156,6 @@ background-color: rgb(85, 0, 255);
         </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="page_inspection_setting">
-       <layout class="QVBoxLayout" name="verticalLayout_3">
-        <property name="spacing">
-         <number>0</number>
-        </property>
-        <property name="leftMargin">
-         <number>0</number>
-        </property>
-        <property name="topMargin">
-         <number>0</number>
-        </property>
-        <property name="rightMargin">
-         <number>0</number>
-        </property>
-        <property name="bottomMargin">
-         <number>0</number>
-        </property>
-        <item>
-         <widget class="QWidget" name="widget_LayoutDeviceInspectionSettings" native="true">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-            <bold>true</bold>
-           </font>
-          </property>
-          <layout class="QHBoxLayout" name="LayoutDeviceInspectionSettings">
-           <property name="spacing">
-            <number>0</number>
-           </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_DeviceInspection"/>
-           </item>
-           <item>
-            <spacer name="horizontalSpacer">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-          </layout>
-         </widget>
-        </item>
-       </layout>
-      </widget>
       <widget class="QWidget" name="page_inspection_data">
        <widget class="QTableView" name="tableView_inspection_data">
         <property name="geometry">
@@ -517,15 +455,6 @@ border: 2px solid #263238;
         <property name="icon">
          <iconset resource="../resource.qrc">
           <normaloff>:/asset/titler/Robot.svg</normaloff>:/asset/titler/Robot.svg</iconset>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>巡检设置</string>
-        </property>
-        <property name="icon">
-         <iconset resource="../resource.qrc">
-          <normaloff>:/asset/titler/RobotMaster.svg</normaloff>:/asset/titler/RobotMaster.svg</iconset>
         </property>
        </item>
        <item>

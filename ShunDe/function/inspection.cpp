@@ -1,9 +1,12 @@
 #include "inspection.h"
 #include "AppUtil.h"
 
+#include <QDateTime>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QToolTip>
+
+const int SECS_PER_DAY = 24 * 60 * 60; // 86400 秒
 
 QString configPath("inspection.json");
 
@@ -13,6 +16,8 @@ Inspection::Inspection(QWidget *parent) :
 {
     ui->setupUi(this);
     connect(ui->comboBox_point_type,&QComboBox::currentIndexChanged,ui->stackedWidget_pointType,&QStackedWidget::setCurrentIndex);
+    connect(ui->comboBox_type_time,&QComboBox::currentIndexChanged,ui->stackedWidget_typeTime,&QStackedWidget::setCurrentIndex);
+
 }
 
 Inspection::~Inspection()
@@ -28,6 +33,18 @@ void Inspection::start()
     if(ReadJsonData(config,configPath)){
         qDebug()<<"从JSON文件中读取配置数据"<<config;
         update_config_show();
+
+        QString currentTask = config["currentTask"].toString();
+        if(!currentTask.isEmpty()){
+            int row_currentTask = ui->comboBox_task_name->findText(currentTask);
+            if(row_currentTask >=0 ){
+                ui->comboBox_task_name->setCurrentIndex(row_currentTask);
+            }
+        }
+
+        foreach (const QString taskName, config["tasks"].toObject().keys()) {
+            emit updata_task_run_time(taskName);
+        }
     }
 
     qDebug()<<"void Inspection::start()";
@@ -56,20 +73,13 @@ void Inspection::update_config_show()
                                                                     ));
         QStringList timeList;
         foreach (const QJsonValue& value , task["time"].toArray()){
-            timeList.append(value.toString());
+            timeList.append(value.toObject()["time"].toString());
         }
-        ui->tableWidget_tasks->setItem(row,2,new QTableWidgetItem(timeList.join(", ")));
+        ui->tableWidget_tasks->setItem(row,2,new QTableWidgetItem(timeList.join(",")));
     }
     // 自适应大小
     ui->tableWidget_tasks->resizeColumnsToContents();
 
-    QString currentTask = config["currentTask"].toString();
-    if(!currentTask.isEmpty()){
-        int row_currentTask = ui->comboBox_task_name->findText(currentTask);
-        if(row_currentTask >=0 ){
-            ui->comboBox_task_name->setCurrentIndex(row_currentTask);
-        }
-    }
 }
 
 void Inspection::update_pointsJsonArray_show()
@@ -128,10 +138,10 @@ void Inspection::update_timesJsonArray_show()
     ui->listWidget_task_time->clear();
     // 使用 Qt 迭代器
     foreach (const QJsonValue& value , timesJsonArray) {
-        QString time = value.toString();
+        QJsonObject time = value.toObject();
         qDebug()<<"Inspection::time:"<<time;
         //任务时间显示
-        ui->listWidget_task_time->addItem(time);
+        ui->listWidget_task_time->addItem(get_time_operation_display(time));
     }
 //    // 使用经典的 for 循环
 //    for (int i = 0; i < timesJsonArray.size(); ++i)
@@ -143,8 +153,12 @@ void Inspection::update_timesJsonArray_show()
 
 }
 
-void Inspection::set_task(QJsonObject task)
+void Inspection::set_task()
 {
+    QString currentTask = ui->comboBox_task_name->currentText();
+    config["currentTask"] =currentTask;
+    QJsonObject task = config["tasks"].toObject()[currentTask].toObject();
+
     ui->checkBox_taskName_isEnable->setCheckState(Qt::CheckState(task["isEnable"].toInt()));//启用
     ui->lineEdit_personName->setText(task["personName"].toString());//
     ui->lineEdit_remark->setText(task["remark"].toString());//
@@ -311,6 +325,153 @@ QString Inspection::get_action_operation_display(PointAction operation, QJsonObj
     return display;
 }
 
+QJsonObject Inspection::get_time_operation()
+{
+    QJsonObject time;
+    TypeTime type = TypeTime(ui->comboBox_type_time->currentIndex());
+    time["type"] = type;
+    time["time"] = ui->timeEdit_taks_time->time().toString("hh:mm:ss");
+    switch (type) {
+    case TypeTime_Day:
+        time["date"] = ui->dateEdit_days_interval_begin->date().toString("yyyy-MM-dd");
+        time["days_interval"] = ui->spinBox_days_interval->value();
+        break;
+    case TypeTime_Week:{
+        QStringList week;
+        week.append(i2s(ui->checkBox_time_week_1->checkState()));
+        week.append(i2s(ui->checkBox_time_week_2->checkState()));
+        week.append(i2s(ui->checkBox_time_week_3->checkState()));
+        week.append(i2s(ui->checkBox_time_week_4->checkState()));
+        week.append(i2s(ui->checkBox_time_week_5->checkState()));
+        week.append(i2s(ui->checkBox_time_week_6->checkState()));
+        week.append(i2s(ui->checkBox_time_week_7->checkState()));
+        time["week"] = week.join(",");
+        break;}
+    default:
+        break;
+    }
+    return time;
+}
+
+
+void Inspection::set_time_operation(QJsonObject time)
+{
+    qDebug()<<time;
+    TypeTime type = TypeTime(time["type"].toInt());
+    ui->comboBox_type_time->setCurrentIndex(type);
+    ui->timeEdit_taks_time->setTime(QTime::fromString(time["time"].toString(), "hh:mm:ss"));
+    switch (type) {
+    case TypeTime_Day:
+        ui->dateEdit_days_interval_begin->setDate(QDate::fromString(time["date"].toString(),"yyyy-MM-dd"));
+        ui->spinBox_days_interval->setValue(time["days_interval"].toInt());
+        break;
+    case TypeTime_Week:{
+        QStringList week = time["week"].toString().split(",");
+        ui->checkBox_time_week_1->setCheckState(Qt::CheckState(week.at(0).toInt()));
+        ui->checkBox_time_week_2->setCheckState(Qt::CheckState(week.at(1).toInt()));
+        ui->checkBox_time_week_3->setCheckState(Qt::CheckState(week.at(2).toInt()));
+        ui->checkBox_time_week_4->setCheckState(Qt::CheckState(week.at(3).toInt()));
+        ui->checkBox_time_week_5->setCheckState(Qt::CheckState(week.at(4).toInt()));
+        ui->checkBox_time_week_6->setCheckState(Qt::CheckState(week.at(5).toInt()));
+        ui->checkBox_time_week_7->setCheckState(Qt::CheckState(week.at(6).toInt()));
+        break;}
+    default:
+        break;
+    }
+    return;
+}
+
+QString Inspection::get_time_operation_display(QJsonObject time)
+{
+    QString display = time["time"].toString();
+    TypeTime type = TypeTime(time["type"].toInt());
+    switch (type) {
+    case TypeTime_Day:
+        display =display + QString(" 每隔 %1 天").arg(time["days_interval"].toInt());
+        break;
+    case TypeTime_Week:
+        display = display + " 每星期";
+        break;
+    default:
+        break;
+    }
+    return display;
+}
+
+int Inspection::getFirstTime(QJsonObject time)
+{
+    qDebug()<<"getFirstTime(QJsonObject time)"<<time;
+    int msec = -1;
+    QDateTime now = QDateTime::currentDateTime();
+    TypeTime type = TypeTime(time["type"].toInt());
+    switch (type) {
+    case TypeTime_Day:{
+        QDateTime taskDateTime = QDateTime(QDate::fromString(time["date"].toString(),"yyyy-MM-dd"), QTime::fromString(time["time"].toString(), "hh:mm:ss"));
+        while (taskDateTime < now) {
+            taskDateTime = taskDateTime.addDays(time["days_interval"].toInt());
+        }
+        msec = taskDateTime.toMSecsSinceEpoch() - now.toMSecsSinceEpoch();
+        break;}
+    case TypeTime_Week:{
+        QStringList weekDays = time["week"].toString().split(",");
+        int currentDay = now.date().dayOfWeek();
+        int targetDay = 0;
+        QDateTime taskDateTime;
+        do{
+            for (;;) { //一周最大 加7次
+                if(targetDay >= 8){return -1;}
+
+                int dayOfWeek = (currentDay+targetDay -1 )%7 +1;
+                if(weekDays.at(dayOfWeek-1).toInt() == Qt::Checked){
+                    taskDateTime = QDateTime(now.date().addDays(targetDay), QTime::fromString(time["time"].toString(), "hh:mm:ss"));
+                    qDebug()<<"currentDay"<<currentDay<<"targetDay"<<targetDay;
+                    qDebug()<<"taskDateTime"<<taskDateTime;
+                    targetDay ++;//for跳出后不会执行++
+                    break;
+                }
+                targetDay ++;
+
+            }
+
+        }while (taskDateTime < now);
+        msec = taskDateTime.toMSecsSinceEpoch() - now.toMSecsSinceEpoch();
+        break;}
+    default:
+        break;
+    }
+
+    return msec;
+}
+#include <QDateTime>
+qint64 Inspection::getNextTimeInterval(QJsonObject time)
+{
+    qint64 value = -1;//msec
+    TypeTime type = TypeTime(time["type"].toInt());
+    switch (type) {
+    case TypeTime_Day: {
+        int daysInterval = time["days_interval"].toInt();
+        value = daysInterval*SECS_PER_DAY*1000;
+        break;
+    }
+    case TypeTime_Week: {
+        QStringList weekDays = time["week"].toString().split(",");
+        int currentDay = QDateTime::currentDateTime().date().dayOfWeek();
+        int targetDay = 1;
+        for(;targetDay<=7;targetDay++){
+            int dayOfWeek = (currentDay+targetDay -1 )%7 +1;
+            if(weekDays.at(dayOfWeek-1).toInt() == Qt::Checked){
+                value = targetDay*SECS_PER_DAY*1000;
+                break;
+            }
+        }
+        break;
+    }
+    default:
+        break;
+    }
+    return value;
+}
+
 void Inspection::on_toolButton_task_update_clicked()
 {
     QJsonObject tasks = config["tasks"].toObject();
@@ -339,14 +500,23 @@ void Inspection::on_toolButton_save_config_clicked()
 {
     QJsonObject tasks = config["tasks"].toObject();
     QString taskName = ui->comboBox_task_name->currentText();
-    if(tasks.contains(taskName)){
-        qDebug()<<"从JSON文件中保存数据11"<<tasks[taskName].toObject();
-    }
-    tasks[taskName] = get_task();
+    QJsonObject old_task = tasks[taskName].toObject();
+    QJsonObject task = get_task();
+    tasks[taskName] = task;
     config["tasks"] = tasks;
+    if(tasks.contains(taskName)){
+        qDebug()<<"保存修改配置:"<<config;
+        qDebug()<<"保存修改配置，之前配置为："<<old_task;
+        qDebug()<<"保存修改配置，配置为："<<task;
+    }
+
     if(SavaJsonData(config,configPath)){
-        qDebug()<<"从JSON文件中保存配置数据"<<config;
-        update_config_show();
+        qDebug()<<"配置:"<<old_task["isEnable"].toInt()<<task["isEnable"].toInt()<<old_task["time"].toArray()<<task["time"].toArray();
+        if(old_task["time"].toArray() != task["time"].toArray()){
+            emit updata_task_run_time(taskName);
+            qDebug()<<"配置已经改变，需要改变显示，重启"<<config;
+            update_config_show();
+        }
     }
 }
 
@@ -391,18 +561,19 @@ void Inspection::on_pushButton_widgetSetting_isShow_clicked()
 
 void Inspection::on_toolButton_task_time_add_clicked()
 {
-    QString newTime = ui->timeEdit_taks_time->time().toString("hh:mm:ss");
+    //每个任务不可重复
+    QJsonObject newTime = get_time_operation();
     // 检查时间是否重复
     if (timesJsonArray.contains(newTime)){
         QToolTip::showText(ui->toolButton_task_time_add->mapToGlobal(QPoint(0, 0)),
-                           "时间不能重复添加!",
+                           "不能重复添加!",
                            ui->toolButton_task_time_add);
         return;
     }
 
     // 将新时间添加到 timesJsonArray 并更新 listWidget
     timesJsonArray.append(newTime);
-    ui->listWidget_task_time->addItem(newTime);
+    ui->listWidget_task_time->addItem(get_time_operation_display(newTime));
 
 }
 
@@ -417,7 +588,7 @@ void Inspection::on_toolButton_task_time_update_clicked()
                            ui->toolButton_task_time_update);
         return;
     }
-    QString newTime = ui->timeEdit_taks_time->time().toString("hh:mm:ss");
+    QJsonObject newTime = get_time_operation();
 
     // 检查时间是否重复
     if (timesJsonArray.contains(newTime)){
@@ -429,7 +600,7 @@ void Inspection::on_toolButton_task_time_update_clicked()
 
     // 更新 timesJsonArray 和 listWidget
     timesJsonArray[currentRow] = newTime;
-    ui->listWidget_task_time->item(currentRow)->setText(newTime);
+    ui->listWidget_task_time->item(currentRow)->setText(get_time_operation_display(newTime));
 }
 
 
@@ -452,17 +623,40 @@ void Inspection::on_toolButton_task_time_delete_clicked()
 void Inspection::on_toolButton_task_time_sort_clicked()
 {
     qDebug()<<timesJsonArray.toVariantList().toList();
-    QStringList stringList;
-    foreach (const QJsonValue& value , timesJsonArray)
-    {
-        stringList.append(value.toString());
-    }
-    std::sort(stringList.begin(), stringList.end());
-    timesJsonArray = QJsonArray::fromStringList(stringList);
-    ui->listWidget_task_time->clear();
-    ui->listWidget_task_time->addItems(stringList);
-    update_timesJsonArray_show();
+//    QStringList stringList;
+//    QStringList stringTimeList;
+//    QMap<QString,int> mapTimeJson;
+//    for(int i = 0;i < timesJsonArray.size();i++)
+//    {
+//        QJsonObject time = timesJsonArray.at(i).toObject();
+//        stringTimeList.append(time["time"].toString());
+//        mapTimeJson[time["time"].toString()] = i;
+//    }
+//    std::sort(stringList.begin(), stringList.end());
+//    timesJsonArray = QJsonArray::fromStringList(stringList);
+//    ui->listWidget_task_time->clear();
+//    ui->listWidget_task_time->addItems(stringList);
 
+
+    // 获取 timesJsonArray 中的所有 QJsonObject
+    QList<QJsonObject> timeObjs;
+    for (int i = 0; i < timesJsonArray.size(); ++i) {
+        timeObjs.append(timesJsonArray.at(i).toObject());
+    }
+
+    // 对 timeObjs 进行排序
+    std::sort(timeObjs.begin(), timeObjs.end(), [](const QJsonObject& a, const QJsonObject& b) {
+        QTime timeA = QTime::fromString(a["time"].toString(), "hh:mm:ss");
+        QTime timeB = QTime::fromString(b["time"].toString(), "hh:mm:ss");
+        return timeA < timeB;
+    });
+
+    // 更新 timesJsonArray 和 listWidget_task_time
+    timesJsonArray = QJsonArray();
+    for (const auto& timeObj : timeObjs) {
+        timesJsonArray.append(timeObj);
+    }
+    update_timesJsonArray_show();
 }
 
 
@@ -551,7 +745,7 @@ void Inspection::on_toolButton_task_point_delete_clicked()
 void Inspection::on_listWidget_task_time_currentRowChanged(int currentRow)
 {
     qDebug() << "Inspection::on_listWidget_task_time_currentRowChanged(int "<<currentRow;
-    ui->timeEdit_taks_time->setTime(QTime::fromString(timesJsonArray.at(currentRow).toString(), "hh:mm:ss"));
+    set_time_operation(timesJsonArray.at(currentRow).toObject());
 }
 
 
@@ -567,19 +761,13 @@ void Inspection::on_tableWidget_tasks_itemClicked(QTableWidgetItem *item)
 {
     qDebug() << "Inspection::on_tableWidget_tasks_itemClicked"<<item->row()<<item->text();
     ui->comboBox_task_name->setCurrentIndex(item->row());
-    set_task(config["tasks"].toObject()[ui->comboBox_task_name->currentText()].toObject());
+    set_task();
 }
 
 void Inspection::on_comboBox_task_name_activated(int index)
 {
     qDebug() << "void Inspection::on_comboBox_task_name_activated(int "<<index<<ui->comboBox_task_name->currentText();
-    QString currentTask = ui->comboBox_task_name->currentText();
-    config["currentTask"] =currentTask;
-
-    QJsonObject task = config["tasks"].toObject()[currentTask].toObject();
-    qDebug() <<"task"<< task;
-
-    set_task(task);
+    set_task();
 }
 
 void Inspection::on_comboBox_task_points_currentIndexChanged(int index)
@@ -713,7 +901,25 @@ void Inspection::on_listWidget_task_point_action_currentRowChanged(int currentRo
 }
 
 
+void Inspection::on_pushButton_robot_name_clicked()
+{
+    ui->tableWidget_tasks->setVisible(!ui->tableWidget_tasks->isVisible());
+}
 
 
+void Inspection::on_horizontalSlider_time_valueChanged(int value)
+{
+    qDebug() <<"Inspection::on_horizontalSlider_time_valueChanged(int "<<value<<ui->horizontalSlider_time->isSliderDown();
+
+    QTime time(0, 0, 0);
+    time = time.addSecs(value);
+    ui->timeEdit_taks_time->setTime(time);
+}
 
 
+void Inspection::on_timeEdit_taks_time_timeChanged(const QTime &time)
+{
+    qDebug() <<"Inspection::on_timeEdit_taks_time_timeChanged(const QTime &"<<time<<time.msec();
+    int seconds = time.hour() * 3600 + time.minute() * 60 + time.second();
+    ui->horizontalSlider_time->setValue(seconds);
+}

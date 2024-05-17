@@ -35,7 +35,7 @@ public:
     void update_actionsJsonArray_show();
     void update_timesJsonArray_show();
 
-    void set_task(QJsonObject task);
+    void set_task();//根据选中的编号读取
     QJsonObject get_task();
 
     void set_point(QJsonObject point);
@@ -53,6 +53,20 @@ public:
     QJsonObject get_action_operation(PointAction operation);
     void set_action_operation(PointAction operation,QJsonObject action);
     QString get_action_operation_display(PointAction operation,QJsonObject action);
+
+    enum TypeTime{
+        TypeTime_Day = 0,
+        TypeTime_Week,
+    };
+
+    QJsonObject get_time_operation();
+    void set_time_operation(QJsonObject time);
+    QString get_time_operation_display(QJsonObject time);
+    int getFirstTime(QJsonObject time);
+    qint64 getNextTimeInterval(QJsonObject time);
+
+signals:
+    void updata_task_run_time(const QString &taskName);
 
 private slots:
     void on_toolButton_task_update_clicked();
@@ -116,6 +130,12 @@ private slots:
     void on_pushButton_widgetActionSetting_isShow_clicked();
 
     void on_listWidget_task_point_action_currentRowChanged(int currentRow);
+
+    void on_pushButton_robot_name_clicked();
+
+    void on_horizontalSlider_time_valueChanged(int value);
+
+    void on_timeEdit_taks_time_timeChanged(const QTime &time);
 
 private:
 

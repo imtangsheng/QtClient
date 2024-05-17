@@ -172,6 +172,7 @@ private slots:
     void on_toolButton_robot_batteryLevel_clicked();
     void on_toolButton_robot_status_clicked();
     void on_pushButton_start_inspection_task_clicked();
+    void on_pushButton_robot_gas_isShow_clicked();
 };
 
 struct Device
