@@ -203,11 +203,6 @@ void MainWindow::test()
     ui->tableView_events->setSortingEnabled(true);
     ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
-//    SQL->init_events();
-//    SQL->updata_eventsView();
-//    SQL->ui->tableView_events->resizeColumnsToContents();
-//    ui->verticalLayoutWidgetStatus->addWidget(SQL->ui->EventCenterWidget);
-
 }
 
 void MainWindow::mousePressEvent(QMouseEvent *event)

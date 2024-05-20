@@ -1,47 +1,16 @@
 #include "sqlite.h"
-
 SQLite* SQL;
-
 #include <QTimeEdit>
-#define EventCenter "EventCenter"
-const auto events_SQL = QLatin1String(R"(
-    CREATE TABLE IF NOT EXISTS EventCenter (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        source TEXT,
-        type TEXT,
-        level TEXT,
-        details TEXT,
-        status TEXT)
-)");
 
+QMap<int, QString> EventCenter_column_name;
+#define EventCenter "EventCenter"
+
+QMap<int, QString> InspectionTasks_column_name;
 #define InspectionTasks "InspectionTasks"
-const auto InspectionTasks_SQL = QLatin1String(R"(
-    CREATE TABLE IF NOT EXISTS InspectionTasks (
-        id TEXT PRIMARY KEY,
-        taskName TEXT,
-        numOfCheckpoints INTEGER,
-        numOfNormalPoints INTEGER,
-        numOfErrorPoints INTEGER,
-        numOfAlarmPoints INTEGER,
-        checkResult TEXT,
-        startTime DATETIME,
-        other TEXT
-    )
-)");
+
 
 #define InspectionCheckpoints "InspectionCheckpoints"
-const auto InspectionCheckpoints_SQL = QLatin1String(R"(
-    CREATE TABLE IF NOT EXISTS InspectionCheckpoints (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        taskId TEXT,
-        checkpointName TEXT,
-        checkpointContent TEXT,
-        checkResult TEXT,
-        remark TEXT,
-        checkTime DATETIME,
-        FOREIGN KEY (taskId) REFERENCES inspectionTasks(id))
-)");
+
 
 class EventTimeDelegate : public QStyledItemDelegate {
 public:
@@ -110,80 +79,6 @@ QSqlError SQLite::initDb(const QString& name, const QString& connectionName) {
     return QSqlError();
 }
 
-QSqlError SQLite::init_events()
-{
-    if(!db.tables().contains(EventCenter, Qt::CaseInsensitive)){
-        if(!query.exec(events_SQL))
-            return query.lastError();
-    }
-    model_events.setQuery("SELECT * FROM EventCenter",db);
-    if(model_events.lastError().isValid()){
-        qDebug() << "SQLite::init_events() Failed to load data:" << model_events.lastError().text();
-        return model_events.lastError();
-    }
-
-    proxyModel_events.setSourceModel(&model_events);
-    proxyModel_events.setFilterCaseSensitivity(Qt::CaseInsensitive);
-    proxyModel_events.setFilterKeyColumn(-1); // 对所有列过滤
-    // 设置表格的标题
-    proxyModel_events.setHeaderData(0,Qt::Horizontal,"序号");
-    proxyModel_events.setHeaderData(1,Qt::Horizontal,"事件时间");
-    proxyModel_events.setHeaderData(2,Qt::Horizontal,"事件源");
-    proxyModel_events.setHeaderData(3,Qt::Horizontal,"事件类型");
-    proxyModel_events.setHeaderData(4,Qt::Horizontal,"事件级别");
-    proxyModel_events.setHeaderData(5,Qt::Horizontal,"事件细节");
-    proxyModel_events.setHeaderData(6,Qt::Horizontal,"状态");
-
-    ui->tableView_events->setModel(&proxyModel_events);
-    ui->tableView_events->setSortingEnabled(true);//排序
-    ui->tableView_events->setItemDelegateForColumn(1, new EventTimeDelegate);
-    ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-    return QSqlError();
-}
-
-QVariant SQLite::add_event(const QString &source, const QString &type, const QString &level, const QString &details, const QString &status)
-{
-    // 插入数据
-    QSqlQuery q(db);
-    q.prepare("INSERT INTO EventCenter (time, source, type, level, details, status) "
-              "VALUES (:time, :source, :type, :level, :details, :status)");
-    //q.bindValue(":time", QDateTime::currentDateTime().toString(Qt::ISODate));
-    q.bindValue(":time", QDateTime::currentDateTime());
-    q.bindValue(":source", source);
-    q.bindValue(":type", type);
-    q.bindValue(":level", level);
-    q.bindValue(":details", details);
-    q.bindValue(":status", status);
-
-    if (!q.exec()) {
-        qWarning() << "Failed to add event:" << q.lastError().text();
-        return QVariant();
-    }
-    return q.lastInsertId();
-}
-
-void SQLite::updata_eventsView()
-{
-    // 定义每页显示的行数和当前页码
-    int rowsPerPage = 10;
-    int currentPage = 1;
-    // 构建带有限制和偏移量的查询语句
-    QString queryStr = QString("SELECT * FROM EventCenter LIMIT %1 OFFSET %2")
-                           .arg(rowsPerPage).arg((currentPage - 1) * rowsPerPage);
-
-    // 执行查询语句
-    model_events.setQuery(queryStr,db);
-
-    if(model_events.lastError().isValid()){
-        qWarning() << "Failed to load data:" << model_events.lastError().text();
-        //return model_events.lastError();
-    }
-    // 调整列宽和行高以适应内容
-    ui->tableView_events->resizeColumnsToContents();
-    ui->tableView_events->resizeRowsToContents();
-    ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-}
-
 QSqlError SQLite::delete_events(int id)
 {
     //QSqlQuery query(db);
@@ -196,30 +91,6 @@ QSqlError SQLite::delete_events(int id)
     return QSqlError();
 }
 
-void SQLite::search_keyword_from_events(const QString &keyword)
-{
-    //QSqlQuery query(db);
-    query.prepare("SELECT * FROM EventCenter WHERE source LIKE :keyword OR type LIKE :keyword OR level LIKE :keyword OR details LIKE :keyword OR status LIKE :keyword");
-    query.bindValue(":keyword", "%" + keyword + "%");
-    if (!query.exec()) {
-        qWarning() << "Failed to search data:" << query.lastError().text();
-
-    }
-    model_events.setQuery(std::move(query));
-}
-
-void SQLite::filter_events_by_Time(const QDateTime& startTime, const QDateTime& endTime)
-{
-    QSqlQuery q(db);
-    q.prepare("SELECT * FROM EventCenter WHERE timestamp BETWEEN :startTime AND :endTime");
-    q.bindValue(":startTime", startTime);
-    q.bindValue(":endTime", endTime);
-    if (!q.exec()) {
-        qWarning() << "Failed to filter data:" << q.lastError().text();
-    }
-
-    model_events.setQuery(std::move(q));
-}
 
 QSqlError SQLite::updata_keyword_from_events(const int &id, const QString &keyword)
 {
@@ -237,9 +108,28 @@ QSqlError SQLite::updata_keyword_from_events(const int &id, const QString &keywo
 QSqlError SQLite::init_EventCenter()
 {
     if(!db.tables().contains(EventCenter, Qt::CaseInsensitive)){
+        const auto events_SQL = QLatin1String(R"(
+            CREATE TABLE IF NOT EXISTS EventCenter (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                source TEXT,
+                type TEXT,
+                level TEXT,
+                details TEXT,
+                status TEXT)
+        )");
         if(!query.exec(events_SQL))
             return query.lastError();
     }
+    EventCenter_column_name.clear();
+    EventCenter_column_name[0] = "id";
+    EventCenter_column_name[1] = "time";
+    EventCenter_column_name[2] = "source";
+    EventCenter_column_name[3] = "type";
+    EventCenter_column_name[4] = "level";
+    EventCenter_column_name[5] = "details";
+    EventCenter_column_name[6] = "status";
+
     //QSqlTableModel是一个不可复制的类，只能通过构造函数进行初始化
     EventCenter_Model = new QSqlTableModel(nullptr, db);
     EventCenter_Model->setTable(EventCenter);
@@ -279,13 +169,50 @@ bool SQLite::add_EventCenter(const QString &source, const QString &type, const Q
     }
 }
 
+bool SQLite::filter_EventCenter(int column, const QString &value)
+{
+    // 设置筛选条件
+    QString filter = QString("%1 = '%2'").arg(EventCenter_column_name[column]).arg(value);
+    EventCenter_Model->setFilter(filter);
+    if (EventCenter_Model->select()) {
+        return true;
+    } else {
+        qWarning() << "Failed to insert inspection task:" << EventCenter_Model->lastError().text();
+        return false;
+    }
+}
+
 QSqlError SQLite::init_inspectionTasks()
 {
     if(!db.tables().contains(InspectionTasks, Qt::CaseInsensitive)){
         QSqlQuery q(db);
+        const auto InspectionTasks_SQL = QLatin1String(R"(
+            CREATE TABLE IF NOT EXISTS InspectionTasks (
+                id TEXT PRIMARY KEY,
+                taskName TEXT,
+                numOfCheckpoints INTEGER,
+                numOfNormalPoints INTEGER,
+                numOfErrorPoints INTEGER,
+                numOfAlarmPoints INTEGER,
+                checkResult TEXT,
+                startTime DATETIME,
+                other TEXT
+            )
+        )");
         if(!q.exec(InspectionTasks_SQL))
             return q.lastError();
     }
+
+    InspectionTasks_column_name.clear();
+    InspectionTasks_column_name[0] = "id";
+    InspectionTasks_column_name[1] = "taskName";
+    InspectionTasks_column_name[2] = "numOfCheckpoints";
+    InspectionTasks_column_name[3] = "numOfNormalPoints";
+    InspectionTasks_column_name[4] = "numOfErrorPoints";
+    InspectionTasks_column_name[5] = "numOfAlarmPoints";
+    InspectionTasks_column_name[6] = "checkResult";
+    InspectionTasks_column_name[7] = "startTime";
+    InspectionTasks_column_name[8] = "other";
 
     inspectionTasksModel = new QSqlTableModel(nullptr, db);
     inspectionTasksModel->setTable(InspectionTasks);
@@ -303,6 +230,7 @@ QSqlError SQLite::init_inspectionTasks()
 
 //    tableView_inspectionTasks->setModel(inspectionTasksModel);
 //    tableView_inspectionTasks->resizeColumnsToContents();
+
     return QSqlError();
 }
 
@@ -329,10 +257,34 @@ bool SQLite::add_inspectionTasks(const QString &taskName, int numOfCheckpoints, 
     }
 }
 
+bool SQLite::filter_inspectionTasks(int column, const QString &value)
+{
+    // 设置筛选条件
+    QString filter = QString("%1 = '%2'").arg(InspectionTasks_column_name[column]).arg(value);
+    inspectionTasksModel->setFilter(filter);
+    if (inspectionTasksModel->select()) {
+        return true;
+    } else {
+        qWarning() << "Failed to insert inspection task:" << inspectionTasksModel->lastError().text();
+        return false;
+    }
+}
+
 QSqlError SQLite::init_inspectionCheckpoints()
 {
     if(!db.tables().contains(InspectionCheckpoints, Qt::CaseInsensitive)){
         QSqlQuery q(db);
+        const auto InspectionCheckpoints_SQL = QLatin1String(R"(
+            CREATE TABLE IF NOT EXISTS InspectionCheckpoints (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                taskId TEXT,
+                checkpointName TEXT,
+                checkpointContent TEXT,
+                checkResult TEXT,
+                remark TEXT,
+                checkTime DATETIME,
+                FOREIGN KEY (taskId) REFERENCES inspectionTasks(id))
+        )");
         if(!q.exec(InspectionCheckpoints_SQL))
             return q.lastError();
     }

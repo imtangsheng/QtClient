@@ -25,26 +25,20 @@ public:
     QSqlDatabase db;
     QSqlQuery query;
     //事件中心表
-    QSqlQueryModel model_events;
-    QSortFilterProxyModel proxyModel_events;
-    QSqlError init_events();
-    QVariant add_event(const QString &source, const QString &type, const QString &level, const QString &details, const QString &status);
-    void updata_eventsView();
     QSqlError delete_events(int id);
-    void search_keyword_from_events(const QString& keyword);
-    void filter_events_by_Time(const QDateTime& startTime, const QDateTime& endTime);
     QSqlError updata_keyword_from_events(const int &id,const QString& keyword); //modify
     //巡检任务表
     QSqlTableModel* EventCenter_Model;
     QSqlError init_EventCenter();
     bool add_EventCenter(const QString &source, const QString &type, const QString &level, const QString &details, const QString &status);
-
+    bool filter_EventCenter(int column,const QString& value);
 
     //巡检任务表
     QString taskUuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
     QSqlTableModel* inspectionTasksModel;
     QSqlError init_inspectionTasks();
     bool add_inspectionTasks(const QString& taskName, int numOfCheckpoints, int numOfNormalPoints, int numOfErrorPoints, int numOfAlarmPoints, const QString& checkResult, const QDateTime& startTime, const QString& other);
+    bool filter_inspectionTasks(int column,const QString& value);
 
     //巡检任务表详情点
     QSqlTableModel* inspectionCheckpoints_Model;
