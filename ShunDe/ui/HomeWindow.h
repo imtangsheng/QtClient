@@ -26,7 +26,7 @@ public:
     QTcpServer server;
     int DeviceId = -1;
 
-    bool addRobotDevice(int id);
+    bool addNewRobotDevice(int id);
 
     QFuture<int> future;
     bool startTcpServerListen(const QString &ipAddress = "0.0.0.0", const quint16 &port = 12345);

@@ -103,6 +103,17 @@ enum DeviceType
 
 };
 
+/*定义机器人设备类型，型号*/
+enum RobotType
+{
+    RobotType_default,
+    RobotType_HikVision_Camera,//海康平台
+    RobotType_SelfCamera_launchdigital_thermal,//自研发云台，使用海康可见光sdk接口，朗驰热成像
+
+};
+
+
+#define SelfCamera
 
 namespace Ui
 {
@@ -121,9 +132,10 @@ public:
     Ui::Robot *ui;
     void init();
     void start();
-    void clientOffline();
+    void clientOfflineEvent();
     void quit();
 
+    bool clientSendMessage(const QByteArray &data);//没有弹窗提示
     bool sendMessage(const QString &message);
     bool sendMessage(const QByteArray &message);
 
@@ -131,6 +143,10 @@ public:
     bool isCmdCharging();
 
     /**机器人数据读取**/
+    RobotType robotType = RobotType_default;
+    RobotType getRobotType();
+    void setRobotType(RobotType type);
+
     int id = -1;
     QString name;
     QTcpSocket *client = nullptr;
@@ -139,9 +155,13 @@ public:
     int robotBatteryLevel = -1;
     RobotRunningStatus robotStatus = RobotRunningStatus_Null;
     void updateDataShow();
+
+    /**机器人SelfCamera自研发云台显示角度**/
+#ifdef SelfCamera
     int camera_pan;
     int camera_tilt;
     bool updateCameraPose_Pan_Tilt(int pan, int tilt);
+#endif
 
     /**机器人控制**/
     bool moveTo(int32_t pose);
@@ -173,9 +193,13 @@ public:
     QPoint getPicturePosFromPose(const int32_t& pose);
 
 private:
+    QReadWriteLock m_rwLock;
     // QString ipAddress = "127.0.0.1"; // 服务器IP地址
     // quint16 port = 12345; // 服务器端口号
     void updateRobotNameShow(const QString &name);
+
+
+
 signals:
     void setCameraWidgetPlay(const int &id, const QUrl &source);
 

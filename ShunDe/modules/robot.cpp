@@ -34,10 +34,12 @@ void Robot::init()
 {
     config = AppJson[this->objectName()].toObject()[i2s(id)].toObject();
 
+    setRobotType(RobotType(config["robotType"].toInt(0)));
     if (config.contains("camera"))
     {
         QJsonObject camera = config["camera"].toObject();
 
+        ui->comboBox_robot_type->setCurrentIndex(config["robotType"].toInt(0));
 
         ui->lineEdit_channel01_video_name->setText(camera["video_name"].toString());
         ui->lineEdit_channel01_video_username->setText(camera["video_username"].toString());
@@ -87,14 +89,17 @@ void Robot::start()
     inspection.start();
 }
 
-void Robot::clientOffline()
+void Robot::clientOfflineEvent()
 {
+    robotStatus = RobotRunningStatus_Null;
+    client = nullptr;
+
     ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot_Offline.svg"));
     ui->pushButton_robot->setText("设备离线");
-    robotStatus = RobotRunningStatus_Null;
 
     ui->toolButton_robot_status->setToolTip("离线");
     ui->toolButton_robot_status->setIcon(QIcon(":/asset/Robot/Robot_warning.svg"));
+
 }
 
 void Robot::quit()
@@ -116,6 +121,15 @@ void Robot::quit()
     //worker_inspection_thread->deleteLater();
     //deleteLater();//自动释放
     qDebug() << "void Robot::quit()";
+}
+
+bool Robot::clientSendMessage(const QByteArray &data)
+{
+    if(client){
+        client->write(data);
+        return true;
+    }
+    return false;
 }
 
 bool Robot::sendMessage(const QString &message)
@@ -179,6 +193,18 @@ bool Robot::isCmdCharging()
         return true;
     }
     return false;
+}
+
+RobotType Robot::getRobotType()
+{
+    QReadLocker locker(&m_rwLock);
+    return robotType;
+}
+
+void Robot::setRobotType(RobotType type)
+{
+    QWriteLocker locker(&m_rwLock);
+    robotType = type;
 }
 
 void Robot::updateDataShow()
@@ -291,14 +317,27 @@ void Robot::updateDataShow()
         ui->label_robot_pose->setText(i2s(pose) + "mm");
     }
     // 更新角度
-    if (camera_pan != data->camera_pan || camera_tilt != data->camera_tilt)
-    {
-        camera_pan = data->camera_pan;
-        camera_tilt = data->camera_tilt;
-        std::thread t(&Robot::updateCameraPose_Pan_Tilt, this, camera_pan, camera_tilt);
-        t.detach();
+    switch (getRobotType()) {
+    case RobotType_default:
+        break;
+    case RobotType_HikVision_Camera:
+        break;
+    case RobotType_SelfCamera_launchdigital_thermal:{
+        //自研发云台没有显示角度的功能，使用海康接口方法，显示在画面中
+        // updateCameraPose_Pan_Tilt(data->camera_pan, data->camera_tilt);
+        if (camera_pan != data->camera_pan || camera_tilt != data->camera_tilt)
+        {
+            camera_pan = data->camera_pan;
+            camera_tilt = data->camera_tilt;
+            std::thread t(&Robot::updateCameraPose_Pan_Tilt, this, camera_pan, camera_tilt);
+            t.detach();
+        }
+        break;}
+    default:
+        break;
     }
-    // updateCameraPose_Pan_Tilt(data->camera_pan, data->camera_tilt);
+
+
 }
 
 bool Robot::updateCameraPose_Pan_Tilt(int pan, int tilt)
@@ -367,7 +406,9 @@ bool Robot::moveTo(int32_t pose)
     //    byteArray.append((0xff00 & arg1) >> 8);
     //    byteArray.append((0xff0000 & arg1) >> 16);
     //    byteArray.append((0xff000000 & arg1) >> 24);
-    sendMessage(byteArray);
+    return sendMessage(byteArray);
+
+    //return true;
 }
 
 void Robot::update_inspection_data_show()
@@ -461,6 +502,8 @@ void Robot::on_toolButton_robto_config_save_clicked()
 
     QJsonObject camera = config["camera"].toObject();
     config["name"] = ui->lineEdit_robot_name->text();
+    config["robotType"] = ui->comboBox_robot_type->currentIndex();
+    setRobotType(RobotType(config["robotType"].toInt(0)));
 
     camera["video_name"] = ui->lineEdit_channel01_video_name->text();
     camera["video_username"] = ui->lineEdit_channel01_video_username->text();
@@ -488,7 +531,7 @@ void Robot::on_toolButton_robto_config_save_clicked()
 void Robot::on_pushButton_robot_clicked()
 {
     ui->widgetSetting->setWindowFlags(Qt::Dialog);
-    ui->widgetSetting->setWindowTitle(config["camera"].toObject()["name"].toString(objectName()));
+    ui->widgetSetting->setWindowTitle(config["name"].toString(objectName()));
     ui->widgetSetting->setWindowIcon(QIcon(":/asset/Robot/Robot.svg"));
     ui->widgetSetting->setAttribute(Qt::WA_ShowModal, true);
     ui->widgetSetting->setParent(this);

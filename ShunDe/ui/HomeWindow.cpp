@@ -38,10 +38,10 @@ void HomeWindow::start()
     foreach (QString key, devices.keys())
     {
         QJsonObject device = devices[key].toObject();
-        addRobotDevice(key.toInt());
+        addNewRobotDevice(key.toInt());
         //初始化
         DeviceMap[key.toInt()].type = DeviceType(device["type"].toInt());
-        DeviceMap[key.toInt()].robot->clientOffline();
+        DeviceMap[key.toInt()].robot->clientOfflineEvent();
     }
     ui->comboBox_device_add_type->addItem("1云台I代", DeviceType_Other);
     ui->comboBox_device_add_type->addItem("2云台II", DeviceType_Robot);
@@ -119,7 +119,7 @@ void HomeWindow::RelayoutCameraWidget()
     }
 }
 
-bool HomeWindow::addRobotDevice(int id)
+bool HomeWindow::addNewRobotDevice(int id)
 {
     if(DeviceMap.contains(id)){
         return false;
@@ -190,20 +190,25 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
             // 机器人
             int clientId = (int)headerData.at(2) << 8 | (int)headerData.at(3);
             qDebug() << "新的客户端连接：currenId" << clientId;
-
-            addRobotDevice(clientId);
+            //自动添加新设备，初始化，如果已经存在，只需要更新连接socket
+            addNewRobotDevice(clientId);
             DeviceMap[clientId].ipAddress = socket->peerAddress().toString() + ":" + socket->peerPort();
             DeviceMap[clientId].isOnline = true;
             DeviceMap[clientId].robot->client = socket;
-            DeviceMap[clientId].robot->init();
+
             // 接收客户端发送的数据
             QObject::connect(socket, &QTcpSocket::readyRead, this, [=]()
                              {
                 QByteArray bytes = socket->readAll();
-
+                //只处理64字节的数据，对粘包，丢包不进行处理
                 if(bytes.length()==64){
                     //qDebug() << "接收到客户端数据："<< QString(bytes.at(55))<<(int)bytes.at(56)<<(int)bytes.at(57)<<(int)bytes.at(58);
+                    QReadWriteLock lock;
+                    lock.lockForWrite();
+                    // 访问共享资源的读写操作
                     DeviceMap[clientId].robot->data = (RobotRecvPacket *) bytes.data();
+                    lock.unlock();
+
                     DeviceMap[clientId].robot->updateDataShow();
                 }else{
                     qDebug() << "接收到客户端异常长度数据：" <<bytes.length()<< bytes.toHex();
@@ -213,8 +218,10 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
 
             QObject::connect(socket, &QTcpSocket::disconnected,this, [=]() {
                 DeviceMap[clientId].isOnline = false;
-                DeviceMap[clientId].robot->clientOffline();
-                DeviceMap[clientId].robot->quit();
+                DeviceMap[clientId].robot->clientOfflineEvent();
+
+                //DeviceMap[clientId].robot->quit();
+
                 socket->deleteLater();
             });
         }
