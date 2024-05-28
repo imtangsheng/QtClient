@@ -43,5 +43,7 @@
         <file>asset/titler/Home.svg</file>
         <file>asset/titler/Robot.svg</file>
         <file>asset/titler/RobotMaster.svg</file>
+        <file>asset/map.png</file>
+        <file>asset/HomeWindow/map_isShow.svg</file>
     </qresource>
 </RCC>

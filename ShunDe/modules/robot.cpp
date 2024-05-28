@@ -1,4 +1,5 @@
 #include "robot.h"
+#include <QMenu>
 #include <QMessageBox>
 #include <QScreen>
 #include <QToolTip>
@@ -11,10 +12,19 @@ Robot::Robot(QWidget *parent) : QWidget(parent),
 {
     ui->setupUi(this);
 //    inspection.setParent(this);
+    QMenu * toolMenu = new QMenu(this);
+    //QMenu menu(this);
+    toolMenu->addAction("Full Screen",this,[this](){
+        qDebug()<<"showContextMenu(const QPoint &pos)"<<this->isFullScreen();
+    });
+
+    ui->toolButton_widget_cameraChannel_isShow->setMenu(toolMenu);
 }
 
 Robot::~Robot()
 {
+    delete client;
+    delete data;
     delete ui;
     delete worker_inspection_thread;
     qDebug() << "Robot::~Robot()";
@@ -54,13 +64,9 @@ void Robot::init()
     }
 
     name = config["name"].toString("机器人设备"+i2s(id));
-    ui->lineEdit_robot_name->setText(name);
-    ui->pushButton_robot->setText(name);
-    ui->label_robot_name->setText(name);
-    ui->pushButton_robot_gas_isShow->setText(name);
-    ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
+    updateRobotNameShow(name);
 
-    inspection.ui->pushButton_robot_name->setText(name);
+    ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
     connect(inspection.ui->toolButton_point_position_get,&QToolButton::clicked,this,[=](){
         qDebug() << "toolButton_point_position_get,&QToolButton::clicked"<<pose;
         inspection.ui->doubleSpinBox_poiont_position->setValue(pose/1000);//mm->m
@@ -138,6 +144,7 @@ bool Robot::sendMessage(const QString &message)
 
 bool Robot::sendMessage(const QByteArray &message)
 {
+    //qDebug() << "客户端sendMessage"<<client;使用先初始化
     if (!client)
     {
         qWarning() << "客户端sendMessage deviceId 不存在";
@@ -176,7 +183,7 @@ bool Robot::isCmdCharging()
 
 void Robot::updateDataShow()
 {
-    qDebug() << "HomeWindow::updateRobotDataShow(int )" << sizeof(data);
+    //qDebug() << "HomeWindow::updateRobotDataShow(int )" << sizeof(data);
     //    RobotRecvPacket packet = *data;
     //    qDebug() << "head:               0x" << QString::number(packet.head, 16).toUpper();
     //    qDebug() << "networkIndicator:   " << packet.networkIndicator;
@@ -347,6 +354,68 @@ bool Robot::updateCameraPose_Pan_Tilt(int pan, int tilt)
     return true;
 }
 
+bool Robot::moveTo(int32_t pose)
+{
+
+    QByteArray byteArray;
+    byteArray.append(Robot_CMD_Header);
+    byteArray.append(0x0A);
+    byteArray.append(0x02);
+    byteArray.append(0x01);
+    byteArray.append(reinterpret_cast<const char *>(&pose), sizeof(pose));
+    //    byteArray.append(0xff & arg1);
+    //    byteArray.append((0xff00 & arg1) >> 8);
+    //    byteArray.append((0xff0000 & arg1) >> 16);
+    //    byteArray.append((0xff000000 & arg1) >> 24);
+    sendMessage(byteArray);
+}
+
+void Robot::update_inspection_data_show()
+{
+    ui->label_inspection_current_task_value->setText(inspection_data.current_task_name);
+
+    ui->label_inspection_current_task_point_current_value->setText(inspection_data.current_task_name);
+    ui->label_inspection_current_task_point_next_value->setText(inspection_data.current_task_name);
+
+    ui->label_inspection_current_task_point_current_action_value->setText(inspection_data.current_task_name);
+    ui->label_inspection_current_task_point_current_action_progress_value->setText(inspection_data.current_task_name);
+
+
+    ui->label_inspection_info_current_task_finish_points_value->setText(inspection_data.current_task_name);
+    ui->label_inspection_info_current_task_not_finish_points_value->setText(inspection_data.current_task_name);
+
+    ui->label_inspection_task_next_value->setText(inspection_data.current_task_name);
+    ui->label_inspection_task_next_time_value->setText(inspection_data.current_task_name);
+
+}
+
+int32_t Robot::getPoseFromPicturePos(const QPoint &pos)
+{
+    int32_t x = pos.x();
+    int32_t y = pos.y();
+    return  y * 100; // 将 x 和 y 打包成 int32_t 类型
+}
+
+QPoint Robot::getPicturePosFromPose(const int32_t &pose)
+{
+
+    return QPoint(0, pose/100);
+}
+
+void Robot::updateRobotNameShow(const QString &name)
+{
+
+    ui->lineEdit_robot_name->setText(name);
+    ui->pushButton_robot->setText(name);
+    ui->label_robot_name->setText(name);
+    ui->pushButton_robot_gas_isShow->setText(name);
+    ui->toolButton_robot_map->setText(name);
+
+    inspection.ui->pushButton_robot_name->setText(name);
+
+
+}
+
 
 void Robot::on_toolButton_widget_cameraChannel_isShow_clicked()
 {
@@ -410,11 +479,7 @@ void Robot::on_toolButton_robto_config_save_clicked()
     //更新名称
     //init()
     name = config["name"].toString();
-    ui->lineEdit_robot_name->setText(name);
-    ui->pushButton_robot->setText(name);
-    ui->label_robot_name->setText(name);
-    ui->pushButton_robot_gas_isShow->setText(name);
-    inspection.ui->pushButton_robot_name->setText(name);
+    updateRobotNameShow(name);
 
     ui->label_channel01_video_name->setText(camera["video_name"].toString());
     ui->label_channel02_thermal_name->setText(camera["thermal_name"].toString());
@@ -523,5 +588,11 @@ void Robot::on_pushButton_start_inspection_task_clicked()
 void Robot::on_pushButton_robot_gas_isShow_clicked()
 {
     ui->widget_gas_show->setVisible(!ui->widget_gas_show->isVisible());
+}
+
+
+void Robot::on_toolButton_robot_map_clicked()
+{
+    qDebug() <<"Robot::on_toolButton_robot_map_clicked()";
 }
 

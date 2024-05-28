@@ -45,6 +45,10 @@ void MainWindow::showUI()
 
     init();
     _Start();
+
+    ui->dateTimeEdit_events_time_begin->setDateTime(QDateTime::currentDateTime().date().startOfDay());
+    ui->dateTimeEdit_events_time_end->setDateTime(QDateTime::currentDateTime().date().endOfDay());
+
     show();
 }
 
@@ -174,6 +178,20 @@ void MainWindow::_Start()
     }
     ui->tabWidget_mainWindow->setCurrentIndex(jsonMainConfig["TabCurrent"].toInt());
 
+    /*事件中心显示操作*/
+    SQL->initDb();
+    QSqlError error = SQL->init_EventCenter();
+    if(error.isValid()){
+        // 初始化失败
+        qWarning() << "Failed to initialize Event Center:" << error.text();
+        //return ;
+    }
+    ui->tableView_events->setModel(SQL->EventCenter_Model);
+    ui->tableView_events->resizeColumnsToContents();
+    ui->tableView_events->setSortingEnabled(true);
+    ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+
+
     test();
 }
 
@@ -189,19 +207,6 @@ void MainWindow::test()
 //    addDockWidget(Qt::TopDockWidgetArea,SUB_MAIN->ui->dockWidget);
     //    setCorner(Qt::BottomLeftCorner,Qt::BottomDockWidgetArea);
 
-    SQL->initDb();
-
-    QSqlError error = SQL->init_EventCenter();
-    if(error.isValid()){
-        // 初始化失败
-        qWarning() << "Failed to initialize Event Center:" << error.text();
-        //return ;
-    }
-
-    ui->tableView_events->setModel(SQL->EventCenter_Model);
-    ui->tableView_events->resizeColumnsToContents();
-    ui->tableView_events->setSortingEnabled(true);
-    ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
 }
 
@@ -591,3 +596,46 @@ bool MainWindow::pluginTabInsertMainWindow(int index,QString name)
     jsonMainConfig["TabWindow"] = tabJson;
     return true;
 }
+
+/*事件中心显示操作*/
+void MainWindow::on_toolButton_events_query_time_clicked()
+{
+    qDebug()<<"MainWindow::on_toolButton_events_query_time_clicked()";
+    // 设置筛选条件
+    SQL->EventCenter_Model->setFilter(QString("time >= '%1' AND time <= '%2'")
+                                             .arg(ui->dateTimeEdit_events_time_begin->dateTime().toString(Qt::ISODate))
+                                             .arg(ui->dateTimeEdit_events_time_end->dateTime().toString(Qt::ISODate)));
+    // 提交筛选条件
+    if (!SQL->EventCenter_Model->select()) {
+        // 筛选失败，输出错误信息
+        qWarning() << "筛选失败，错误信息:" << SQL->EventCenter_Model->lastError().text();
+        showMessage("筛选失败，错误信息:"+SQL->EventCenter_Model->lastError().text());
+    }
+}
+
+
+void MainWindow::on_toolButton_events_query_value_clicked()
+{
+    // 获取当前选中单元格的索引
+    QModelIndex currentIndex = ui->tableView_events->currentIndex();
+    if (!currentIndex.isValid()) {
+        // 没有选中单元格,返回 false
+        return;
+    }
+    // 获取选中单元格所在的行和列
+    int selectedRow = currentIndex.row();
+    int selectedColumn = currentIndex.column();
+
+    // 根据选中单元格的列序号,获取对应的数据
+    QString selectedData = SQL->EventCenter_Model->data(SQL->EventCenter_Model->index(selectedRow, selectedColumn)).toString();
+
+    qDebug()<<"test:"<<selectedRow << selectedColumn<<selectedData;
+    // 提交筛选条件
+    if (!SQL->filter_EventCenter(selectedColumn,selectedData)) {
+        // 筛选失败，输出错误信息
+        qWarning() << "筛选失败，错误信息:" << SQL->EventCenter_Model->lastError().text();
+        showMessage("筛选失败，错误信息:"+SQL->EventCenter_Model->lastError().text());
+    }
+
+}
+

@@ -59,13 +59,6 @@ MasterWindow::~MasterWindow()
 void MasterWindow::start()
 {
     SQL->initDb("test.db");
-//    SQL->initDb();
-//    SQL->init_events();
-//    SQL->updata_eventsView();
-//    //ui->tableView_inspection_data = SQL->ui->tableView_events;
-//    ui->tableView_inspection_data->setModel(&SQL->proxyModel_events);
-
-    //SQL->tableView_inspectionTasks = ui->tableView_inspection_data;
 
     QSqlError error = SQL->init_inspectionTasks();
     if (error.isValid()) {
@@ -106,22 +99,22 @@ void MasterWindow::quit()
 
 void MasterWindow::on_pushButton_test_clicked()
 {
-    SQL->taskUuid =  QUuid::createUuid().toString(QUuid::WithoutBraces);
-//    SQL->taskUuid = "test";
-    const QString &taskName = "TEST";
-    int numOfCheckpoints = 3,numOfNormalPoints =1,numOfErrorPoints=1, numOfAlarmPoints=1;
-    const QString &checkResult = "test";
-    const QDateTime &startTime = QDateTime::currentDateTime();
-    const QString &other = "other";
-    SQL->add_inspectionTasks(taskName,numOfCheckpoints,numOfNormalPoints, numOfErrorPoints,numOfAlarmPoints, checkResult, startTime, other);
+//    SQL->taskUuid =  QUuid::createUuid().toString(QUuid::WithoutBraces);
+////    SQL->taskUuid = "test";
+//    const QString &taskName = "TEST";
+//    int numOfCheckpoints = 3,numOfNormalPoints =1,numOfErrorPoints=1, numOfAlarmPoints=1;
+//    const QString &checkResult = "test";
+//    const QDateTime &startTime = QDateTime::currentDateTime();
+//    const QString &other = "other";
+//    SQL->add_inspectionTasks(taskName,numOfCheckpoints,numOfNormalPoints, numOfErrorPoints,numOfAlarmPoints, checkResult, startTime, other);
 
-    const QString& checkpointName = "test1";
-    const QString& checkpointContent = "G:\\data\\image\\test.jpg";
-    const QString& checkResult_point="test2";
-    const QString& remark="";
-    const QDateTime& checkTime = QDateTime::currentDateTime();
+//    const QString& checkpointName = "test1";
+//    const QString& checkpointContent = "G:\\data\\image\\test.jpg";
+//    const QString& checkResult_point="test2";
+//    const QString& remark="";
+//    const QDateTime& checkTime = QDateTime::currentDateTime();
 
-    SQL->add_InspectionCheckpoint(checkpointName,checkpointContent,checkResult_point,remark,checkTime);
+//    SQL->add_InspectionCheckpoint(checkpointName,checkpointContent,checkResult_point,remark,checkTime);
 
     qDebug()<<"MasterWindow::on_pushButton_test_clicked()";
 }
@@ -135,7 +128,7 @@ void MasterWindow::on_tableView_inspection_data_doubleClicked(const QModelIndex 
     // 设置筛选条件
     SQL->inspectionCheckpoints_Model->setFilter(QString("taskId = '%1'").arg(id));
 
-    // 提交筛选条件
+    // 提交筛选条件a
     if (SQL->inspectionCheckpoints_Model->select()) {
         // 筛选成功，更新视图
 //        ui->tableView_inspectionCheckpoints->setModel(SQL->inspectionCheckpoints_Model);
@@ -173,5 +166,31 @@ void MasterWindow::on_toolButton_inspection_query_time_clicked()
                            "筛选失败，错误信息:"+SQL->inspectionTasksModel->lastError().text(),
                            ui->toolButton_inspection_query_time);
     }
+}
+
+
+void MasterWindow::on_toolButton_inspection_query_value_clicked()
+{
+    // 获取当前选中单元格的索引
+    QModelIndex currentIndex = ui->tableView_inspection_data->currentIndex();
+    if (!currentIndex.isValid()) {
+        // 没有选中单元格,返回 false
+        return;
+    }
+    // 获取选中单元格所在的行和列
+    int selectedRow = currentIndex.row();
+    int selectedColumn = currentIndex.column();
+    // 根据选中单元格的列序号,获取对应的数据
+    QString selectedData = SQL->inspectionTasksModel->data(SQL->inspectionTasksModel->index(selectedRow, selectedColumn)).toString();
+    // 提交筛选条件
+    if (!SQL->filter_inspectionTasks(selectedColumn,selectedData)) {
+        // 筛选失败，输出错误信息
+        // 筛选失败，输出错误信息
+        qWarning() << "筛选失败，错误信息:" << SQL->inspectionTasksModel->lastError().text();
+        QToolTip::showText(ui->toolButton_inspection_query_value->mapToGlobal(QPoint(0, 0)),
+            "筛选失败，错误信息:"+SQL->inspectionTasksModel->lastError().text(),
+            ui->toolButton_inspection_query_value);
+    }
+
 }
 

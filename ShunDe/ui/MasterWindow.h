@@ -29,6 +29,8 @@ private slots:
 
     void on_toolButton_inspection_query_time_clicked();
 
+    void on_toolButton_inspection_query_value_clicked();
+
 private:
 
 };

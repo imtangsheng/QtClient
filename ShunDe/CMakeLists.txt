@@ -25,6 +25,7 @@ set(PUBLIC
     ../public/widgets/videowidget.cpp ../public/widgets/videowidget.h
     ../public/widgets/ellipsewidget.cpp ../public/widgets/ellipsewidget.h
     ../public/modules/sqlite.h ../public/modules/sqlite.cpp ../public/modules/sqlite.ui
+    ../public/widgets/maplabel.cpp ../public/widgets/maplabel.h
 )
 set(RESOURCES
     readme.md

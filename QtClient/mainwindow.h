@@ -63,6 +63,10 @@ private slots:
 
     void on_toolButton_WidgetStatus_isStaysOnTopHint_clicked();
 
+    /*事件中心显示操作*/
+    void on_toolButton_events_query_time_clicked();
+
+    void on_toolButton_events_query_value_clicked();
 
 private:
     QJsonObject jsonMainConfig;

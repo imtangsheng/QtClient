@@ -46,11 +46,13 @@ void HomeWindow::start()
     ui->comboBox_device_add_type->addItem("1云台I代", DeviceType_Other);
     ui->comboBox_device_add_type->addItem("2云台II", DeviceType_Robot);
     ui->comboBox_device_add_type->addItem("3云台I代", DeviceType_Robot_test);
+
+    //待增加服务器监听模块
     //    for (DeviceType type : DeviceType) {
 
     //    }
-    qDebug() << "void HomeWindow::init()" << config["devices"].isNull() << devices.isEmpty();
-    qDebug() << "void HomeWindow::init()" << config;
+    qDebug() << "void HomeWindow::init() config[\"devices\"].isNull() " << config["devices"].isNull() << devices.isEmpty();
+    qDebug() << "void HomeWindow::init() config[\"ipAddress\"] " << config["ipAddress"].toString("0.0.0.0")<<config["port"].toInt(12345);
 
     DeviceId = 0;
 
@@ -135,6 +137,14 @@ bool HomeWindow::addRobotDevice(int id)
     //masterWindow->ui->horizontalLayout_DeviceInspection->insertWidget(id,DeviceMap[id].robot->inspection.ui->widget_inspection,Qt::LeftToRight);//机器人巡检设置ui
     connect(DeviceMap[id].robot, &Robot::setCameraWidgetPlay, this, &HomeWindow::CameraWidgetPlay);
     ui->comboBox_device_add_id->addItem(i2s(id), id);
+
+    ui->label_map->add_robot_icon(id,DeviceMap[id].robot->name,DeviceMap[id].robot->ui->toolButton_robot_map);
+    connect(ui->label_map,&MapLabel::move_robot_icon,this,[=](const int& robot_id,const QPoint& pos){
+        qDebug()<<"导航robot_id"<<robot_id<<" pos:"<<pos;
+        DeviceMap[robot_id].robot->ui->toolButton_robot_map->move(pos);
+        qDebug()<<"导航robot_id"<<DeviceMap[robot_id].robot->getPoseFromPicturePos(pos);
+        DeviceMap[robot_id].robot->moveTo(1800);
+    });
     return true;
 }
 
@@ -190,10 +200,16 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
             QObject::connect(socket, &QTcpSocket::readyRead, this, [=]()
                              {
                 QByteArray bytes = socket->readAll();
-                qDebug() << "接收到客户端数据：" <<bytes.length()<< bytes.toHex();
-                qDebug() << "接收到客户端数据："<< QString(bytes.at(55))<<(int)bytes.at(56)<<(int)bytes.at(57)<<(int)bytes.at(58);
-                DeviceMap[clientId].robot->data = (RobotRecvPacket *) bytes.data();
-                DeviceMap[clientId].robot->updateDataShow(); }); // 接收机器人客户端发送的数据
+
+                if(bytes.length()==64){
+                    //qDebug() << "接收到客户端数据："<< QString(bytes.at(55))<<(int)bytes.at(56)<<(int)bytes.at(57)<<(int)bytes.at(58);
+                    DeviceMap[clientId].robot->data = (RobotRecvPacket *) bytes.data();
+                    DeviceMap[clientId].robot->updateDataShow();
+                }else{
+                    qDebug() << "接收到客户端异常长度数据：" <<bytes.length()<< bytes.toHex();
+                }
+
+            }); // 接收机器人客户端发送的数据
 
             QObject::connect(socket, &QTcpSocket::disconnected,this, [=]() {
                 DeviceMap[clientId].isOnline = false;
@@ -391,16 +407,16 @@ void HomeWindow::on_toolButton_robot_charge_set_clicked()
         // 开启充电
         if (DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_State_Charge)))
         {
-            ui->toolButton_robot_state_set->setText("取消充电");
-            ui->toolButton_robot_state_set->setStyleSheet("background-color: red;");
+            ui->toolButton_robot_charge_set->setText("取消充电");
+            ui->toolButton_robot_charge_set->setStyleSheet("background-color: red;");
         }
     }
     else
     {
         if (DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Charge_Off)))
         {
-            ui->toolButton_robot_state_set->setText("开启充电");
-            ui->toolButton_robot_state_set->setStyleSheet("");
+            ui->toolButton_robot_charge_set->setText("开启充电");
+            ui->toolButton_robot_charge_set->setStyleSheet("");
         }
     }
 }
@@ -577,3 +593,10 @@ void HomeWindow::on_comboBox_device_add_id_currentTextChanged(const QString &arg
         }
     }
 }
+
+
+void HomeWindow::on_toolButton_map_show_clicked()
+{
+    ui->window_map->setVisible(!ui->window_map->isVisible());
+}
+

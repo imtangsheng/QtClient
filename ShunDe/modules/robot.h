@@ -103,14 +103,6 @@ enum DeviceType
 
 };
 
-struct RobotDevice
-{
-    int id = -1;
-    DeviceType type = DeviceType_Other;
-    QString ipAddress = "";
-    bool isOnline = false;
-    QTcpSocket *client = nullptr;
-};
 
 namespace Ui
 {
@@ -141,8 +133,8 @@ public:
     /**机器人数据读取**/
     int id = -1;
     QString name;
-    QTcpSocket *client;
-    RobotRecvPacket *data;
+    QTcpSocket *client = nullptr;
+    RobotRecvPacket *data = nullptr;
     int pose=0;
     int robotBatteryLevel = -1;
     RobotRunningStatus robotStatus = RobotRunningStatus_Null;
@@ -151,15 +143,39 @@ public:
     int camera_tilt;
     bool updateCameraPose_Pan_Tilt(int pan, int tilt);
 
-    /**巡检**/
-    Inspection inspection;//巡检声明
+    /**机器人控制**/
+    bool moveTo(int32_t pose);
 
+    /**巡检**/
+    struct InspectionData
+    {
+        int id = -1;
+        QString current_task_name;
+        QString current_task_point_name;
+        QString current_task_point_next_name;
+        QString current_task_point_current_action;
+        QString current_task_point_current_progress;
+        QString current_task_finish_points;
+        QString current_task_not_finish_points;
+        QString task_next_name;
+        QString task_next_time;
+
+    };
+    InspectionData inspection_data;
+    void update_inspection_data_show();
+
+    Inspection inspection;//巡检声明
     //定义一个定时巡检线程，使用线程，可手动结束，等待机器人就位，支持多任务多时间触发
     WorkerInspectionThread* worker_inspection_thread;
+
+    /**机器人坐标转换地图方法**/
+    int32_t getPoseFromPicturePos(const QPoint& pos);
+    QPoint getPicturePosFromPose(const int32_t& pose);
 
 private:
     // QString ipAddress = "127.0.0.1"; // 服务器IP地址
     // quint16 port = 12345; // 服务器端口号
+    void updateRobotNameShow(const QString &name);
 signals:
     void setCameraWidgetPlay(const int &id, const QUrl &source);
 
@@ -173,6 +189,7 @@ private slots:
     void on_toolButton_robot_status_clicked();
     void on_pushButton_start_inspection_task_clicked();
     void on_pushButton_robot_gas_isShow_clicked();
+    void on_toolButton_robot_map_clicked();
 };
 
 struct Device
