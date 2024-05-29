@@ -504,17 +504,17 @@ void Inspection::on_toolButton_save_config_clicked()
     QJsonObject task = get_task();
     tasks[taskName] = task;
     config["tasks"] = tasks;
-    if(tasks.contains(taskName)){
-        qDebug()<<"保存修改配置:"<<config;
-        qDebug()<<"保存修改配置，之前配置为："<<old_task;
-        qDebug()<<"保存修改配置，配置为："<<task;
-    }
+//    if(tasks.contains(taskName)){
+//        qDebug()<<"保存修改配置:"<<config;
+//        qDebug()<<"保存修改配置，之前配置为："<<old_task;
+//        qDebug()<<"保存修改配置，配置为："<<task;
+//    }
 
     if(SavaJsonData(config,configPath)){
-        qDebug()<<"配置:"<<old_task["isEnable"].toInt()<<task["isEnable"].toInt()<<old_task["time"].toArray()<<task["time"].toArray();
+        //qDebug()<<"配置:"<<old_task["isEnable"].toInt()<<task["isEnable"].toInt()<<old_task["time"].toArray()<<task["time"].toArray();
         if(old_task["time"].toArray() != task["time"].toArray()){
             emit updata_task_run_time(taskName);
-            qDebug()<<"配置已经改变，需要改变显示，重启"<<config;
+            //qDebug()<<"配置已经改变，需要改变显示，重启"<<config;
             update_config_show();
         }
     }

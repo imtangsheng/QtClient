@@ -10,7 +10,7 @@
                     "index":0,
                     "position":{"x":2},
                     "pointType":"",
-                    "actions":[
+                    "action":[
                         {
                             "vision_Realtime_Thermometry":{
                                 "dwCommand":3629,

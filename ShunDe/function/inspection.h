@@ -10,6 +10,16 @@
 
 #include "ui_inspection.h"
 
+enum PointAction{
+    PointAction_Time=0,
+    PointAction_Vision_PTZControl,
+    PointAction_Vision_PTZPreset,
+    PointAction_Vision_PTZPOS,
+    PointAction_Vision_CaptureJPEGPicture,
+    PointAction_Vision_Realtime_Thermometry,
+    PointAction_Vision_Other,
+};
+
 namespace Ui {
 class Inspection;
 }
@@ -41,15 +51,7 @@ public:
     void set_point(QJsonObject point);
     QJsonObject get_point();
 
-    enum PointAction{
-        PointAction_Time=0,
-        PointAction_Vision_PTZControl,
-        PointAction_Vision_PTZPreset,
-        PointAction_Vision_PTZPOS,
-        PointAction_Vision_CaptureJPEGPicture,
-        PointAction_Vision_Realtime_Thermometry,
-        PointAction_Vision_Other,
-    };
+
     QJsonObject get_action_operation(PointAction operation);
     void set_action_operation(PointAction operation,QJsonObject action);
     QString get_action_operation_display(PointAction operation,QJsonObject action);

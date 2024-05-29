@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1586</width>
-    <height>467</height>
+    <height>590</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,10 +16,10 @@
   <widget class="QWidget" name="widgetMenu" native="true">
    <property name="geometry">
     <rect>
-     <x>10</x>
-     <y>0</y>
+     <x>0</x>
+     <y>90</y>
      <width>223</width>
-     <height>308</height>
+     <height>241</height>
     </rect>
    </property>
    <property name="sizePolicy">
@@ -393,28 +393,28 @@
           <item row="7" column="1">
            <widget class="QLabel" name="label_inspection_task_next_value">
             <property name="text">
-             <string>test2</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item row="7" column="3">
            <widget class="QLabel" name="label_inspection_task_next_time_name">
             <property name="text">
-             <string>20：00</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
            <widget class="QLabel" name="label_inspection_current_task_point_current_action_value">
             <property name="text">
-             <string>拍照</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_inspection_current_task_name">
             <property name="text">
-             <string>当前任务:</string>
+             <string>巡检任务:</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -444,14 +444,14 @@
           <item row="4" column="3">
            <widget class="QLabel" name="label_inspection_info_current_task_not_finish_points_value">
             <property name="text">
-             <string>1</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
            <widget class="QLabel" name="label_inspection_current_task_value">
             <property name="text">
-             <string>test</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -468,14 +468,14 @@
           <item row="2" column="3">
            <widget class="QLabel" name="label_inspection_current_task_point_current_action_progress_value">
             <property name="text">
-             <string>100%</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
            <widget class="QLabel" name="label_inspection_info_current_task_finish_points_value">
             <property name="text">
-             <string>5</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -522,7 +522,7 @@
           <item row="1" column="1">
            <widget class="QLabel" name="label_inspection_current_task_point_current_value">
             <property name="text">
-             <string>巡检点1</string>
+             <string/>
             </property>
            </widget>
           </item>
@@ -539,7 +539,24 @@
           <item row="1" column="3">
            <widget class="QLabel" name="label_inspection_current_task_point_next_value">
             <property name="text">
-             <string>巡检点2</string>
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="2">
+           <widget class="QLabel" name="label_inspection_task_current_state_name">
+            <property name="text">
+             <string>任务状态:</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="3">
+           <widget class="QLabel" name="label_inspection_task_current_state_value">
+            <property name="text">
+             <string>待启动</string>
             </property>
            </widget>
           </item>
@@ -576,6 +593,24 @@
    <property name="palette">
     <palette>
      <active>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>55</red>
+         <green>71</green>
+         <blue>79</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Dark">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>38</red>
+         <green>50</green>
+         <blue>56</blue>
+        </color>
+       </brush>
+      </colorrole>
       <colorrole role="Text">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
@@ -585,17 +620,89 @@
         </color>
        </brush>
       </colorrole>
+      <colorrole role="ButtonText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
       <colorrole role="Base">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>144</red>
-         <green>164</green>
-         <blue>174</blue>
+         <red>96</red>
+         <green>125</green>
+         <blue>139</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>120</red>
+         <green>144</green>
+         <blue>156</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>38</red>
+         <green>50</green>
+         <blue>56</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="HighlightedText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>55</red>
+         <green>71</green>
+         <blue>79</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="AlternateBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>96</red>
+         <green>125</green>
+         <blue>139</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ToolTipBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>96</red>
+         <green>125</green>
+         <blue>139</blue>
         </color>
        </brush>
       </colorrole>
      </active>
      <inactive>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>55</red>
+         <green>71</green>
+         <blue>79</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Dark">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>38</red>
+         <green>50</green>
+         <blue>56</blue>
+        </color>
+       </brush>
+      </colorrole>
       <colorrole role="Text">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
@@ -605,17 +712,162 @@
         </color>
        </brush>
       </colorrole>
+      <colorrole role="ButtonText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>170</red>
+         <green>255</green>
+         <blue>255</blue>
+        </color>
+       </brush>
+      </colorrole>
       <colorrole role="Base">
        <brush brushstyle="SolidPattern">
         <color alpha="255">
-         <red>144</red>
-         <green>164</green>
-         <blue>174</blue>
+         <red>96</red>
+         <green>125</green>
+         <blue>139</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>120</red>
+         <green>144</green>
+         <blue>156</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Highlight">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>38</red>
+         <green>50</green>
+         <blue>56</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="HighlightedText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>55</red>
+         <green>71</green>
+         <blue>79</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="AlternateBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>96</red>
+         <green>125</green>
+         <blue>139</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ToolTipBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>96</red>
+         <green>125</green>
+         <blue>139</blue>
         </color>
        </brush>
       </colorrole>
      </inactive>
-     <disabled/>
+     <disabled>
+      <colorrole role="WindowText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>38</red>
+         <green>50</green>
+         <blue>56</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Button">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>55</red>
+         <green>71</green>
+         <blue>79</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Dark">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>38</red>
+         <green>50</green>
+         <blue>56</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Text">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>38</red>
+         <green>50</green>
+         <blue>56</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ButtonText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>38</red>
+         <green>50</green>
+         <blue>56</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Base">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>120</red>
+         <green>144</green>
+         <blue>156</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="Window">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>120</red>
+         <green>144</green>
+         <blue>156</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="HighlightedText">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>55</red>
+         <green>71</green>
+         <blue>79</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="AlternateBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>96</red>
+         <green>125</green>
+         <blue>139</blue>
+        </color>
+       </brush>
+      </colorrole>
+      <colorrole role="ToolTipBase">
+       <brush brushstyle="SolidPattern">
+        <color alpha="255">
+         <red>96</red>
+         <green>125</green>
+         <blue>139</blue>
+        </color>
+       </brush>
+      </colorrole>
+     </disabled>
     </palette>
    </property>
    <property name="styleSheet">
@@ -638,6 +890,11 @@
       </item>
       <item>
        <widget class="QComboBox" name="comboBox_robot_type">
+        <item>
+         <property name="text">
+          <string>默认</string>
+         </property>
+        </item>
         <item>
          <property name="text">
           <string>型号1</string>
@@ -1458,7 +1715,7 @@ border-width: 1px;
    <property name="geometry">
     <rect>
      <x>10</x>
-     <y>280</y>
+     <y>350</y>
      <width>211</width>
      <height>191</height>
     </rect>
@@ -1680,10 +1937,10 @@ border-width: 1px;
   <widget class="QToolButton" name="toolButton_robot_map">
    <property name="geometry">
     <rect>
-     <x>1010</x>
-     <y>10</y>
-     <width>81</width>
-     <height>61</height>
+     <x>0</x>
+     <y>0</y>
+     <width>131</width>
+     <height>51</height>
     </rect>
    </property>
    <property name="sizePolicy">

@@ -107,11 +107,23 @@ enum DeviceType
 enum RobotType
 {
     RobotType_default,
-    RobotType_HikVision_Camera,//海康平台
-    RobotType_SelfCamera_launchdigital_thermal,//自研发云台，使用海康可见光sdk接口，朗驰热成像
+    RobotType_HikVision_Camera,                 // 海康平台
+    RobotType_SelfCamera_launchdigital_thermal, // 自研发云台，使用海康可见光sdk接口，朗驰热成像
 
 };
 
+/*定义机器人巡检类型更新 部分 */
+enum InspectionUpdataType
+{
+    InspectionUpdata_task_current = 0,
+    InspectionUpdata_task_current_state,
+    InspectionUpdata_task_current_point,
+    InspectionUpdata_task_current_point_action,
+    InspectionUpdata_task_current_point_next,
+    InspectionUpdata_task_current_poiont_progress,
+    InspectionUpdata_task_current_completion_progress,
+    InspectionUpdata_task_next,
+};
 
 #define SelfCamera
 
@@ -135,7 +147,7 @@ public:
     void clientOfflineEvent();
     void quit();
 
-    bool clientSendMessage(const QByteArray &data);//没有弹窗提示
+    bool clientSendMessage(const QByteArray &data); // 没有弹窗提示
     bool sendMessage(const QString &message);
     bool sendMessage(const QByteArray &message);
 
@@ -151,7 +163,7 @@ public:
     QString name;
     QTcpSocket *client = nullptr;
     RobotRecvPacket *data = nullptr;
-    int pose=0;
+    int32_t pose = 0;
     int robotBatteryLevel = -1;
     RobotRunningStatus robotStatus = RobotRunningStatus_Null;
     void updateDataShow();
@@ -164,12 +176,11 @@ public:
 #endif
 
     /**机器人控制**/
-    bool moveTo(int32_t pose);
+    bool moveTo(int32_t pose, int timeout = 10);
 
     /**巡检**/
     struct InspectionData
     {
-        int id = -1;
         QString current_task_name;
         QString current_task_point_name;
         QString current_task_point_next_name;
@@ -177,28 +188,34 @@ public:
         QString current_task_point_current_progress;
         QString current_task_finish_points;
         QString current_task_not_finish_points;
+        QString task_current_state;
+
         QString task_next_name;
         QString task_next_time;
 
+        int completed = 0;
+        int not_completed = 0;
+        int warnings = 0;
     };
     InspectionData inspection_data;
-    void update_inspection_data_show();
+    void start_inspection_data_show();
+    void update_inspection_data_show(InspectionUpdataType type);
+    void end_inspection_data_show();
 
-    Inspection inspection;//巡检声明
-    //定义一个定时巡检线程，使用线程，可手动结束，等待机器人就位，支持多任务多时间触发
-    WorkerInspectionThread* worker_inspection_thread;
+    Inspection inspection; // 巡检声明
+    // 定义一个定时巡检线程，使用线程，可手动结束，等待机器人就位，支持多任务多时间触发
+    bool run_action_operation(PointAction operation, QJsonObject action);
+    WorkerInspectionThread *worker_inspection_thread;
 
     /**机器人坐标转换地图方法**/
-    int32_t getPoseFromPicturePos(const QPoint& pos);
-    QPoint getPicturePosFromPose(const int32_t& pose);
+    int32_t getPoseFromPicturePos(const QPoint &pos);
+    QPoint getPicturePosFromPose(const int32_t &pose);
 
 private:
     QReadWriteLock m_rwLock;
     // QString ipAddress = "127.0.0.1"; // 服务器IP地址
     // quint16 port = 12345; // 服务器端口号
     void updateRobotNameShow(const QString &name);
-
-
 
 signals:
     void setCameraWidgetPlay(const int &id, const QUrl &source);
@@ -211,7 +228,7 @@ private slots:
     void on_pushButton_robot_clicked();
     void on_toolButton_robot_batteryLevel_clicked();
     void on_toolButton_robot_status_clicked();
-    void on_pushButton_start_inspection_task_clicked();
+    void on_toolButton_start_inspection_task_clicked();
     void on_pushButton_robot_gas_isShow_clicked();
     void on_toolButton_robot_map_clicked();
 };

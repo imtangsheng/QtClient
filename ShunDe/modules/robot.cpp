@@ -6,17 +6,15 @@
 #include "AppOS.h"
 #include "function/worker_inspection_thread.h"
 
-
 Robot::Robot(QWidget *parent) : QWidget(parent),
                                 ui(new Ui::Robot)
 {
     ui->setupUi(this);
-//    inspection.setParent(this);
-    QMenu * toolMenu = new QMenu(this);
-    //QMenu menu(this);
-    toolMenu->addAction("Full Screen",this,[this](){
-        qDebug()<<"showContextMenu(const QPoint &pos)"<<this->isFullScreen();
-    });
+    //    inspection.setParent(this);
+    QMenu *toolMenu = new QMenu(this);
+    // QMenu menu(this);
+    toolMenu->addAction("Full Screen", this, [this]()
+                        { qDebug() << "showContextMenu(const QPoint &pos)" << this->isFullScreen(); });
 
     ui->toolButton_widget_cameraChannel_isShow->setMenu(toolMenu);
 }
@@ -53,38 +51,41 @@ void Robot::init()
         ui->lineEdit_channel02_thermal_ip->setText(camera["thermal_ip"].toString());
         ui->comboBox_channel02_thermal_stream->setCurrentText(camera["thermal_stream"].toString());
 
-        //名称显示
+        // 名称显示
         ui->label_channel01_video_name->setText(camera["video_name"].toString());
         ui->label_channel02_thermal_name->setText(camera["thermal_name"].toString());
-
-    }else{
-        ui->pushButton_robot->setText("机器人设备 配置不存在"+i2s(id));
+    }
+    else
+    {
+        ui->pushButton_robot->setText("机器人设备 配置不存在" + i2s(id));
     }
 
-    if (config.contains("inspection")){
+    if (config.contains("inspection"))
+    {
         inspection.config = config["inspection"].toObject();
     }
 
-    name = config["name"].toString("机器人设备"+i2s(id));
+    name = config["name"].toString("机器人设备" + i2s(id));
     updateRobotNameShow(name);
 
     ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
-    connect(inspection.ui->toolButton_point_position_get,&QToolButton::clicked,this,[=](){
-        qDebug() << "toolButton_point_position_get,&QToolButton::clicked"<<pose;
-        inspection.ui->doubleSpinBox_poiont_position->setValue(pose/1000);//mm->m
-    });
+    connect(inspection.ui->toolButton_point_position_get, &QToolButton::clicked, this, [=]()
+            {
+                qDebug() << "toolButton_point_position_get,&QToolButton::clicked" << pose;
+                inspection.ui->doubleSpinBox_poiont_position->setValue(pose / 1000); // mm->m
+            });
 
     start();
 
-    qDebug() << "void Robot::init()"<<config;
+    qDebug() << "void Robot::init()" << config;
 }
 
 void Robot::start()
 {
 
     worker_inspection_thread = new WorkerInspectionThread(this);
-    //qDebug() << "worker_inspection_thread:"<<QThread::currentThreadId();
-    connect(&inspection,&Inspection::updata_task_run_time,worker_inspection_thread,&WorkerInspectionThread::updata_task_run_time);
+    // qDebug() << "worker_inspection_thread:"<<QThread::currentThreadId();
+    connect(&inspection, &Inspection::updata_task_run_time, worker_inspection_thread, &WorkerInspectionThread::updata_task_run_time);
 
     inspection.start();
 }
@@ -99,7 +100,6 @@ void Robot::clientOfflineEvent()
 
     ui->toolButton_robot_status->setToolTip("离线");
     ui->toolButton_robot_status->setIcon(QIcon(":/asset/Robot/Robot_warning.svg"));
-
 }
 
 void Robot::quit()
@@ -110,22 +110,23 @@ void Robot::quit()
     devices[i2s(id)] = config;
     AppJson[this->objectName()] = devices;
 
-    if(worker_inspection_thread->isRunning()){
-        qDebug() << "void Robot::quit() worker_inspection_thread->isRunning() "<<worker_inspection_thread->isRunning();
-        worker_inspection_thread->quit();//会请求线程退出,但不会立即退出
-        //worker_inspection_thread->wait();//会阻塞当前的程序,直到目标线程退出。
+    if (worker_inspection_thread->isRunning())
+    {
+        qDebug() << "void Robot::quit() worker_inspection_thread->isRunning() " << worker_inspection_thread->isRunning();
+        worker_inspection_thread->quit(); // 会请求线程退出,但不会立即退出
+        // worker_inspection_thread->wait();//会阻塞当前的程序,直到目标线程退出。
         worker_inspection_thread->terminate();
-        //QThread::terminate() 会立即终止线程的执行。这是一个强制性的退出方式,可能会导致资源泄漏或其他问题
-
+        // QThread::terminate() 会立即终止线程的执行。这是一个强制性的退出方式,可能会导致资源泄漏或其他问题
     }
-    //worker_inspection_thread->deleteLater();
-    //deleteLater();//自动释放
+    // worker_inspection_thread->deleteLater();
+    // deleteLater();//自动释放
     qDebug() << "void Robot::quit()";
 }
 
 bool Robot::clientSendMessage(const QByteArray &data)
 {
-    if(client){
+    if (client)
+    {
         client->write(data);
         return true;
     }
@@ -158,7 +159,7 @@ bool Robot::sendMessage(const QString &message)
 
 bool Robot::sendMessage(const QByteArray &message)
 {
-    //qDebug() << "客户端sendMessage"<<client;使用先初始化
+    // qDebug() << "客户端sendMessage"<<client;使用先初始化
     if (!client)
     {
         qWarning() << "客户端sendMessage deviceId 不存在";
@@ -209,39 +210,39 @@ void Robot::setRobotType(RobotType type)
 
 void Robot::updateDataShow()
 {
-    //qDebug() << "HomeWindow::updateRobotDataShow(int )" << sizeof(data);
-    //    RobotRecvPacket packet = *data;
-    //    qDebug() << "head:               0x" << QString::number(packet.head, 16).toUpper();
-    //    qDebug() << "networkIndicator:   " << packet.networkIndicator;
-    //    qDebug() << "areaIndicator:      " << packet.areaIndicator;
-    //    qDebug() << "robotNumber:        " << packet.robotNumber;
-    //    qDebug() << "temperature:        " << packet.temperature * 0.1 << "°C";
-    //    qDebug() << "humidity:           " << packet.humidity;
-    //    qDebug() << "CO:                 " << packet.CO;
-    //    qDebug() << "H2S:                " << packet.H2S;
-    //    qDebug() << "O2:                 " << packet.O2;
-    //    qDebug() << "CH4:                " << packet.CH4;
-    //    qDebug() << "smoke:              " << packet.smoke;
-    //    qDebug() << "batteryLevel:       " << packet.batteryLevel << "%";
-    //    qDebug() << "pose:               " << packet.pose;
-    //    qDebug() << "gear:               " << packet.gear;
-    //    qDebug() << "reserved1:          " << packet.reserved1;
-    //    qDebug() << "state:              " << packet.state;
-    //    qDebug() << "turnaroundSignal:   " << packet.turnaroundSignal;
-    //    qDebug() << "indicatorColor:     " << packet.indicatorColor;
-    //    qDebug() << "patrolPointReached:" << packet.patrolPointReached;
-    //    qDebug() << "self_test:          " << packet.self_test;
-    //    qDebug() << "reserved2:          " << packet.reserved2;
-    //    qDebug() << "laser1:             " << packet.laser1;
-    //    qDebug() << "laser2:             " << packet.laser2;
-    //    qDebug() << "ultrasonic1:        " << packet.ultrasonic1;
-    //    qDebug() << "laser3:             " << packet.laser3;
-    //    qDebug() << "laser4:             " << packet.laser4;
-    //    qDebug() << "ultrasonic2:        " << packet.ultrasonic2;
-    //    qDebug() << "camera_pan:         " << packet.camera_pan / 10.0 << "°";
-    //    qDebug() << "camera_tilt:        " << packet.camera_tilt / 10.0 << "°";
-    //    qDebug() << "reserved5:          " << packet.reserved5;
-    //    qDebug() << "speed_current:      " << packet.speed_current;
+    // qDebug() << "HomeWindow::updateRobotDataShow(int )" << sizeof(data);
+    //     RobotRecvPacket packet = *data;
+    //     qDebug() << "head:               0x" << QString::number(packet.head, 16).toUpper();
+    //     qDebug() << "networkIndicator:   " << packet.networkIndicator;
+    //     qDebug() << "areaIndicator:      " << packet.areaIndicator;
+    //     qDebug() << "robotNumber:        " << packet.robotNumber;
+    //     qDebug() << "temperature:        " << packet.temperature * 0.1 << "°C";
+    //     qDebug() << "humidity:           " << packet.humidity;
+    //     qDebug() << "CO:                 " << packet.CO;
+    //     qDebug() << "H2S:                " << packet.H2S;
+    //     qDebug() << "O2:                 " << packet.O2;
+    //     qDebug() << "CH4:                " << packet.CH4;
+    //     qDebug() << "smoke:              " << packet.smoke;
+    //     qDebug() << "batteryLevel:       " << packet.batteryLevel << "%";
+    //     qDebug() << "pose:               " << packet.pose;
+    //     qDebug() << "gear:               " << packet.gear;
+    //     qDebug() << "reserved1:          " << packet.reserved1;
+    //     qDebug() << "state:              " << packet.state;
+    //     qDebug() << "turnaroundSignal:   " << packet.turnaroundSignal;
+    //     qDebug() << "indicatorColor:     " << packet.indicatorColor;
+    //     qDebug() << "patrolPointReached:" << packet.patrolPointReached;
+    //     qDebug() << "self_test:          " << packet.self_test;
+    //     qDebug() << "reserved2:          " << packet.reserved2;
+    //     qDebug() << "laser1:             " << packet.laser1;
+    //     qDebug() << "laser2:             " << packet.laser2;
+    //     qDebug() << "ultrasonic1:        " << packet.ultrasonic1;
+    //     qDebug() << "laser3:             " << packet.laser3;
+    //     qDebug() << "laser4:             " << packet.laser4;
+    //     qDebug() << "ultrasonic2:        " << packet.ultrasonic2;
+    //     qDebug() << "camera_pan:         " << packet.camera_pan / 10.0 << "°";
+    //     qDebug() << "camera_tilt:        " << packet.camera_tilt / 10.0 << "°";
+    //     qDebug() << "reserved5:          " << packet.reserved5;
+    //     qDebug() << "speed_current:      " << packet.speed_current;
 
     // 更新传感器
     //    ui->label_robot_temperature->setText(i2s(data->temperature));
@@ -317,14 +318,16 @@ void Robot::updateDataShow()
         ui->label_robot_pose->setText(i2s(pose) + "mm");
     }
     // 更新角度
-    switch (getRobotType()) {
+    switch (getRobotType())
+    {
     case RobotType_default:
         break;
     case RobotType_HikVision_Camera:
         break;
-    case RobotType_SelfCamera_launchdigital_thermal:{
-        //自研发云台没有显示角度的功能，使用海康接口方法，显示在画面中
-        // updateCameraPose_Pan_Tilt(data->camera_pan, data->camera_tilt);
+    case RobotType_SelfCamera_launchdigital_thermal:
+    {
+        // 自研发云台没有显示角度的功能，使用海康接口方法，显示在画面中
+        //  updateCameraPose_Pan_Tilt(data->camera_pan, data->camera_tilt);
         if (camera_pan != data->camera_pan || camera_tilt != data->camera_tilt)
         {
             camera_pan = data->camera_pan;
@@ -332,12 +335,11 @@ void Robot::updateDataShow()
             std::thread t(&Robot::updateCameraPose_Pan_Tilt, this, camera_pan, camera_tilt);
             t.detach();
         }
-        break;}
+        break;
+    }
     default:
         break;
     }
-
-
 }
 
 bool Robot::updateCameraPose_Pan_Tilt(int pan, int tilt)
@@ -393,7 +395,7 @@ bool Robot::updateCameraPose_Pan_Tilt(int pan, int tilt)
     return true;
 }
 
-bool Robot::moveTo(int32_t pose)
+bool Robot::moveTo(int32_t pose, int timeout)
 {
 
     QByteArray byteArray;
@@ -406,41 +408,141 @@ bool Robot::moveTo(int32_t pose)
     //    byteArray.append((0xff00 & arg1) >> 8);
     //    byteArray.append((0xff0000 & arg1) >> 16);
     //    byteArray.append((0xff000000 & arg1) >> 24);
-    return sendMessage(byteArray);
+    for (int i = 0; i < timeout; i++)
+    {
+        if (clientSendMessage(byteArray))
+            return true;
+        QThread::sleep(1);
+    }
 
-    //return true;
+    return false;
 }
 
-void Robot::update_inspection_data_show()
+void Robot::start_inspection_data_show()
 {
-    ui->label_inspection_current_task_value->setText(inspection_data.current_task_name);
+    // 数据初始化
+    inspection_data.warnings = 0;
+    inspection_data.completed = 0;
+    // 更新任务名称
+    update_inspection_data_show(InspectionUpdata_task_current);
 
-    ui->label_inspection_current_task_point_current_value->setText(inspection_data.current_task_name);
-    ui->label_inspection_current_task_point_next_value->setText(inspection_data.current_task_name);
+    inspection_data.task_current_state = tr("进行中");
+    update_inspection_data_show(InspectionUpdata_task_current_state);
 
-    ui->label_inspection_current_task_point_current_action_value->setText(inspection_data.current_task_name);
-    ui->label_inspection_current_task_point_current_action_progress_value->setText(inspection_data.current_task_name);
+    update_inspection_data_show(InspectionUpdata_task_next);
+}
 
+void Robot::update_inspection_data_show(InspectionUpdataType type)
+{
+    switch (type)
+    {
+    case InspectionUpdata_task_current:
+        // 待同时更新下个任务点
+        ui->label_inspection_current_task_value->setText(inspection_data.current_task_name);
+        break;
+    case InspectionUpdata_task_current_state:
+        ui->label_inspection_task_current_state_value->setText(inspection_data.task_current_state);
+        break;
+    case InspectionUpdata_task_current_point:
+        ui->label_inspection_current_task_point_current_value->setText(inspection_data.current_task_point_name);
+        ui->label_inspection_current_task_point_next_value->setText(inspection_data.current_task_point_next_name);
+        break;
+    case InspectionUpdata_task_current_point_action:
+        ui->label_inspection_current_task_point_current_action_value->setText(inspection_data.current_task_point_current_action);
+        break;
+    case InspectionUpdata_task_current_point_next:
+        // 已经放弃
+        ui->label_inspection_current_task_point_next_value->setText(inspection_data.current_task_name);
+        break;
+    case InspectionUpdata_task_current_poiont_progress:
+        ui->label_inspection_current_task_point_current_action_progress_value->setText(inspection_data.current_task_point_current_progress);
+        break;
+    case InspectionUpdata_task_current_completion_progress:
+        ui->label_inspection_info_current_task_finish_points_value->setText(tr("%1个").arg(inspection_data.completed));
+        ui->label_inspection_info_current_task_not_finish_points_value->setText(tr("%1个").arg(inspection_data.not_completed));
+        break;
+    case InspectionUpdata_task_next:
+        // 待同时更新下个任务点
+        ui->label_inspection_task_next_value->setText(inspection_data.task_next_name);
+        ui->label_inspection_task_next_time_value->setText(inspection_data.task_next_time);
+        break;
+    default:
+        break;
+    }
+}
 
-    ui->label_inspection_info_current_task_finish_points_value->setText(inspection_data.current_task_name);
-    ui->label_inspection_info_current_task_not_finish_points_value->setText(inspection_data.current_task_name);
+void Robot::end_inspection_data_show()
+{
+    if (inspection_data.warnings == 0)
+    {
+        inspection_data.task_current_state = tr("结束");
+    }
+    else
+    {
+        inspection_data.task_current_state = tr("异常%1个").arg(inspection_data.warnings);
+    }
+    update_inspection_data_show(InspectionUpdata_task_current_state);
+}
 
-    ui->label_inspection_task_next_value->setText(inspection_data.current_task_name);
-    ui->label_inspection_task_next_time_value->setText(inspection_data.current_task_name);
+bool Robot::run_action_operation(PointAction operation, QJsonObject action)
+{
+    QString display;
+    switch (operation)
+    {
+    case PointAction::PointAction_Time:
+        QThread::sleep(action["sleep"].toInt());
+        display = "时间:" + i2s(action["sleep"].toInt());
+        break;
+    case PointAction::PointAction_Vision_PTZControl:
+        display = "云台基本控制";
+        qDebug() << Qt::CheckState(action["dwStop"].toInt());
+        qDebug() << action["dwPTZCommand"].toInt();
 
+        break;
+    case PointAction::PointAction_Vision_PTZPreset:
+        display = "云台预置点功能:" + i2s(action["dwPresetIndex"].toInt());
+        qDebug() << action["lChannel"].toInt();
+        qDebug() << action["dwPresetIndex"].toInt();
+        qDebug() << action["dwPTZPresetCmd"].toInt();
+
+        break;
+    case PointAction::PointAction_Vision_PTZPOS:
+        display = "云台设置PTZ参数";
+        qDebug() << action["wAction"].toInt();
+        qDebug() << action["wPanPos"].toDouble();
+        qDebug() << action["wTiltPos"].toDouble();
+        qDebug() << action["wZoomPos"].toDouble();
+        break;
+    case PointAction::PointAction_Vision_CaptureJPEGPicture:
+        display = "云台抓图:" + i2s(action["lChannel"].toInt());
+        qDebug() << action["lChannel"].toInt();
+        qDebug() << action["sPicFileName"].toInt();
+        break;
+    case PointAction::PointAction_Vision_Realtime_Thermometry:
+        display = "热成像测温";
+        qDebug() << action["sPicFileName"].toInt();
+        break;
+    case PointAction::PointAction_Vision_Other:
+        display = "其他";
+        break;
+    default:
+        break;
+    }
+    qDebug() << "run_action_operation:" << display;
+    return true;
 }
 
 int32_t Robot::getPoseFromPicturePos(const QPoint &pos)
 {
     int32_t x = pos.x();
     int32_t y = pos.y();
-    return  y * 100; // 将 x 和 y 打包成 int32_t 类型
+    return y * 100; // 将 x 和 y 打包成 int32_t 类型
 }
 
 QPoint Robot::getPicturePosFromPose(const int32_t &pose)
 {
 
-    return QPoint(0, pose/100);
+    return QPoint(0, pose / 100);
 }
 
 void Robot::updateRobotNameShow(const QString &name)
@@ -453,10 +555,7 @@ void Robot::updateRobotNameShow(const QString &name)
     ui->toolButton_robot_map->setText(name);
 
     inspection.ui->pushButton_robot_name->setText(name);
-
-
 }
-
 
 void Robot::on_toolButton_widget_cameraChannel_isShow_clicked()
 {
@@ -487,13 +586,13 @@ void Robot::on_toolButton_channel01_video_play_clicked()
 void Robot::on_toolButton_channel02_thermal_play_clicked()
 {
     QJsonObject camera = config["camera"].toObject();
-    //0 是通道号
-    //主码流"rtspUrlMain": "rtsp://192.168.1.19:554/0/main", 子码流 "rtspUrlSub": "rtsp://192.168.1.19:554/0/sub"
+    // 0 是通道号
+    // 主码流"rtspUrlMain": "rtsp://192.168.1.19:554/0/main", 子码流 "rtspUrlSub": "rtsp://192.168.1.19:554/0/sub"
     QUrl source = QUrl("rtsp://" +
                        camera["thermal_username"].toString() + ":" +
                        camera["thermal_password"].toString() + "@" +
                        camera["thermal_ip"].toString() + "/0/" +
-                       camera["thermal_stream"].toString() );
+                       camera["thermal_stream"].toString());
     emit setCameraWidgetPlay(id, source);
 }
 
@@ -519,8 +618,8 @@ void Robot::on_toolButton_robto_config_save_clicked()
 
     config["camera"] = camera;
     ui->widgetSetting->close();
-    //更新名称
-    //init()
+    // 更新名称
+    // init()
     name = config["name"].toString();
     updateRobotNameShow(name);
 
@@ -615,17 +714,16 @@ void Robot::on_toolButton_robot_status_clicked()
     }
 }
 
-
-
-void Robot::on_pushButton_start_inspection_task_clicked()
+void Robot::on_toolButton_start_inspection_task_clicked()
 {
-    worker_inspection_thread->current_task = inspection.config["tasks"].toObject()[inspection.ui->comboBox_task_name->currentText()].toObject();
-    //thread_task.start();
+    QString task_name = inspection.ui->comboBox_task_name->currentText();
+    worker_inspection_thread->current_task = inspection.config["tasks"].toObject()[task_name].toObject();
+    worker_inspection_thread->current_task_name = task_name;
+    // thread_task.start();
     worker_inspection_thread->start();
-    //worker_inspection_thread->run();
-    //QMetaObject::invokeMethod(worker_inspection_thread, "start", Qt::QueuedConnection);
-    qDebug() << "on_pushButton_start_inspection_task_clicked():"<<QThread::currentThreadId();
-
+    // worker_inspection_thread->run();
+    // QMetaObject::invokeMethod(worker_inspection_thread, "start", Qt::QueuedConnection);
+    qDebug() << "on_pushButton_start_inspection_task_clicked():" << QThread::currentThreadId();
 }
 
 void Robot::on_pushButton_robot_gas_isShow_clicked()
@@ -633,9 +731,7 @@ void Robot::on_pushButton_robot_gas_isShow_clicked()
     ui->widget_gas_show->setVisible(!ui->widget_gas_show->isVisible());
 }
 
-
 void Robot::on_toolButton_robot_map_clicked()
 {
-    qDebug() <<"Robot::on_toolButton_robot_map_clicked()";
+    qDebug() << "Robot::on_toolButton_robot_map_clicked()";
 }
-

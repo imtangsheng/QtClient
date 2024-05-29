@@ -143,7 +143,7 @@ bool HomeWindow::addNewRobotDevice(int id)
         qDebug()<<"导航robot_id"<<robot_id<<" pos:"<<pos;
         DeviceMap[robot_id].robot->ui->toolButton_robot_map->move(pos);
         qDebug()<<"导航robot_id"<<DeviceMap[robot_id].robot->getPoseFromPicturePos(pos);
-        DeviceMap[robot_id].robot->moveTo(1800);
+        DeviceMap[robot_id].robot->moveTo(DeviceMap[robot_id].robot->getPoseFromPicturePos(pos));
     });
     return true;
 }
