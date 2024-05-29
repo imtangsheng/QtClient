@@ -9,6 +9,8 @@
 #include <QJsonObject>
 #include "ui_robot.h"
 #include "function/inspection.h"
+#include "HikVisionCamera.h"
+
 class WorkerInspectionThread;
 
 #define Robot_CMD_Header 0x5A // 命令 头
@@ -172,11 +174,13 @@ public:
 #ifdef SelfCamera
     int camera_pan;
     int camera_tilt;
-    bool updateCameraPose_Pan_Tilt(int pan, int tilt);
 #endif
 
     /**机器人控制**/
     bool moveTo(int32_t pose, int timeout = 10);
+
+    /**摄像头控制**/
+    HikVisionCamera hikVisionCamera;
 
     /**巡检**/
     struct InspectionData

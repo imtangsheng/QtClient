@@ -37,6 +37,8 @@ void Robot::init()
     {
         QJsonObject camera = config["camera"].toObject();
 
+        hikVisionCamera.camera = camera;
+
         ui->comboBox_robot_type->setCurrentIndex(config["robotType"].toInt(0));
 
         ui->lineEdit_channel01_video_name->setText(camera["video_name"].toString());
@@ -327,12 +329,11 @@ void Robot::updateDataShow()
     case RobotType_SelfCamera_launchdigital_thermal:
     {
         // 自研发云台没有显示角度的功能，使用海康接口方法，显示在画面中
-        //  updateCameraPose_Pan_Tilt(data->camera_pan, data->camera_tilt);
         if (camera_pan != data->camera_pan || camera_tilt != data->camera_tilt)
         {
             camera_pan = data->camera_pan;
             camera_tilt = data->camera_tilt;
-            std::thread t(&Robot::updateCameraPose_Pan_Tilt, this, camera_pan, camera_tilt);
+            std::thread t(&HikVisionCamera::updateCameraPose_Pan_Tilt, &hikVisionCamera, camera_pan, camera_tilt);
             t.detach();
         }
         break;
@@ -342,58 +343,6 @@ void Robot::updateDataShow()
     }
 }
 
-bool Robot::updateCameraPose_Pan_Tilt(int pan, int tilt)
-{
-    // 创建XML数据
-    QByteArray xmlData = ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
-                          "<TextOverlay >"
-                          "<id>1</id>"
-                          "<enabled>true</enabled>"
-                          "<displayText>"
-                          "P" +
-                          i2s(pan) + ":" + "T" + i2s(tilt) +
-                          "</displayText>"
-                          "</TextOverlay>")
-                             .toUtf8();
-
-    // 发送POST请求，并将XML数据作为请求的主体数据
-    qDebug() << "xmlData:" << xmlData;
-    QJsonObject camera = config["camera"].toObject();
-    QUrl api_path = QUrl("http://" + camera["video_ip"].toString() + "/ISAPI/System/Video/inputs/channels/1/overlays/text/1");
-    // 设置Digest Authorization认证参数
-    QString username = camera["video_username"].toString();
-    QString password = camera["video_password"].toString();
-
-    QNetworkAccessManager manager;
-    // 创建一个QNetworkRequest对象，并设置请求的URL
-    QNetworkRequest request(api_path);
-    QNetworkReply *reply = manager.put(request, xmlData);
-    // 等待请求完成
-    QEventLoop loop;
-    // 处理认证
-    QObject::connect(&manager, &QNetworkAccessManager::authenticationRequired, [&](QNetworkReply *reply, QAuthenticator *authenticator)
-                     {
-        authenticator->setUser(username);
-        authenticator->setPassword(password);
-        qDebug() << "Response:处理认证"<<reply; });
-    QObject::connect(reply, &QNetworkReply::finished, &loop, &QEventLoop::quit);
-    loop.exec();
-    // 检查请求是否成功
-    if (reply->error() == QNetworkReply::NoError)
-    {
-        // 读取响应数据
-        QByteArray response = reply->readAll();
-        qDebug() << "Response:" << response;
-    }
-    else
-    {
-        // 处理请求错误
-        qDebug() << "Error:" << reply->errorString();
-    }
-    // 释放资源
-    reply->deleteLater();
-    return true;
-}
 
 bool Robot::moveTo(int32_t pose, int timeout)
 {
@@ -497,14 +446,14 @@ bool Robot::run_action_operation(PointAction operation, QJsonObject action)
         display = "云台基本控制";
         qDebug() << Qt::CheckState(action["dwStop"].toInt());
         qDebug() << action["dwPTZCommand"].toInt();
-
+        hikVisionCamera.PTZControl(action["dwPTZCommand"].toInt(),action["dwStop"].toInt());
         break;
     case PointAction::PointAction_Vision_PTZPreset:
         display = "云台预置点功能:" + i2s(action["dwPresetIndex"].toInt());
         qDebug() << action["lChannel"].toInt();
         qDebug() << action["dwPresetIndex"].toInt();
         qDebug() << action["dwPTZPresetCmd"].toInt();
-
+        hikVisionCamera.PTZPreset(action["lChannel"].toInt(),action["dwPresetIndex"].toInt(),action["dwPTZPresetCmd"].toInt());
         break;
     case PointAction::PointAction_Vision_PTZPOS:
         display = "云台设置PTZ参数";
@@ -512,15 +461,18 @@ bool Robot::run_action_operation(PointAction operation, QJsonObject action)
         qDebug() << action["wPanPos"].toDouble();
         qDebug() << action["wTiltPos"].toDouble();
         qDebug() << action["wZoomPos"].toDouble();
+        hikVisionCamera.PTZPOS(action["wAction"].toInt(),action["wPanPos"].toDouble()*10,action["wTiltPos"].toDouble()*10,action["wZoomPos"].toDouble()*10);
         break;
     case PointAction::PointAction_Vision_CaptureJPEGPicture:
         display = "云台抓图:" + i2s(action["lChannel"].toInt());
         qDebug() << action["lChannel"].toInt();
         qDebug() << action["sPicFileName"].toInt();
+        hikVisionCamera.CaptureJPEGPicture(action["lChannel"].toInt(),action["sPicFileName"].toInt());
         break;
     case PointAction::PointAction_Vision_Realtime_Thermometry:
         display = "热成像测温";
         qDebug() << action["sPicFileName"].toInt();
+        hikVisionCamera.Realtime_Thermometry(action["sPicFileName"].toInt());
         break;
     case PointAction::PointAction_Vision_Other:
         display = "其他";
@@ -617,6 +569,8 @@ void Robot::on_toolButton_robto_config_save_clicked()
     camera["thermal_stream"] = ui->comboBox_channel02_thermal_stream->currentText();
 
     config["camera"] = camera;
+    hikVisionCamera.camera = camera;
+
     ui->widgetSetting->close();
     // 更新名称
     // init()
