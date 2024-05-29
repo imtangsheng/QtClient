@@ -107,6 +107,8 @@ void WorkerInspectionThread::updata_task_run_time(const QString &taskName)
             timer->setInterval(value);
             current_task = task;
             current_task_name = taskName;
+            //QJsonObject task_time = task_time_array.first().toObject();
+            task_time_array.removeFirst();
             task_time_array_insert_data(taskName, time["time"].toString(), QDateTime::currentDateTime().addMSecs(value));
             start(); });
         int msec = m_robot->inspection.getFirstTime(time);
@@ -133,9 +135,6 @@ void WorkerInspectionThread::run()
     qDebug() << "线程WorkerInspectionThread m_robot" << m_robot->id << m_robot->pose << QThread::currentThreadId();
     qDebug() << "m_robot current_task" << current_task;
     // #1任务启用
-    //QJsonObject task_time = task_time_array.first().toObject();
-    task_time_array.removeFirst();
-
     if (Qt::CheckState(current_task["isEnable"].toInt(0)) != Qt::Checked)
     {
         qDebug() << QTime::currentTime() << "任务未启用";
