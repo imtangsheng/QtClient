@@ -257,6 +257,28 @@ bool SQLite::add_inspectionTasks(const QString &taskName, int numOfCheckpoints, 
     }
 }
 
+bool SQLite::add_inspectionTasks(const InspectionTaskData &taskData)
+{
+    int row = 0;//第一行插入
+    inspectionTasksModel->insertRow(row);
+    inspectionTasksModel->setData(inspectionTasksModel->index(row, 0), taskData.taskUuid);
+    inspectionTasksModel->setData(inspectionTasksModel->index(row, 1), taskData.taskName);
+    inspectionTasksModel->setData(inspectionTasksModel->index(row, 2), taskData.numOfCheckpoints);
+    inspectionTasksModel->setData(inspectionTasksModel->index(row, 3), taskData.numOfNormalPoints);
+    inspectionTasksModel->setData(inspectionTasksModel->index(row, 4), taskData.numOfErrorPoints);
+    inspectionTasksModel->setData(inspectionTasksModel->index(row, 5), taskData.numOfAlarmPoints);
+    inspectionTasksModel->setData(inspectionTasksModel->index(row, 6), taskData.checkResult);
+    inspectionTasksModel->setData(inspectionTasksModel->index(row, 7), taskData.startTime);
+    inspectionTasksModel->setData(inspectionTasksModel->index(row, 8), taskData.other);
+    if (inspectionTasksModel->submitAll()) {
+        inspectionTasksModel->select();
+        return true;
+    } else {
+        qWarning() << "Failed to insert inspection task:" << inspectionTasksModel->lastError().text();
+        return false;
+    }
+}
+
 bool SQLite::filter_inspectionTasks(int column, const QString &value)
 {
     // 设置筛选条件
@@ -318,6 +340,26 @@ bool SQLite::add_InspectionCheckpoint(const QString &checkpointName, const QStri
     inspectionCheckpoints_Model->setData(inspectionCheckpoints_Model->index(row, 4), checkResult);
     inspectionCheckpoints_Model->setData(inspectionCheckpoints_Model->index(row, 5), remark);
     inspectionCheckpoints_Model->setData(inspectionCheckpoints_Model->index(row, 6), checkTime);
+
+    if (inspectionCheckpoints_Model->submitAll()) {
+        inspectionCheckpoints_Model->select();
+        return true;
+    } else {
+        qWarning() << "Failed to insert inspection checkpoint:" << inspectionCheckpoints_Model->lastError().text();
+        return false;
+    }
+}
+
+bool SQLite::add_InspectionCheckpoint(const InspectionCheckpointData &checkpointData)
+{
+    int row = 0;//第一行插入
+    inspectionCheckpoints_Model->insertRow(row);
+    inspectionCheckpoints_Model->setData(inspectionCheckpoints_Model->index(row, 1), checkpointData.taskUuid);
+    inspectionCheckpoints_Model->setData(inspectionCheckpoints_Model->index(row, 2), checkpointData.checkpointName);
+    inspectionCheckpoints_Model->setData(inspectionCheckpoints_Model->index(row, 3), checkpointData.checkpointContent);
+    inspectionCheckpoints_Model->setData(inspectionCheckpoints_Model->index(row, 4), checkpointData.checkResult);
+    inspectionCheckpoints_Model->setData(inspectionCheckpoints_Model->index(row, 5), checkpointData.remark);
+    inspectionCheckpoints_Model->setData(inspectionCheckpoints_Model->index(row, 6), checkpointData.checkTime);
 
     if (inspectionCheckpoints_Model->submitAll()) {
         inspectionCheckpoints_Model->select();
