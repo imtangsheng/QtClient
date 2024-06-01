@@ -48,10 +48,17 @@ qt_add_plugin(ShunDe SHARED
   ${TS_FILES}
 )
 
+set(LIBS_DIR "${PROJECT_BINARY_DIR}/../libs/HikVision")
+
 target_sources(ShunDe PRIVATE
     ${UI} ${Modules} ${Function}
     ${PUBLIC} ${RESOURCES}
+
 )
+
+
+include_directories("${LIBS_DIR}/include")
+#link_directories("${LIBS_DIR}/lib")
 
 set_target_properties(ShunDe PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/../plugins"
@@ -59,11 +66,13 @@ set_target_properties(ShunDe PROPERTIES
     OUTPUT_NAME "ShunDe"
 )
 
-target_link_libraries(ShunDe PRIVATE 
+target_link_libraries(ShunDe PRIVATE
   Qt${QT_VERSION_MAJOR}::Gui
   Qt${QT_VERSION_MAJOR}::Widgets
   Qt${QT_VERSION_MAJOR}::MultimediaWidgets
   Qt${QT_VERSION_MAJOR}::Sql
+  "${LIBS_DIR}/lib/HCNetSDK.lib"
+
 )
 
 target_compile_definitions(ShunDe PRIVATE SHUNDE_LIBRARY)
@@ -77,4 +86,7 @@ endif()
 # 添加include目录
 target_include_directories(ShunDe PRIVATE
   ../public ../public/widgets/
+
 )
+
+
