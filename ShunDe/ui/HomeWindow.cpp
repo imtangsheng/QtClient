@@ -107,13 +107,13 @@ void HomeWindow::RelayoutCameraWidget()
             lastItemCameraWidget = currentItemCameraWidget;
             currentItemCameraWidget = cameraWidgets.indexOf(cameraWidget);
             MouseButtonPressCameraWidget(currentItemCameraWidget); });
-        qDebug() << "初始布局 void HomeWindow::RelayoutCameraWidget() 22:" << cameraWidgets.size();
+        //qDebug() << "初始布局 void HomeWindow::RelayoutCameraWidget() 22:" << cameraWidgets.size();
     }
 
     int numColumns = 2; // 每行的列数
     for (int i = 0; i < cameraWidgetsNum; i++)
     {
-        qDebug() << "void HomeWindow::RelayoutCameraWidget() 33:" << i << i / numColumns << i % numColumns;
+        //qDebug() << "void HomeWindow::RelayoutCameraWidget() 33:" << i << i / numColumns << i % numColumns;
         //        CameraWidget* widget = cameraWidgets[i];
         ui->LayoutPreview->addWidget(cameraWidgets[i], i / numColumns, i % numColumns);
     }
@@ -182,6 +182,7 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
     // 接收一次数据 第一次等待10s接收信息
     if (socket->waitForReadyRead(10000))
     {
+
         QByteArray headerData = socket->readAll();
         int value = (int)headerData.at(0) << 8 | (int)headerData.at(1);
         qDebug() << "新的客户端连接：value" << headerData.at(0) << (int)headerData.at(0) << (int)headerData.at(1) << value;
@@ -195,6 +196,7 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
             DeviceMap[clientId].ipAddress = socket->peerAddress().toString() + ":" + socket->peerPort();
             DeviceMap[clientId].isOnline = true;
             DeviceMap[clientId].robot->client = socket;
+            DeviceMap[clientId].robot->clientOnlineEvent();
 
             // 接收客户端发送的数据
             QObject::connect(socket, &QTcpSocket::readyRead, this, [=]()
@@ -211,7 +213,7 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
 
                     DeviceMap[clientId].robot->updateDataShow();
                 }else{
-                    qDebug() << "接收到客户端异常长度数据：" <<bytes.length()<< bytes.toHex();
+                    qDebug() << "接收到客户端异常长度数据：" <<bytes.length();//<< bytes.toHex();
                 }
 
             }); // 接收机器人客户端发送的数据
@@ -606,4 +608,6 @@ void HomeWindow::on_toolButton_map_show_clicked()
 {
     ui->window_map->setVisible(!ui->window_map->isVisible());
 }
+
+
 

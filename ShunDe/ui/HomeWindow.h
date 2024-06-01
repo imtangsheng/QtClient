@@ -71,6 +71,7 @@ private slots:
 
     void on_toolButton_map_show_clicked();
 
+
 private:
     QJsonObject config;
     Ui::HomeWindow *ui;

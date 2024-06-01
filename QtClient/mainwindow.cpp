@@ -146,7 +146,7 @@ void MainWindow::_Start()
     //    const auto list2 = APP_SETTINGS.value("list",QVariant::fromValue(QList<int>{}));
     //    QList<int> list4 = APP_SETTINGS.value("list").value<QList<int>>();
     AppSettings.endGroup();
-    qDebug()<<"jsonSettingsVariable 格式的配置："<<jsonMainConfig;
+    //qDebug()<<"jsonSettingsVariable 格式的配置："<<jsonMainConfig;
     foreach (const QString key, jsonMainConfig["TabWindow"].toObject().keys()) {
         QJsonObject objKey = jsonMainConfig["TabWindow"].toObject()[key].toObject();
         switch (objKey["type"].toInt()) {
@@ -155,7 +155,7 @@ void MainWindow::_Start()
             break;
         case TabWindowType_Plugin:
             //判断加载的插件中是否有这个插件名称object name
-            qDebug()<<"pluginNameToListIndex"<<pluginGetListIndexFromName<<objKey;
+            //qDebug()<<"pluginNameToListIndex"<<pluginGetListIndexFromName<<objKey;
             if(pluginGetListIndexFromName.contains(objKey["object"].toString())){
                 pluginTabInsertMainWindow(pluginGetListIndexFromName[objKey["object"].toString()],objKey["name"].toString());
             }else{
@@ -170,7 +170,7 @@ void MainWindow::_Start()
     ui->tabWidget_mainWindow->setTabsClosable(true);
     // 要设置第1个选项卡不可关闭
     ui->tabWidget_mainWindow->tabBar()->setTabButton(0,QTabBar::RightSide,nullptr);
-    qDebug()<<"ui->tabWidget_mainWindow->count()格式的配置："<<ui->tabWidget_mainWindow->count();
+    //qDebug()<<"ui->tabWidget_mainWindow->count()格式的配置："<<ui->tabWidget_mainWindow->count();
     for(int index = 1; index < ui->tabWidget_mainWindow->count();index++){
         //初始化Tab标签的数据和其他配置
 //        int index = jsonMainConfig["TabWindow"].toObject()[key].toObject()["index"].toInt();
@@ -423,7 +423,7 @@ void MainWindow::TabCurrentChanged(int index)
 
 void MainWindow::geometryChanged(const QPoint& pos)
 {
-    qDebug() << "MainWindow::geometryChanged(const QPoint *"<<pos;
+    //qDebug() << "MainWindow::geometryChanged(const QPoint *"<<pos;
     if(ui->WidgetStatus->isFloating())    {
         QPoint posW = mapFromGlobal(QPoint(0, 0)); //负数
         qDebug() << "dockWidget::resizeEvent(QResizeEvent"<<posW.toPointF();
@@ -536,11 +536,11 @@ bool MainWindow::pluginLoad()
 #elif defined(Q_OS_MAC)
 #endif
     pluginsDir.cd("plugins");
-    qDebug()<<"加载插件EchoWindow::loadPlugin():"<<pluginsDir;
+    //qDebug()<<"加载插件EchoWindow::loadPlugin():"<<pluginsDir;
     const QStringList entries = pluginsDir.entryList(QDir::Files);
     pluginList.clear();
     for (const QString &fileName : entries) {
-        qDebug()<<"加载插件Window::loadPlugin():"<<entries<<fileName;
+        //qDebug()<<"加载插件Window::loadPlugin():"<<entries<<fileName;
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName),this);
         QObject *plugin = pluginLoader.instance();
         if (plugin) {
@@ -559,7 +559,7 @@ bool MainWindow::pluginLoad()
                 connect(plugin,SIGNAL(signalShowMessage(int,QString)),this,SLOT(show_message(int,QString)));
 //                connect(this,SIGNAL(quit),plugin,SLOT(quit));//不会触发该信号
                 //记录插件对应的lilst下标
-                qDebug()<<"加载插件Window::"<<pluginList.count()<<inter->id<<inter->ObjectName<<inter->getObjectNane();
+                //qDebug()<<"加载插件Window::"<<pluginList.count()<<inter->id<<inter->ObjectName<<inter->getObjectNane();
                 pluginGetListIndexFromName.insert(inter->getObjectNane(),inter->id);
             }
 //            pluginLoader.unload();//主动释放会把加载的插件也释放掉

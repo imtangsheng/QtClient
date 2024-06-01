@@ -28,7 +28,7 @@ TitleBar::~TitleBar()
 
 void TitleBar::mousePressEvent(QMouseEvent *event)
 {
-    qDebug()<<"WidgetHeader::mousePressEvent "<<event->button();
+    //qDebug()<<"WidgetHeader::mousePressEvent "<<event->button();
     if(event->button() == Qt::LeftButton){
         isMousePressed = true;
         mouseStartMovePos = event->pos();
@@ -49,7 +49,7 @@ void TitleBar::mouseMoveEvent(QMouseEvent *event)
 
 void TitleBar::mouseReleaseEvent(QMouseEvent *event)
 {
-    qDebug()<<"WidgetHeader::mouseReleaseEvent "<<event->button();
+    //qDebug()<<"WidgetHeader::mouseReleaseEvent "<<event->button();
     if(event->button() == Qt::LeftButton){
         isMousePressed = false;
         return;
@@ -59,7 +59,7 @@ void TitleBar::mouseReleaseEvent(QMouseEvent *event)
 
 void TitleBar::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    qDebug()<<"WidgetHeader::mouseDoubleClickEvent "<<event->button();
+    //qDebug()<<"WidgetHeader::mouseDoubleClickEvent "<<event->button();
     if(event->button() == Qt::LeftButton){
         if(this->window()->windowState() == Qt::WindowFullScreen){
             this->window()->showNormal();

@@ -17,13 +17,15 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("My Application");
     parser.addHelpOption();
 
-    QCommandLineOption nameOption("name", "Specify a name", "name");
+    QCommandLineOption nameOption("name", "Specify a name", "name","tang");
     parser.addOption(nameOption);
 
-    QString name = parser.value(nameOption);
-    qDebug() << "APP Name:" << name;
-
+    // 解析命令行参数 --name "tang"
     parser.process(app);
+
+    QString name = parser.value(nameOption);
+    qDebug() << "APP the Name is:" << name;
+
 //    a.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);//让QWidget子对象不再共享父窗口,各自独立
 #ifdef QT_NO_DEBUG
     qInstallMessageHandler(logToFile);
@@ -56,5 +58,6 @@ int main(int argc, char *argv[])
         first->show();
     }
 
+    qDebug() << "APP the Name is:" << name;
     return app.exec();
 }

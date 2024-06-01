@@ -10,4 +10,7 @@
 IsSucce ReadJsonData(QJsonObject& jsonData,const QString& filePath);
 IsSucce SavaJsonData(QJsonObject& jsonData,const QString& filePath);
 
+/*json文件读取软件相关配置*/
+
+
 #endif // APPUTIL_H

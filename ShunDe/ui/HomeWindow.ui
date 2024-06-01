@@ -651,7 +651,7 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>258</width>
+          <width>289</width>
           <height>194</height>
          </rect>
         </property>
@@ -827,11 +827,9 @@
                    <property name="toolTip">
                     <string>设备id编码，唯一标识</string>
                    </property>
-                   <item>
-                    <property name="text">
-                     <string>2</string>
-                    </property>
-                   </item>
+                   <property name="editable">
+                    <bool>true</bool>
+                   </property>
                   </widget>
                  </item>
                  <item>

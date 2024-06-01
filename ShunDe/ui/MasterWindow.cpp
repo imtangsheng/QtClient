@@ -82,7 +82,7 @@ void MasterWindow::start()
         //隐藏"任务ID"列
         ui->tableView_inspectionCheckpoints->setColumnHidden(1,true);
         ui->tableView_inspectionCheckpoints->setSortingEnabled(true);//排序
-        ui->tableView_inspectionCheckpoints->setItemDelegateForColumn(3,new ImageDelegate);
+        ui->tableView_inspectionCheckpoints->setItemDelegateForColumn(3,new ImageDelegate_List);
         ui->tableView_inspectionCheckpoints->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     }
 

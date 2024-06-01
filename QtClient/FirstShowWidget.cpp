@@ -36,7 +36,7 @@ void FirstShowWidget::init()
 
 bool FirstShowWidget::startAutoLogin()
 {
-    qDebug()<<"FirstShowWidget::startAutoLogin()"<<isAutoLogin<<isAutoLogin;
+    //qDebug()<<"FirstShowWidget::startAutoLogin()"<<isAutoLogin<<isAutoLogin;
     if(isAutoLogin){
         if(start()){return true;}
     }
@@ -45,7 +45,7 @@ bool FirstShowWidget::startAutoLogin()
 
 bool FirstShowWidget::start()
 {
-    qDebug()<<"FirstShowWidget::start()";
+    //qDebug()<<"FirstShowWidget::start()";
     if("admin" != ui->lineEdit_username->text()){
         qDebug()<<"username error"<<username<<ui->lineEdit_username->text();
         QMessageBox::warning(this, "警告", "username error");
