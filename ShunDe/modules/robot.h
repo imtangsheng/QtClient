@@ -15,6 +15,8 @@ class WorkerInspectionThread;
 
 #define Robot_CMD_Header 0x5A // 命令 头
 
+#define Robot_CMD_SET_PTZPOS 0x22 // 命令 设置俯仰角
+
 #define Robot_CMD_Camera_Up "5A 02 01"         // 相机云台 上
 #define Robot_CMD_Camera_Down "5A 02 02"       // 相机云台 下
 #define Robot_CMD_Camera_Left "5A 02 03"       // 相机云台 左
@@ -141,11 +143,12 @@ class Robot : public QWidget
 public:
     explicit Robot(QWidget *parent = nullptr);
     ~Robot();
-
+    void test();
     QJsonObject config;
     Ui::Robot *ui;
     void init();
     void start();
+    void clientOnlineEvent();
     void clientOfflineEvent();
     void quit();
 
@@ -178,7 +181,7 @@ public:
 
     /**机器人控制**/
     bool moveTo(int32_t pose, int timeout = 10);
-
+    bool control(int command,bool stop = true);
     /**摄像头控制**/
     HikVisionCamera hikVisionCamera;
 
@@ -200,6 +203,7 @@ public:
         int completed = 0;
         int not_completed = 0;
         int warnings = 0;
+        QStringList pointContent;
     };
     InspectionData inspection_data;
     void start_inspection_data_show();
@@ -232,9 +236,11 @@ private slots:
     void on_pushButton_robot_clicked();
     void on_toolButton_robot_batteryLevel_clicked();
     void on_toolButton_robot_status_clicked();
-    void on_toolButton_start_inspection_task_clicked();
+    void on_toolButton_inspection_task_start_clicked();
+    void on_toolButton_inspection_task_cancel_clicked();
     void on_pushButton_robot_gas_isShow_clicked();
     void on_toolButton_robot_map_clicked();
+
 };
 
 struct Device

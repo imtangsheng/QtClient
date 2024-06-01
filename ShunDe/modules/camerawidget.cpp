@@ -19,8 +19,8 @@ CameraWidget::~CameraWidget()
 
 void CameraWidget::init()
 {
-//    setContentsMargins(1,1,1,1);//显示边框
 //    player.setAudioOutput(&audioOutput);
+    ui->VideoWidget->setAspectRatioMode(Qt::IgnoreAspectRatio);//设置图像自动拉伸铺满全屏
     player.setVideoOutput(ui->VideoWidget);
 
 }
