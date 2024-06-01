@@ -1,4 +1,5 @@
 #include "worker_inspection_thread.h"
+#include "modules/sqlite.h"
 
 WorkerInspectionThread::WorkerInspectionThread(Robot *robot, QObject *parent)
     : QThread{parent}, m_robot(robot)
@@ -31,7 +32,7 @@ void WorkerInspectionThread::task_time_array_insert_data(QString task_name, QStr
     // 插入新的任务信息
     task_time_array.insert(index, timeObj);
 
-    qDebug() << "task_time_array_insert_data" <<task_time_array;
+    //qDebug() << "task_time_array_insert_data" <<task_time_array;
 }
 
 void WorkerInspectionThread::task_time_array_delete_data_by_task_name(QString task_name)
@@ -72,7 +73,7 @@ QJsonObject WorkerInspectionThread::task_time_array_get_current_enable_task()
 
 void WorkerInspectionThread::updata_task_run_time(const QString &taskName)
 {
-    qDebug() << "更新任务时间WorkerInspectionThread::updata_task_run_time(const QString &" << taskName;
+    //qDebug() << "更新任务时间WorkerInspectionThread::updata_task_run_time(const QString &" << taskName;
     QJsonObject task = m_robot->inspection.config["tasks"].toObject()[taskName].toObject();
     //qDebug() << "任务时间:" << task["time"].toArray();
     if (tasksTimers.contains(taskName))
@@ -99,7 +100,7 @@ void WorkerInspectionThread::updata_task_run_time(const QString &taskName)
                 {
             qDebug() << "任务:"<<taskName;
             qint64 value = m_robot->inspection.getNextTimeInterval(time);
-            qDebug() << "任务名称:"<<taskName<<"time:"<<time<<"msec"<<value;
+            //qDebug() << "任务名称:"<<taskName<<"time:"<<time<<"msec"<<value;
             if(value==-1){
                 qWarning() << "任务时间错误，任务名称:"<<taskName<<"time:"<<time;
                 return;
@@ -116,7 +117,7 @@ void WorkerInspectionThread::updata_task_run_time(const QString &taskName)
         {
             qWarning() << "任务时间错误，任务名称:" << taskName << "time:" << time;
         }
-        qDebug() << "任务名称:" << taskName << "time:" << time << "msec" << msec;
+        //qDebug() << "任务名称:" << taskName << "time:" << time << "msec" << msec;
         task_time_array_insert_data(taskName, time["time"].toString(), QDateTime::currentDateTime().addMSecs(msec));
         timer->start(msec);
         timers.append(timer);
@@ -145,19 +146,25 @@ void WorkerInspectionThread::run()
 
     m_robot->inspection_data.task_next_name = task_time_next["task_name"].toString();
     m_robot->inspection_data.task_next_time = task_time_next["task_time"].toString();
-
     m_robot->inspection_data.current_task_name = current_task_name;
-
     m_robot->start_inspection_data_show();
+
     // #2任务点
     int32_t point_timeout = current_task["point_timeout"].toInt(30 * 3600);   // 默认30分钟
-    double point_deviation = current_task["point_deviation"].toDouble(0.05f); // 默认 0.05 米
+    int32_t point_deviation = current_task["point_deviation"].toInteger(500); // 默认 0.05 米
 
     QJsonArray pointsArray = current_task["points"].toArray();
     int totalPoints = pointsArray.size();
-
     m_robot->inspection_data.not_completed = totalPoints;
     m_robot->update_inspection_data_show(InspectionUpdata_task_current_completion_progress);
+
+    /*数据记录*/
+    InspectionTaskData taskData;
+    taskData.taskUuid = QUuid::createUuid().toString(QUuid::WithoutBraces);
+    taskData.taskName = current_task_name;
+    taskData.numOfCheckpoints = totalPoints;
+    taskData.startTime = QDateTime::currentDateTime();
+
 
     for (int i = 0; i < totalPoints; i++)
     {
@@ -168,6 +175,12 @@ void WorkerInspectionThread::run()
         m_robot->inspection_data.current_task_point_name = point["pointName"].toString();
         m_robot->inspection_data.current_task_point_next_name = pointsArray.at(i + 1).toObject()["pointName"].toString();
         m_robot->update_inspection_data_show(InspectionUpdata_task_current_point);
+
+         /*数据记录 保存巡检点数据*/
+        InspectionCheckpointData checkpointData;
+        checkpointData.taskUuid = taskData.taskUuid;
+        checkpointData.checkpointName = m_robot->inspection_data.current_task_point_name;
+        checkpointData.checkTime = QDateTime::currentDateTime();
         // #2->1 移动到任务点
         int32_t gotoPose = point["position"].toDouble() * 1000; //(单位m)
                                                                 //        QEventLoop movePlace_Loop;
@@ -186,15 +199,15 @@ void WorkerInspectionThread::run()
 
         if (m_robot->moveTo(gotoPose))
         {
-            double prevDistance = -1.0; // 上一次的距离
+            int32_t prevDistance = -1.0; // 上一次的距离
             for (int i = 0; i < point_timeout; i++)
             {
-                double distance = std::abs(gotoPose - m_robot->pose) / 1000.0;
+                int32_t distance = std::abs(gotoPose - m_robot->pose);
                 // 只有距离变化时才更新显示
                 if (distance != prevDistance)
                 {
                     prevDistance = distance;
-                    m_robot->inspection_data.current_task_point_current_progress = tr("距离: %.3f m").arg(prevDistance);
+                    m_robot->inspection_data.current_task_point_current_progress = tr("距离: %.3f m").arg(prevDistance / 1000.0);
                     m_robot->update_inspection_data_show(InspectionUpdata_task_current_poiont_progress);
                 }
                 // 距离小于误差表示完成
@@ -249,15 +262,29 @@ void WorkerInspectionThread::run()
             m_robot->inspection_data.warnings++; // 异常点加1
             m_robot->inspection_data.task_current_state = tr("异常%1个").arg(m_robot->inspection_data.warnings);
             m_robot->update_inspection_data_show(InspectionUpdata_task_current_state);
+            checkpointData.checkResult = "异常";
         }
         else
         {
             m_robot->inspection_data.completed++;
+            checkpointData.checkResult = "正常";
         }
         m_robot->inspection_data.not_completed = totalPoints - i - 1;
         m_robot->update_inspection_data_show(InspectionUpdata_task_current_completion_progress);
+
+        checkpointData.checkpointContent = m_robot->inspection_data.pointContent.join(",");
+
+        //checkpointData.remark = "";
+        SQL->add_InspectionCheckpoint(checkpointData);
+
     } // points
     // #3任务完成操作
-
     m_robot->end_inspection_data_show();
+
+    taskData.numOfErrorPoints = m_robot->inspection_data.warnings;
+    taskData.numOfNormalPoints = m_robot->inspection_data.completed;
+    taskData.checkResult = m_robot->inspection_data.task_current_state;
+
+    SQL->add_inspectionTasks(taskData);
+
 }

@@ -6,6 +6,41 @@
 #include "AppOS.h"
 #include "function/worker_inspection_thread.h"
 
+//switch (getRobotType())
+//{
+//case RobotType_default:
+//    //break;
+//case RobotType_HikVision_Camera:{
+//    break;}
+//case RobotType_SelfCamera_launchdigital_thermal:{
+//    break;}
+//default:
+//    break;
+//}
+
+QString getAbsoluteFilePath(int sPicFileName) {
+    qDebug()<<"getAbsoluteFilePath"<<sPicFileName;
+    // 获取当前日期和时间
+    QDateTime currentDateTime = QDateTime::currentDateTime();
+
+    // 创建年月目录
+    QString yearMonthDir = currentDateTime.toString("yyyy-MM");
+    QString absPath = QString("D:/PicturePath/%1").arg(yearMonthDir);
+    QDir dir(absPath);
+    if (!dir.exists()) {
+        dir.mkpath(absPath);
+    }
+
+    // 生成文件名
+    QString fileNameFormat = "yyyy-MM-dd HH-mm-ss.zzz";
+    QString fileName = currentDateTime.toString(fileNameFormat);
+
+    // 拼接完整路径
+    QString fullFilePath = QString("%1/%2.jpg").arg(absPath, fileName);
+
+    return fullFilePath;
+}
+
 Robot::Robot(QWidget *parent) : QWidget(parent),
                                 ui(new Ui::Robot)
 {
@@ -13,19 +48,30 @@ Robot::Robot(QWidget *parent) : QWidget(parent),
     //    inspection.setParent(this);
     QMenu *toolMenu = new QMenu(this);
     // QMenu menu(this);
-    toolMenu->addAction("Full Screen", this, [this]()
-                        { qDebug() << "showContextMenu(const QPoint &pos)" << this->isFullScreen(); });
+    toolMenu->addAction("Full Screen", this, [this](){
+        qDebug() << "showContextMenu(const QPoint &pos)" << this->isFullScreen();
+        test();
+    });
 
     ui->toolButton_widget_cameraChannel_isShow->setMenu(toolMenu);
 }
 
 Robot::~Robot()
 {
+    qDebug() << "Robot::~Robot() 0";
+    if(worker_inspection_thread->isRunning()) worker_inspection_thread->quit();
+    worker_inspection_thread->deleteLater();
     delete client;
     delete data;
     delete ui;
-    delete worker_inspection_thread;
-    qDebug() << "Robot::~Robot()";
+
+    qDebug() << "Robot::~Robot() 1";
+}
+
+void Robot::test()
+{
+    qDebug() << "Robot::test()";
+    hikVisionCamera.start();
 }
 
 void Robot::init()
@@ -77,9 +123,38 @@ void Robot::init()
                 inspection.ui->doubleSpinBox_poiont_position->setValue(pose / 1000); // mm->m
             });
 
+    connect(inspection.ui->toolButton_vision_PTZPOS_get, &QToolButton::clicked, this, [=](){
+        switch (getRobotType())
+        {
+        case RobotType_default:
+            //break;
+        case RobotType_HikVision_Camera:{
+            QJsonObject action = hikVisionCamera.PTZPOS_get(inspection.ui->comboBox_vision_PTZPOS_lChannel->currentIndex()+1);
+            qDebug() << "toolButton_vision_PTZPOS_get,&QToolButton::clicked"<<action;
+            if(action["success"].toBool()){
+                inspection.ui->doubleSpinBox_vision_PTZPOS_wPanPos->setValue(action["wPanPos"].toInt() / 10.0);
+                inspection.ui->doubleSpinBox_vision_PTZPOS_wTiltPos->setValue(action["wTiltPos"].toInt() / 10.0);
+                inspection.ui->doubleSpinBox_vision_PTZPOS_wZoomPos->setValue(action["wZoomPos"].toInt() / 10.0);
+            }
+            break;}
+        case RobotType_SelfCamera_launchdigital_thermal:
+        {
+            // 自研发云台没有倍率
+            inspection.ui->doubleSpinBox_vision_PTZPOS_wPanPos->setValue(camera_pan / 10.0);
+            inspection.ui->doubleSpinBox_vision_PTZPOS_wTiltPos->setValue(camera_tilt / 10.0);
+            break;
+        }
+        default:
+            break;
+        }
+
+
+    });
+
+    connect(&inspection,&Inspection::run_action_operation,this,&Robot::run_action_operation);
     start();
 
-    qDebug() << "void Robot::init()" << config;
+    //qDebug() << "void Robot::init()" << config;
 }
 
 void Robot::start()
@@ -90,6 +165,14 @@ void Robot::start()
     connect(&inspection, &Inspection::updata_task_run_time, worker_inspection_thread, &WorkerInspectionThread::updata_task_run_time);
 
     inspection.start();
+}
+
+void Robot::clientOnlineEvent()
+{
+    ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
+    ui->pushButton_robot->setText(name);
+    ui->toolButton_robot_status->setToolTip(name+"在线");
+    ui->toolButton_robot_status->setIcon(QIcon(":/asset/Robot/Robot.svg"));
 }
 
 void Robot::clientOfflineEvent()
@@ -323,7 +406,7 @@ void Robot::updateDataShow()
     switch (getRobotType())
     {
     case RobotType_default:
-        break;
+        //break;
     case RobotType_HikVision_Camera:
         break;
     case RobotType_SelfCamera_launchdigital_thermal:
@@ -365,6 +448,20 @@ bool Robot::moveTo(int32_t pose, int timeout)
     }
 
     return false;
+}
+
+bool Robot::control(int command, bool stop)
+{
+    bool success = false;
+    switch (command) {
+    case 0:
+        success = stop ? 1:0;
+        break;
+    default:
+        success = stop ? 1:0;
+        break;
+    }
+    return success;
 }
 
 void Robot::start_inspection_data_show()
@@ -436,52 +533,103 @@ void Robot::end_inspection_data_show()
 bool Robot::run_action_operation(PointAction operation, QJsonObject action)
 {
     QString display;
+    bool success = false;
     switch (operation)
     {
-    case PointAction::PointAction_Time:
+    case PointAction::PointAction_Time:{
         QThread::sleep(action["sleep"].toInt());
         display = "时间:" + i2s(action["sleep"].toInt());
-        break;
-    case PointAction::PointAction_Vision_PTZControl:
-        display = "云台基本控制";
+        success = true;
+        break;}
+    case PointAction::PointAction_Vision_PTZControl:{
+        display = "设备基本控制";
+        switch (getRobotType())
+        {
+        case RobotType_default:
+            //break;
+        case RobotType_HikVision_Camera:{
+            success = hikVisionCamera.PTZControl(action["lChannel"].toInt(1),action["dwPTZCommand"].toInt(),action["dwStop"].toInt(1));
+            break;}
+        case RobotType_SelfCamera_launchdigital_thermal:{
+            success = control(action["dwPTZCommand"].toInt(),action["dwStop"].toInt(1));
+            break;}
+        default:
+            break;
+        }
+        qDebug() << action["lChannel"].toInt();
         qDebug() << Qt::CheckState(action["dwStop"].toInt());
         qDebug() << action["dwPTZCommand"].toInt();
-        hikVisionCamera.PTZControl(action["dwPTZCommand"].toInt(),action["dwStop"].toInt());
-        break;
-    case PointAction::PointAction_Vision_PTZPreset:
+
+        break;}
+    case PointAction::PointAction_Vision_PTZPreset:{
         display = "云台预置点功能:" + i2s(action["dwPresetIndex"].toInt());
         qDebug() << action["lChannel"].toInt();
         qDebug() << action["dwPresetIndex"].toInt();
         qDebug() << action["dwPTZPresetCmd"].toInt();
-        hikVisionCamera.PTZPreset(action["lChannel"].toInt(),action["dwPresetIndex"].toInt(),action["dwPTZPresetCmd"].toInt());
-        break;
-    case PointAction::PointAction_Vision_PTZPOS:
+        success = hikVisionCamera.PTZPreset(action["lChannel"].toInt(1),action["dwPresetIndex"].toInt(),action["dwPTZPresetCmd"].toInt());
+        break;}
+    case PointAction::PointAction_Vision_PTZPOS:{
         display = "云台设置PTZ参数";
-        qDebug() << action["wAction"].toInt();
-        qDebug() << action["wPanPos"].toDouble();
-        qDebug() << action["wTiltPos"].toDouble();
-        qDebug() << action["wZoomPos"].toDouble();
-        hikVisionCamera.PTZPOS(action["wAction"].toInt(),action["wPanPos"].toDouble()*10,action["wTiltPos"].toDouble()*10,action["wZoomPos"].toDouble()*10);
-        break;
-    case PointAction::PointAction_Vision_CaptureJPEGPicture:
+//        qDebug() << action["lChannel"].toInt();
+//        qDebug() << action["wAction"].toInt();
+//        qDebug() << action["wPanPos"].toDouble();
+//        qDebug() << action["wTiltPos"].toDouble();
+//        qDebug() << action["wZoomPos"].toDouble();
+        switch (getRobotType())
+        {
+        case RobotType_default:
+            //break;
+        case RobotType_HikVision_Camera:{
+            success = hikVisionCamera.PTZPOS_set(action["lChannel"].toInt(1),action["wAction"].toInt(),action["wPanPos"].toDouble()*10,action["wTiltPos"].toDouble()*10,action["wZoomPos"].toDouble()*10);
+            break;}
+        case RobotType_SelfCamera_launchdigital_thermal:{
+            QByteArray byteArray;
+            byteArray.append(Robot_CMD_Header);
+            byteArray.append(Robot_CMD_SET_PTZPOS);
+            //    byteArray.append(0x01);
+            int16_t pan = action["wPanPos"].toDouble() * 10;
+            int16_t titl = action["wTiltPos"].toDouble() * 10;
+            byteArray.append(reinterpret_cast<const char *>(&pan), sizeof(pan));
+            byteArray.append(reinterpret_cast<const char *>(&titl), sizeof(titl));
+            success = clientSendMessage(byteArray);
+            break;}
+        default:
+            break;
+        }
+
+        break;}
+    case PointAction::PointAction_Vision_CaptureJPEGPicture:{
         display = "云台抓图:" + i2s(action["lChannel"].toInt());
-        qDebug() << action["lChannel"].toInt();
-        qDebug() << action["sPicFileName"].toInt();
-        hikVisionCamera.CaptureJPEGPicture(action["lChannel"].toInt(),action["sPicFileName"].toInt());
-        break;
-    case PointAction::PointAction_Vision_Realtime_Thermometry:
+        QString fileName = getAbsoluteFilePath(action["sPicFileName"].toInt());
+        RobotType type = getRobotType();
+        if(type == RobotType_SelfCamera_launchdigital_thermal && action["lChannel"].toInt(1) == 2){
+            //其他方法，热成像的摄像头
+            success = false;
+        }else{
+            success = hikVisionCamera.CaptureJPEGPicture(action["lChannel"].toInt(),fileName);
+        }
+        if(success) inspection_data.pointContent.append(fileName);
+        break;}
+    case PointAction::PointAction_Vision_Realtime_Thermometry:{
         display = "热成像测温";
         qDebug() << action["sPicFileName"].toInt();
-        hikVisionCamera.Realtime_Thermometry(action["sPicFileName"].toInt());
-        break;
-    case PointAction::PointAction_Vision_Other:
+        QString fileName = getAbsoluteFilePath(action["sPicFileName"].toInt());
+        success = hikVisionCamera.Realtime_Thermometry(fileName);
+        if(success) inspection_data.pointContent.append(fileName);
+        break;}
+    case PointAction::PointAction_Robot_Control:{
+        display = "机器人控制";
+        qDebug() << action["robot_cmd"].toString().toUtf8();
+        success = clientSendMessage(action["robot_cmd"].toString().toUtf8());
+        break;}
+    case PointAction::PointAction_Vision_Other:{
         display = "其他";
-        break;
+        break;}
     default:
         break;
     }
     qDebug() << "run_action_operation:" << display;
-    return true;
+    return success;
 }
 
 int32_t Robot::getPoseFromPicturePos(const QPoint &pos)
@@ -668,7 +816,8 @@ void Robot::on_toolButton_robot_status_clicked()
     }
 }
 
-void Robot::on_toolButton_start_inspection_task_clicked()
+
+void Robot::on_toolButton_inspection_task_start_clicked()
 {
     QString task_name = inspection.ui->comboBox_task_name->currentText();
     worker_inspection_thread->current_task = inspection.config["tasks"].toObject()[task_name].toObject();
@@ -680,6 +829,25 @@ void Robot::on_toolButton_start_inspection_task_clicked()
     qDebug() << "on_pushButton_start_inspection_task_clicked():" << QThread::currentThreadId();
 }
 
+void Robot::on_toolButton_inspection_task_cancel_clicked()
+{
+    if (worker_inspection_thread->isRunning()) {
+        // 显示确认弹窗
+        QMessageBox confirmBox(QMessageBox::Question, "取消检查", "确定要取消当前检查吗?", QMessageBox::Yes | QMessageBox::No, this);
+        int result = confirmBox.exec();
+
+        if (result == QMessageBox::Yes) {
+            // 用户确认取消检查
+            //worker_inspection_thread->quit();
+            //worker_inspection_thread->wait();//等待退出
+    //        worker_inspection_thread->exit();
+            worker_inspection_thread->terminate();
+            inspection_data.task_current_state = tr("强制取消");
+            update_inspection_data_show(InspectionUpdata_task_current_state);
+        }
+    }
+}
+
 void Robot::on_pushButton_robot_gas_isShow_clicked()
 {
     ui->widget_gas_show->setVisible(!ui->widget_gas_show->isVisible());
@@ -689,3 +857,5 @@ void Robot::on_toolButton_robot_map_clicked()
 {
     qDebug() << "Robot::on_toolButton_robot_map_clicked()";
 }
+
+

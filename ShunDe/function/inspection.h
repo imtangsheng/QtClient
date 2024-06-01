@@ -17,6 +17,7 @@ enum PointAction{
     PointAction_Vision_PTZPOS,
     PointAction_Vision_CaptureJPEGPicture,
     PointAction_Vision_Realtime_Thermometry,
+    PointAction_Robot_Control,
     PointAction_Vision_Other,
 };
 
@@ -69,6 +70,7 @@ public:
 
 signals:
     void updata_task_run_time(const QString &taskName);
+    void run_action_operation(PointAction operation, QJsonObject action);
 
 private slots:
     void on_toolButton_task_update_clicked();
@@ -138,6 +140,16 @@ private slots:
     void on_horizontalSlider_time_valueChanged(int value);
 
     void on_timeEdit_taks_time_timeChanged(const QTime &time);
+
+    void on_toolButton_vision_preset_dwPresetCmd_set_clicked();
+
+    void on_toolButton_vision_preset_dwPresetCmd_use_clicked();
+
+    void on_toolButton_vision_PTZControl_test_clicked();
+
+    void on_toolButton_vision_PTZPOS_set_clicked();
+
+    void on_toolButton_robot_cmd_test_clicked();
 
 private:
 
