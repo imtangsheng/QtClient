@@ -4,6 +4,11 @@
 #include <QMainWindow>
 #include "ui_MasterWindow.h"
 
+enum FileDownloadType {
+    XLSX,
+    CSV,
+};
+
 namespace Ui {
 class MasterWindow;
 }
@@ -22,6 +27,9 @@ public:
 
     void init_page_robot_system();
 
+    bool saveFileToCSV(const QString &filePath);
+    bool saveFileToExcel(const QString &filePath);
+
 private slots:
     void on_pushButton_test_clicked();
 
@@ -30,6 +38,8 @@ private slots:
     void on_toolButton_inspection_query_time_clicked();
 
     void on_toolButton_inspection_query_value_clicked();
+
+    void on_toolButton__inspectionPoints_export_file_download_clicked();
 
 private:
 
