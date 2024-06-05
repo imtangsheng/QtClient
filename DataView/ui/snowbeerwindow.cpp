@@ -12,7 +12,7 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 
-QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d+)℃.*");
+QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d{3})*.*");
 #include <QRandomGenerator>
 
 #include "AppOS.h"
