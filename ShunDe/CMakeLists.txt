@@ -17,7 +17,7 @@ include_directories(${PROJECT_SOURCE_DIR})
 file(GLOB_RECURSE UI ./ui/*.*)
 file(GLOB_RECURSE Modules ./modules/*.*)
 file(GLOB_RECURSE Function ./function/*.*)
-file(GLOB_RECURSE Script ../scripts/*.py)
+file(GLOB_RECURSE Script ../scripts/*.*)
 
 set(PUBLIC
     ../public/PluginInterface.h

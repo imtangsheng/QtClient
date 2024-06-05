@@ -249,6 +249,8 @@ private slots:
     void on_pushButton_robot_gas_isShow_clicked();
     void on_toolButton__gas_alarm_set_clicked();
     void on_toolButton_vision_default_set_clicked();
+    void on_pushButton_scripts_filePath_get_clicked();
+    void on_pushButton_scripts_filePath_run_clicked();
 };
 
 struct Device

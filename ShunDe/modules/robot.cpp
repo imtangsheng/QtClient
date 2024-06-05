@@ -1,4 +1,6 @@
 #include "robot.h"
+#include <QDesktopServices>
+#include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
 #include <QScreen>
@@ -913,3 +915,35 @@ void Robot::on_toolButton_vision_default_set_clicked()
     config["vision_default_PTZPOS_wPanPos"] = ui->doubleSpinBox_vision_default_PTZPOS_wPanPos->value();
     config["vision_default_PTZPOS_wTiltPos"] = ui->doubleSpinBox_vision_default_PTZPOS_wTiltPos->value();
 }
+
+void Robot::on_pushButton_scripts_filePath_get_clicked()
+{
+    // 获取当前应用程序的目录
+    QString currentDir = QDir::current().absolutePath();
+    // 构建 scripts/ 目录的路径
+    QString scriptsDir = QDir(currentDir).filePath("scripts");
+    // 打开文件选择对话框
+    QString selectedFile = QFileDialog::getOpenFileName(this,"选择 Python 脚本",scriptsDir,"Python 脚本 (*.py)");
+    if (selectedFile.isEmpty())return;
+
+    ui->lineEdit_scripts_filePath->setText(selectedFile);
+
+}
+
+
+void Robot::on_pushButton_scripts_filePath_run_clicked()
+{
+    QString filePath = ui->lineEdit_scripts_filePath->text();
+    QFileInfo fileInfo(filePath);
+    if (!fileInfo.exists()) {
+        QMessageBox::critical(nullptr, "错误", QString("文件 '%1' 不存在。").arg(filePath));
+        return;
+    }
+    QUrl url = QUrl::fromLocalFile(filePath);
+    if (!QDesktopServices::openUrl(url)) {
+        QMessageBox::critical(nullptr, "错误", QString("无法打开文件 '%1'。是否设置打开默认文件的应用程序。").arg(filePath));
+        return;
+    }
+
+}
+

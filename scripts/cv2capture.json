@@ -1,0 +1,17 @@
+{
+    "log": {
+        "level": "info",
+        "path": "D:/video/",
+        "name": "video",
+        "videolog_file": "video.log"
+    },
+    "hikvision": [{
+        "ip":"192.168.1.64",
+        "port": 8000,
+        "user": "admin",
+        "password": "dacang80",
+        "video_dir": "D:/video/"
+        }
+
+    ]
+}
