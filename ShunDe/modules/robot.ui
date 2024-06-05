@@ -218,6 +218,9 @@
           <height>24</height>
          </size>
         </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
        </widget>
       </item>
       <item>
@@ -347,7 +350,7 @@
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_widget_inspection_titler">
          <item>
-          <widget class="QLabel" name="label_16">
+          <widget class="QLabel" name="label_inspection_task_title">
            <property name="text">
             <string>巡检任务信息</string>
            </property>
@@ -367,9 +370,16 @@
           </spacer>
          </item>
          <item>
-          <widget class="QToolButton" name="toolButton_start_inspection_task">
+          <widget class="QToolButton" name="toolButton_inspection_task_start">
            <property name="text">
             <string>启动巡检</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_inspection_task_cancel">
+           <property name="text">
+            <string>取消巡检</string>
            </property>
           </widget>
          </item>
@@ -1184,8 +1194,8 @@
     <rect>
      <x>640</x>
      <y>0</y>
-     <width>351</width>
-     <height>331</height>
+     <width>341</width>
+     <height>491</height>
     </rect>
    </property>
    <property name="maximumSize">
@@ -1195,9 +1205,56 @@
     </size>
    </property>
    <property name="styleSheet">
-    <string notr="true"/>
+    <string notr="true">QSpinBox::down-button {
+subcontrol-origin: border;
+subcontrol-position: left;
+width: 16px;
+height: 16px;
+border-image: url(:/asset/HomeWindow/Speed_Sub.svg);
+border-width: 1px;
+}
+QSpinBox::up-button {
+subcontrol-origin: border;
+subcontrol-position: right;
+width: 16px;
+height: 16px;
+border-image: url(:/asset/HomeWindow/Speed_Add.svg);
+border-width: 1px;
+}
+
+QDoubleSpinBox::down-button {
+subcontrol-origin: border;
+subcontrol-position: left;
+width: 16px;
+height: 16px;
+border-image: url(:/asset/HomeWindow/Speed_Sub.svg);
+border-width: 1px;
+}
+QDoubleSpinBox::up-button {
+subcontrol-origin: border;
+subcontrol-position: right;
+width: 16px;
+height: 16px;
+border-image: url(:/asset/HomeWindow/Speed_Add.svg);
+border-width: 1px;
+}</string>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout_4">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout_5">
       <item>
@@ -1337,8 +1394,39 @@ QSlider::sub-page:horizontal {
      <layout class="QHBoxLayout" name="horizontalLayout_6">
       <item>
        <widget class="QLabel" name="label_robot_state_2">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>气体检测报警值设置：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_16">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton__gas_alarm_set">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>设置</string>
         </property>
        </widget>
       </item>
@@ -1347,23 +1435,7 @@ QSlider::sub-page:horizontal {
     <item>
      <widget class="QWidget" name="widget_gas_alarm_setting" native="true">
       <property name="styleSheet">
-       <string notr="true">QSpinBox::down-button {
-subcontrol-origin: border;
-subcontrol-position: left;
-width: 16px;
-height: 16px;
-border-image: url(:/asset/HomeWindow/Speed_Sub.svg);
-border-width: 1px;
-}
-QSpinBox::up-button {
-subcontrol-origin: border;
-subcontrol-position: right;
-width: 16px;
-height: 16px;
-border-image: url(:/asset/HomeWindow/Speed_Add.svg);
-border-width: 1px;
-}
-</string>
+       <string notr="true"/>
       </property>
       <layout class="QGridLayout" name="gridLayout">
        <property name="leftMargin">
@@ -1697,6 +1769,201 @@ border-width: 1px;
      </widget>
     </item>
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_9">
+      <item>
+       <widget class="QLabel" name="label_robot_state_4">
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>巡检任务设置：</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_15">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QToolButton" name="toolButton_vision_default_set">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string>设置</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QGridLayout" name="gridLayout_vision_default">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_robot_temperature_set_min_2">
+        <property name="text">
+         <string>默认预置点</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_vision_default_PTZPOS_wPanPos">
+        <property name="minimumSize">
+         <size>
+          <width>64</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <double>360.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QSpinBox" name="spinBox_vision_default_PTZPreset_dwPresetIndex">
+        <property name="minimumSize">
+         <size>
+          <width>64</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>300</number>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_robot_temperature_set_min_3">
+        <property name="text">
+         <string>拍照停留时间(秒)</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QSpinBox" name="spinBox_vision_wait_default">
+        <property name="minimumSize">
+         <size>
+          <width>64</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="singleStep">
+         <number>1</number>
+        </property>
+        <property name="value">
+         <number>30</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="4">
+       <widget class="QDoubleSpinBox" name="doubleSpinBox_vision_default_PTZPOS_wTiltPos">
+        <property name="minimumSize">
+         <size>
+          <width>64</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="decimals">
+         <number>1</number>
+        </property>
+        <property name="minimum">
+         <double>-90.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>90.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="label_robot_temperature_set_min_4">
+        <property name="text">
+         <string>水平角度</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QLabel" name="label_robot_temperature_set_min_5">
+        <property name="text">
+         <string>垂直角度</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="5">
+       <spacer name="horizontalSpacer_18">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="3" column="5">
+       <spacer name="horizontalSpacer_17">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item row="1" column="5">
+       <spacer name="horizontalSpacer_19">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
      <spacer name="verticalSpacer">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -1939,15 +2206,27 @@ border-width: 1px;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>131</width>
-     <height>51</height>
+     <width>50</width>
+     <height>50</height>
     </rect>
    </property>
    <property name="sizePolicy">
-    <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
      <horstretch>0</horstretch>
      <verstretch>0</verstretch>
     </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>50</width>
+     <height>50</height>
+    </size>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>50</width>
+     <height>50</height>
+    </size>
    </property>
    <property name="toolTip">
     <string>参数配置</string>

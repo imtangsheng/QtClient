@@ -200,15 +200,17 @@ public:
         QString task_next_name;
         QString task_next_time;
 
+        int totalPoints =0;
         int completed = 0;
         int not_completed = 0;
         int warnings = 0;
-        QStringList pointContent;
+        QStringList current_task_point_content_strList = QStringList();
     };
     InspectionData inspection_data;
-    void start_inspection_data_show();
+    void start_inspection_task_and_data_show();
+    void start_inspection_task_point_and_data_show();
     void update_inspection_data_show(InspectionUpdataType type);
-    void end_inspection_data_show();
+    void end_inspection_task_and_data_show();
 
     Inspection inspection; // 巡检声明
     // 定义一个定时巡检线程，使用线程，可手动结束，等待机器人就位，支持多任务多时间触发
@@ -224,9 +226,13 @@ private:
     // QString ipAddress = "127.0.0.1"; // 服务器IP地址
     // quint16 port = 12345; // 服务器端口号
     void updateRobotNameShow(const QString &name);
+    const int vision_wait_default = 30;//拍照停留时间
+    const int vision_default_PTZPreset_dwPresetIndex = 1;//拍照回默认预置点
+    const double vision_default_PTZPOS_wPanPos = 0.0;//拍照回默认角度
+    const double vision_default_PTZPOS_wTiltPos = 0.0;
 
 signals:
-    void setCameraWidgetPlay(const int &id, const QUrl &source);
+    void setCameraWidgetPlay(const int &id, const int &channel,const QUrl &source);
 
 private slots:
     void on_toolButton_widget_cameraChannel_isShow_clicked();
@@ -238,9 +244,11 @@ private slots:
     void on_toolButton_robot_status_clicked();
     void on_toolButton_inspection_task_start_clicked();
     void on_toolButton_inspection_task_cancel_clicked();
-    void on_pushButton_robot_gas_isShow_clicked();
-    void on_toolButton_robot_map_clicked();
 
+    void on_toolButton_robot_map_clicked();
+    void on_pushButton_robot_gas_isShow_clicked();
+    void on_toolButton__gas_alarm_set_clicked();
+    void on_toolButton_vision_default_set_clicked();
 };
 
 struct Device

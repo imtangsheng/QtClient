@@ -11,6 +11,7 @@
 #define SET_PRESET 8   //设置预置点
 #define CLE_PRESET 9   //清除预置点
 #define GOTO_PRESET 39 //转到预置点
+#define LIGHT_PWRON 2 //接通灯光电源
 
 const int SECS_PER_DAY = 24 * 60 * 60; // 86400 秒
 
@@ -42,7 +43,7 @@ void Inspection::start()
     // 默认读取，会从id中赋值的
     if(ReadJsonData(config,configPath)){
         //qDebug()<<"从JSON文件中读取配置数据"<<config;
-        update_config_show();
+        update_tasksJson_show();
 
         QString currentTask = config["currentTask"].toString();
         if(!currentTask.isEmpty()){
@@ -65,7 +66,7 @@ void Inspection::quit()
     qDebug()<<"Inspection::quit()退出";
 }
 
-void Inspection::update_config_show()
+void Inspection::update_tasksJson_show()
 {
     //清理显示
     ui->comboBox_task_name->clear();
@@ -238,7 +239,8 @@ QJsonObject Inspection::get_action_operation(PointAction operation)
     case PointAction::PointAction_Vision_PTZControl:
         action["lChannel"] = ui->comboBox_vision_PTZControl_lChannel->currentIndex() + 1;
         action["dwStop"] = Qt::CheckState(ui->checkBox_vision_PTZControl_dwStop->checkState()) == Qt::Checked  ? 0 : 1 ;
-        action["dwPTZCommand"] = ui->comboBox_vision_PTZControl_dwPTZCommand->currentIndex();
+        //action["dwPTZCommand"] = ui->comboBox_vision_PTZControl_dwPTZCommand->currentIndex();
+        action["dwPTZCommand"] = LIGHT_PWRON;
         break;
     case PointAction::PointAction_Vision_PTZPreset:
         action["lChannel"] = ui->comboBox_vision_preset_lChannel->currentIndex() + 1;
@@ -246,12 +248,27 @@ QJsonObject Inspection::get_action_operation(PointAction operation)
         //action["dwPTZPresetCmd"] = ui->comboBox_vision_preset_dwPresetCmd->currentIndex();
         action["dwPTZPresetCmd"] = GOTO_PRESET;//云台操作只有39调用
         break;
+    case PointAction::PointAction_Vision_PTZPreset_Capture:
+        action["lChannel"] = ui->comboBox_vision_preset_capture_lChannel->currentIndex() + 1;
+        action["dwPresetIndex"] = ui->comboBox_vision_preset_capture_dwPresetIndex->currentIndex() +1 ;
+        //action["dwPTZPresetCmd"] = ui->comboBox_vision_preset_dwPresetCmd->currentIndex();
+        action["dwPTZPresetCmd"] = GOTO_PRESET;//云台操作只有39调用
+        action["sPicFileName"] = ui->comboBox_vision_preset_capture_sPicFileName->currentIndex();
+        break;
     case PointAction::PointAction_Vision_PTZPOS:
         action["lChannel"] = ui->comboBox_vision_PTZPOS_lChannel->currentIndex() + 1;
         action["wAction"] = ui->comboBox_vision_PTZPOS_wAction->currentIndex() +1;
         action["wPanPos"] = ui->doubleSpinBox_vision_PTZPOS_wPanPos->value() * 10;
         action["wTiltPos"] = ui->doubleSpinBox_vision_PTZPOS_wTiltPos->value() * 10;
         action["wZoomPos"] = ui->doubleSpinBox_vision_PTZPOS_wZoomPos->value() * 10;
+        break;
+    case PointAction::PointAction_Vision_PTZPOS_Capture:
+        action["lChannel"] = ui->comboBox_vision_PTZPOS_capture_lChannel->currentIndex() + 1;
+        action["wAction"] = ui->comboBox_vision_PTZPOS_capture_wAction->currentIndex() +1;
+        action["wPanPos"] = ui->doubleSpinBox_vision_PTZPOS_capture_wPanPos->value() * 10;
+        action["wTiltPos"] = ui->doubleSpinBox_vision_PTZPOS_capture_wTiltPos->value() * 10;
+        action["wZoomPos"] = ui->doubleSpinBox_vision_PTZPOS_capture_wZoomPos->value() * 10;
+        action["sPicFileName"] = ui->comboBox_vision_PTZPOS_capture_sPicFileName->currentIndex();
         break;
     case PointAction::PointAction_Vision_CaptureJPEGPicture:
         action["lChannel"] = ui->comboBox_vision_capture_lChannel->currentIndex() + 1;
@@ -280,19 +297,35 @@ void Inspection::set_action_operation(PointAction operation, QJsonObject action)
         ui->spinBox_time_second->setValue(action["sleep"].toInt());
         break;
     case PointAction::PointAction_Vision_PTZControl:
+        ui->comboBox_vision_PTZControl_lChannel->setCurrentIndex(action["lChannel"].toInt() - 1);
         ui->checkBox_vision_PTZControl_dwStop->setCheckState(action["dwStop"].toInt() ? Qt::Unchecked : Qt::Checked);
-        ui->comboBox_vision_PTZControl_dwPTZCommand->setCurrentIndex(action["dwPTZCommand"].toInt());
+        //ui->comboBox_vision_PTZControl_dwPTZCommand->setCurrentIndex(action["dwPTZCommand"].toInt());
         break;
     case PointAction::PointAction_Vision_PTZPreset:
         ui->comboBox_vision_preset_lChannel->setCurrentIndex(action["lChannel"].toInt() - 1);
         ui->comboBox_vision_preset_dwPresetIndex->setCurrentIndex(action["dwPresetIndex"].toInt() - 1);
         //ui->comboBox_vision_preset_dwPresetCmd->setCurrentIndex(action["dwPTZPresetCmd"].toInt());
         break;
+    case PointAction::PointAction_Vision_PTZPreset_Capture:
+        ui->comboBox_vision_preset_capture_lChannel->setCurrentIndex(action["lChannel"].toInt() - 1);
+        ui->comboBox_vision_preset_capture_dwPresetIndex->setCurrentIndex(action["dwPresetIndex"].toInt() - 1);
+        //ui->comboBox_vision_preset_dwPresetCmd->setCurrentIndex(action["dwPTZPresetCmd"].toInt());
+        ui->comboBox_vision_preset_capture_sPicFileName->setCurrentIndex(action["sPicFileName"].toInt());
+        break;
     case PointAction::PointAction_Vision_PTZPOS:
+        ui->comboBox_vision_PTZPOS_lChannel->setCurrentIndex(action["lChannel"].toInt() - 1);
         ui->comboBox_vision_PTZPOS_wAction->setCurrentIndex(action["wAction"].toInt() - 1);
         ui->doubleSpinBox_vision_PTZPOS_wPanPos->setValue(action["wPanPos"].toInt() / 10.0);
         ui->doubleSpinBox_vision_PTZPOS_wTiltPos->setValue(action["wTiltPos"].toInt() / 10.0);
         ui->doubleSpinBox_vision_PTZPOS_wZoomPos->setValue(action["wZoomPos"].toInt() / 10.0);
+        break;
+    case PointAction::PointAction_Vision_PTZPOS_Capture:
+        ui->comboBox_vision_PTZPOS_capture_lChannel->setCurrentIndex(action["lChannel"].toInt() - 1);
+        ui->comboBox_vision_PTZPOS_capture_wAction->setCurrentIndex(action["wAction"].toInt() - 1);
+        ui->doubleSpinBox_vision_PTZPOS_capture_wPanPos->setValue(action["wPanPos"].toInt() / 10.0);
+        ui->doubleSpinBox_vision_PTZPOS_capture_wTiltPos->setValue(action["wTiltPos"].toInt() / 10.0);
+        ui->doubleSpinBox_vision_PTZPOS_capture_wZoomPos->setValue(action["wZoomPos"].toInt() / 10.0);
+        ui->comboBox_vision_PTZPOS_capture_sPicFileName->setCurrentIndex(action["sPicFileName"].toInt());
         break;
     case PointAction::PointAction_Vision_CaptureJPEGPicture:
         ui->comboBox_vision_capture_lChannel->setCurrentIndex(action["lChannel"].toInt() - 1);
@@ -325,8 +358,14 @@ QString Inspection::get_action_operation_display(PointAction operation, QJsonObj
     case PointAction::PointAction_Vision_PTZPreset:
         display = "云台预置点功能:"+i2s(action["dwPresetIndex"].toInt());
         break;
+    case PointAction::PointAction_Vision_PTZPreset_Capture:
+        display = "云台预置点拍照:"+i2s(action["dwPresetIndex"].toInt());
+        break;
     case PointAction::PointAction_Vision_PTZPOS:
         display = "云台设置PTZ参数";
+        break;
+    case PointAction::PointAction_Vision_PTZPOS_Capture:
+        display = "云台设置PTZ拍照";
         break;
     case PointAction::PointAction_Vision_CaptureJPEGPicture:
         display = "云台抓图:"+i2s(action["lChannel"].toInt());
@@ -508,12 +547,13 @@ void Inspection::on_toolButton_task_update_clicked()
 
 void Inspection::on_toolButton_task_delete_clicked()
 {
-    QJsonObject tasks = config["tasks"].toObject();
+        QJsonObject tasks = config["tasks"].toObject();
     QString taskName = ui->comboBox_task_name->currentText();
     if(tasks.contains(taskName)){
         qDebug()<<"从JSON文件中保存数据11"<<tasks[taskName].toObject();
         tasks.remove(taskName);
         config["tasks"] = tasks;
+        update_tasksJson_show();
     }
 }
 
@@ -537,7 +577,7 @@ void Inspection::on_toolButton_save_config_clicked()
         if(old_task["time"].toArray() != task["time"].toArray()){
             emit updata_task_run_time(taskName);
             //qDebug()<<"配置已经改变，需要改变显示，重启"<<config;
-            update_config_show();
+            update_tasksJson_show();
         }
     }
 }

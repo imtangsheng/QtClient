@@ -14,7 +14,9 @@ enum PointAction{
     PointAction_Time=0,
     PointAction_Vision_PTZControl,
     PointAction_Vision_PTZPreset,
+    PointAction_Vision_PTZPreset_Capture,
     PointAction_Vision_PTZPOS,
+    PointAction_Vision_PTZPOS_Capture,
     PointAction_Vision_CaptureJPEGPicture,
     PointAction_Vision_Realtime_Thermometry,
     PointAction_Robot_Control,
@@ -41,7 +43,7 @@ public:
     QJsonArray actionsJsonArray;
     QJsonArray timesJsonArray;
 
-    void update_config_show();
+    void update_tasksJson_show();
     void update_pointsJsonArray_show();
     void update_actionsJsonArray_show();
     void update_timesJsonArray_show();
