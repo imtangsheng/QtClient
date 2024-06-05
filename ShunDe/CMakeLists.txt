@@ -50,21 +50,14 @@ qt_add_plugin(ShunDe SHARED
   ${TS_FILES}
 )
 
-set(LIBS_DIR "${PROJECT_BINARY_DIR}/../libs/HikVision")
-include_directories("${LIBS_DIR}/include")
-
-set(thirdparty_dir "${PROJECT_BINARY_DIR}/../libs/xlsxio")
-include_directories("${thirdparty_dir}/include")
-
-file(GLOB_RECURSE Thirdparty ../libs/*/include/*.*)
-
+set(Thirdparty_DIR "${PROJECT_BINARY_DIR}/../libs")
+include_directories("${Thirdparty_DIR}/HikVision/include")
 
 target_sources(ShunDe PRIVATE
     ${UI} ${Modules} ${Function}
     ${PUBLIC} ${RESOURCES}
     ${Script}
 )
-
 
 set_target_properties(ShunDe PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${PROJECT_BINARY_DIR}/../plugins"
@@ -77,9 +70,7 @@ target_link_libraries(ShunDe PRIVATE
   Qt${QT_VERSION_MAJOR}::Widgets
   Qt${QT_VERSION_MAJOR}::MultimediaWidgets
   Qt${QT_VERSION_MAJOR}::Sql
-  "${LIBS_DIR}/lib/HCNetSDK.dll"
-  "${thirdparty_dir}/lib/libxlsxio_write.dll"
-
+  "${Thirdparty_DIR}/HikVision/lib/HCNetSDK.lib"
 )
 
 target_compile_definitions(ShunDe PRIVATE SHUNDE_LIBRARY)
