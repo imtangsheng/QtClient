@@ -133,14 +133,14 @@ target_include_directories(QtClient PRIVATE
 #检查是否使用了共享库构建
 #如果是，则将共享插件作为构建示例目标的依赖项进行构建。这意味着在构建示例目标时，也会构建共享插件。
 #如果不是使用共享库构建，即Qt是以静态方式构建的，那么它将链接库到示例目标中。这意味着在构建示例目标时，会将库静态链接到示例目标中。
-if(QT6_IS_SHARED_LIBS_BUILD)
-    # Build the shared plugin too when building this example target.
-#    add_dependencies(QtClient DataView MediaPlayer)
-     add_dependencies(QtClient ShunDe)
-else()
-    # Link the echoplugin if Qt is built statically.
-    target_link_libraries(QtClient PRIVATE
-        ShunDe
-    )
-endif()
+#if(QT6_IS_SHARED_LIBS_BUILD)
+#    # Build the shared plugin too when building this example target.
+##    add_dependencies(QtClient DataView MediaPlayer)
+#     add_dependencies(QtClient ShunDe)
+#else()
+#    # Link the echoplugin if Qt is built statically.
+#    target_link_libraries(QtClient PRIVATE
+#        ShunDe
+#    )
+#endif()
 #MediaPlayer
