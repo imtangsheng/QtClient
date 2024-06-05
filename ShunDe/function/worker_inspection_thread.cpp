@@ -147,7 +147,7 @@ void WorkerInspectionThread::run()
     m_robot->inspection_data.task_next_name = task_time_next["task_name"].toString();
     m_robot->inspection_data.task_next_time = task_time_next["task_time"].toString();
     m_robot->inspection_data.current_task_name = current_task_name;
-    m_robot->start_inspection_data_show();
+    m_robot->start_inspection_task_and_data_show();
 
     // #2任务点
     int32_t point_timeout = current_task["point_timeout"].toInt(30 * 3600);   // 默认30分钟
@@ -155,6 +155,7 @@ void WorkerInspectionThread::run()
 
     QJsonArray pointsArray = current_task["points"].toArray();
     int totalPoints = pointsArray.size();
+    m_robot->inspection_data.totalPoints = totalPoints;
     m_robot->inspection_data.not_completed = totalPoints;
     m_robot->update_inspection_data_show(InspectionUpdata_task_current_completion_progress);
 
@@ -166,14 +167,22 @@ void WorkerInspectionThread::run()
     taskData.startTime = QDateTime::currentDateTime();
 
 
-    for (int i = 0; i < totalPoints; i++)
+    for (int i = 0; i < totalPoints; ++i)
     {
-        bool the_warnings = false;
         QJsonObject point = pointsArray.at(i).toObject();
+        // #2->0 任务点启用
+        if (Qt::CheckState(point["isEnable"].toInt(0)) != Qt::Checked)
+        {
+            qDebug() << QTime::currentTime() <<"点："<<i<< point["pointName"].toString()<<"任务未启用";
+            ++m_robot->inspection_data.completed;
+            continue;
+        }
+        bool the_warnings = false;
         //    foreach (const QJsonValue& value , current_task["points"].toArray()) {
         //        QJsonObject point = value.toObject();
         m_robot->inspection_data.current_task_point_name = point["pointName"].toString();
         m_robot->inspection_data.current_task_point_next_name = pointsArray.at(i + 1).toObject()["pointName"].toString();
+        m_robot->start_inspection_task_point_and_data_show();
         m_robot->update_inspection_data_show(InspectionUpdata_task_current_point);
 
          /*数据记录 保存巡检点数据*/
@@ -207,7 +216,7 @@ void WorkerInspectionThread::run()
                 if (distance != prevDistance)
                 {
                     prevDistance = distance;
-                    m_robot->inspection_data.current_task_point_current_progress = tr("距离: %.3f m").arg(prevDistance / 1000.0);
+                    m_robot->inspection_data.current_task_point_current_progress = tr("距离: %1 m").arg(prevDistance / 1000.0,0,'f',3);
                     m_robot->update_inspection_data_show(InspectionUpdata_task_current_poiont_progress);
                 }
                 // 距离小于误差表示完成
@@ -272,14 +281,14 @@ void WorkerInspectionThread::run()
         m_robot->inspection_data.not_completed = totalPoints - i - 1;
         m_robot->update_inspection_data_show(InspectionUpdata_task_current_completion_progress);
 
-        checkpointData.checkpointContent = m_robot->inspection_data.pointContent.join(",");
+        checkpointData.checkpointContent = m_robot->inspection_data.current_task_point_content_strList.join(",");
 
         //checkpointData.remark = "";
         SQL->add_InspectionCheckpoint(checkpointData);
 
     } // points
     // #3任务完成操作
-    m_robot->end_inspection_data_show();
+    m_robot->end_inspection_task_and_data_show();
 
     taskData.numOfErrorPoints = m_robot->inspection_data.warnings;
     taskData.numOfNormalPoints = m_robot->inspection_data.completed;

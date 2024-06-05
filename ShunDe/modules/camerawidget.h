@@ -25,6 +25,9 @@ public:
     QMediaPlayer player;
     QAudioOutput audioOutput;
 
+    int id = -1;
+    int cameralChannel = -1;
+
 protected:
     void keyPressEvent(QKeyEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;

@@ -43,9 +43,9 @@ void HomeWindow::start()
         DeviceMap[key.toInt()].type = DeviceType(device["type"].toInt());
         DeviceMap[key.toInt()].robot->clientOfflineEvent();
     }
-    ui->comboBox_device_add_type->addItem("1云台I代", DeviceType_Other);
-    ui->comboBox_device_add_type->addItem("2云台II", DeviceType_Robot);
-    ui->comboBox_device_add_type->addItem("3云台I代", DeviceType_Robot_test);
+    ui->comboBox_device_manage_type->addItem("1云台I代", DeviceType_Other);
+    ui->comboBox_device_manage_type->addItem("2云台II", DeviceType_Robot);
+    ui->comboBox_device_manage_type->addItem("3云台I代", DeviceType_Robot_test);
 
     //待增加服务器监听模块
     //    for (DeviceType type : DeviceType) {
@@ -54,7 +54,7 @@ void HomeWindow::start()
     qDebug() << "void HomeWindow::init() config[\"devices\"].isNull() " << config["devices"].isNull() << devices.isEmpty();
     qDebug() << "void HomeWindow::init() config[\"ipAddress\"] " << config["ipAddress"].toString("0.0.0.0")<<config["port"].toInt(12345);
 
-    DeviceId = 0;
+    SelectedId = 0;
 
     RelayoutCameraWidget();
     //    cameraWidgets.resize(cameraWidgetsNum);
@@ -136,7 +136,7 @@ bool HomeWindow::addNewRobotDevice(int id)
     masterWindow->ui->horizontalLayout_DeviceConfigSettings->insertWidget(id,DeviceMap[id].robot->ui->widgetConfig,Qt::LeftToRight);//机器人参数设置ui
     //masterWindow->ui->horizontalLayout_DeviceInspection->insertWidget(id,DeviceMap[id].robot->inspection.ui->widget_inspection,Qt::LeftToRight);//机器人巡检设置ui
     connect(DeviceMap[id].robot, &Robot::setCameraWidgetPlay, this, &HomeWindow::CameraWidgetPlay);
-    ui->comboBox_device_add_id->addItem(i2s(id), id);
+    ui->comboBox_device_manage_id->addItem(i2s(id), id);
 
     ui->label_map->add_robot_icon(id,DeviceMap[id].robot->name,DeviceMap[id].robot->ui->toolButton_robot_map);
     connect(ui->label_map,&MapLabel::move_robot_icon,this,[=](const int& robot_id,const QPoint& pos){
@@ -151,16 +151,13 @@ bool HomeWindow::addNewRobotDevice(int id)
 bool HomeWindow::startTcpServerListen(const QString &ipAddress, const quint16 &port)
 {
     qDebug() << "启动服务器：" << ipAddress << port;
-    if (!server.listen(QHostAddress(ipAddress), port))
-    {
+    if (!server.listen(QHostAddress(ipAddress), port)){
         qWarning() << "无法启动服务器：" << server.errorString();
         return false;
     }
     qDebug() << "服务器已启动，监听地址：" << ipAddress << "，端口号：" << port;
     // 处理新的客户端连接
-    QObject::connect(&server, &QTcpServer::newConnection, this, [=]()
-                     {
-
+    QObject::connect(&server, &QTcpServer::newConnection, this, [=](){
         // 接受新的客户端连接
         QTcpSocket *clientSocket = server.nextPendingConnection();
         // 处理客户端连接
@@ -170,7 +167,7 @@ bool HomeWindow::startTcpServerListen(const QString &ipAddress, const quint16 &p
 
         // 客户端断开连接
         QObject::connect(clientSocket, &QTcpSocket::disconnected, [clientSocket]() {
-            qDebug() << "客户端断开连接：" << clientSocket->peerAddress().toString() << ":" << clientSocket->peerPort();
+            qDebug() << "客户端断开连接startTcpServerListen：" << clientSocket->peerAddress().toString() << ":" << clientSocket->peerPort();
             clientSocket->deleteLater();
         }); });
     return true;
@@ -180,15 +177,11 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
 {
     qDebug() << "HomeWindow::ProcessNewConnection(QTcpSocket *" << socket;
     // 接收一次数据 第一次等待10s接收信息
-    if (socket->waitForReadyRead(10000))
-    {
-
+    if (socket->waitForReadyRead(10000)){
         QByteArray headerData = socket->readAll();
         int value = (int)headerData.at(0) << 8 | (int)headerData.at(1);
         qDebug() << "新的客户端连接：value" << headerData.at(0) << (int)headerData.at(0) << (int)headerData.at(1) << value;
-        if (headerData.at(0) == 0x55 && headerData.at(1) == 0x01)
-        {
-            // 机器人
+        if (headerData.at(0) == 0x55 && headerData.at(1) == 0x01){ // 机器人本体数据
             int clientId = (int)headerData.at(2) << 8 | (int)headerData.at(3);
             qDebug() << "新的客户端连接：currenId" << clientId;
             //自动添加新设备，初始化，如果已经存在，只需要更新连接socket
@@ -199,8 +192,7 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
             DeviceMap[clientId].robot->clientOnlineEvent();
 
             // 接收客户端发送的数据
-            QObject::connect(socket, &QTcpSocket::readyRead, this, [=]()
-                             {
+            QObject::connect(socket, &QTcpSocket::readyRead, this, [=](){
                 QByteArray bytes = socket->readAll();
                 //只处理64字节的数据，对粘包，丢包不进行处理
                 if(bytes.length()==64){
@@ -221,32 +213,35 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
             QObject::connect(socket, &QTcpSocket::disconnected,this, [=]() {
                 DeviceMap[clientId].isOnline = false;
                 DeviceMap[clientId].robot->clientOfflineEvent();
-
-                //DeviceMap[clientId].robot->quit();
-
                 socket->deleteLater();
             });
+        }else{ //机器人未知数据
+            qDebug() << "未知客户端连接：" << socket->peerAddress().toString() << ":" << socket->peerPort();
+            // 主动断开未知设备的连接
+//            socket->disconnectFromHost();
+//            socket->deleteLater();
         }
+    }else{
+     //客户端断开连接
+//        QObject::connect(socket, &QTcpSocket::disconnected, [socket]() {
+//            qDebug() << "客户端断开连接：" << socket->peerAddress().toString() << ":" << socket->peerPort();
+//            socket->disconnectFromHost();
+//            socket->deleteLater();
+//        });
     }
-    else
-    {
-    }
-
     return 0;
-    // 客户端断开连接
-    //    QObject::connect(socket, &QTcpSocket::disconnected, [socket]() {
-    //        qDebug() << "客户端断开连接：" << socket->peerAddress().toString() << ":" << socket->peerPort();
-    //        socket->deleteLater();
-    //    });
 }
 
-bool HomeWindow::CameraWidgetPlay(const int &id, const QUrl &source)
+bool HomeWindow::CameraWidgetPlay(const int &id,const int &channel, const QUrl &source)
 {
-    DeviceId = id;
+    SelectedId = id;
+    selectedCameralChannel = channel;
     if (currentItemCameraWidget == -1)
     {
         return false;
     }
+    cameraWidgets.at(currentItemCameraWidget)->id = id;
+    cameraWidgets.at(currentItemCameraWidget)->cameralChannel = channel;
     //存在同源奔溃后无法重新连接的问题，暂时未测
     // QUrl source = QUrl("rtsp://admin:dacang80@192.168.1.38:554/Streaming/Channels/101");
     cameraWidgets.at(currentItemCameraWidget)->player.setSource(source);
@@ -265,6 +260,22 @@ void HomeWindow::MouseButtonPressCameraWidget(int index)
         cameraWidgets.at(lastItemCameraWidget)->setContentsMargins(0, 0, 0, 0); // 显示边框
     }
     cameraWidgets.at(index)->setContentsMargins(1, 1, 1, 1); // 显示边框
+
+    selectedCameralChannel = cameraWidgets.at(index)->cameralChannel;
+    if(SelectedId != cameraWidgets.at(index)->id){
+        UpdateSelectedId(cameraWidgets.at(index)->id);
+    }
+}
+
+void HomeWindow::UpdateSelectedId(const int &id)
+{
+    SelectedId = id;
+    int index = ui->comboBox_device_manage_id->findText(i2s(id));
+    if (index != -1)
+    {
+        ui->comboBox_device_manage_id->setCurrentIndex(index);
+    }
+
 }
 
 void HomeWindow::on_toolButton_DeviceControlWidget_show_clicked()
@@ -355,54 +366,54 @@ void HomeWindow::on_toolButton_robot_send_cmd_clicked()
     //            cmdByteArray.append(static_cast<char>(value));
     //        }
     //    }
-    DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(cmd.toUtf8()));
+    DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(cmd.toUtf8()));
 }
 
 void HomeWindow::on_toolButton_robot_move_forward_pressed()
 {
     qDebug() << "HomeWindow::on_toolButton_robot_move_forward_pressed()";
     // robot.sendMessage(currentDeviceId,QByteArray::fromRawData("\x5A\x02\x09", 3));
-    DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Move_Forward));
+    DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Move_Forward));
 }
 
 void HomeWindow::on_toolButton_robot_move_forward_released()
 {
-    DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Move_Stop));
+    DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Move_Stop));
 }
 
 void HomeWindow::on_toolButton_robot_move_backward_pressed()
 {
-    DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Move_Backward));
+    DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Move_Backward));
 }
 
 void HomeWindow::on_toolButton_robot_move_backward_released()
 {
-    DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Move_Stop));
+    DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Move_Stop));
 }
 
 void HomeWindow::on_toolButton_robot_speed_add_clicked()
 {
-    DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Speed_Add));
+    DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Speed_Add));
 }
 
 void HomeWindow::on_toolButton_robot_speed_subtract_clicked()
 {
-    DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Speed_Subtrat));
+    DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Speed_Subtrat));
 }
 
 void HomeWindow::on_toolButton_robot_state_set_clicked()
 {
-    if (DeviceMap[DeviceId].robot->isCmdState())
+    if (DeviceMap[SelectedId].robot->isCmdState())
     {
         // 手动模式切换自动
-        if (DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_State_Auto)))
+        if (DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_State_Auto)))
         {
             ui->toolButton_robot_state_set->setText("手动模式");
         }
     }
     else
     {
-        if (DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_State_Cmd)))
+        if (DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_State_Cmd)))
         {
             ui->toolButton_robot_state_set->setText("自动模式");
         }
@@ -411,10 +422,10 @@ void HomeWindow::on_toolButton_robot_state_set_clicked()
 
 void HomeWindow::on_toolButton_robot_charge_set_clicked()
 {
-    if (!DeviceMap[DeviceId].robot->isCmdCharging())
+    if (!DeviceMap[SelectedId].robot->isCmdCharging())
     {
         // 开启充电
-        if (DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_State_Charge)))
+        if (DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_State_Charge)))
         {
             ui->toolButton_robot_charge_set->setText("取消充电");
             ui->toolButton_robot_charge_set->setStyleSheet("background-color: red;");
@@ -422,7 +433,7 @@ void HomeWindow::on_toolButton_robot_charge_set_clicked()
     }
     else
     {
-        if (DeviceMap[DeviceId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Charge_Off)))
+        if (DeviceMap[SelectedId].robot->sendMessage(QByteArray::fromHex(Robot_CMD_Charge_Off)))
         {
             ui->toolButton_robot_charge_set->setText("开启充电");
             ui->toolButton_robot_charge_set->setStyleSheet("");
@@ -441,7 +452,7 @@ void HomeWindow::on_toolButton_robot_camera_set_PAN_TITL_clicked()
     byteArray.append(reinterpret_cast<const char *>(&pan), sizeof(pan));
     byteArray.append(reinterpret_cast<const char *>(&titl), sizeof(titl));
 
-    DeviceMap[DeviceId].robot->sendMessage(byteArray);
+    DeviceMap[SelectedId].robot->sendMessage(byteArray);
 }
 
 void HomeWindow::on_toolButton_robot_map_set_clicked()
@@ -454,7 +465,7 @@ void HomeWindow::on_toolButton_robot_map_set_clicked()
     byteArray.append(reinterpret_cast<const char *>(&origin), sizeof(origin));
     byteArray.append(reinterpret_cast<const char *>(&end), sizeof(end));
 
-    DeviceMap[DeviceId].robot->sendMessage(byteArray);
+    DeviceMap[SelectedId].robot->sendMessage(byteArray);
 }
 
 void HomeWindow::on_toolButton_robot_move_goto_clicked()
@@ -471,7 +482,7 @@ void HomeWindow::on_toolButton_robot_move_goto_clicked()
     //    byteArray.append((0xff00 & arg1) >> 8);
     //    byteArray.append((0xff0000 & arg1) >> 16);
     //    byteArray.append((0xff000000 & arg1) >> 24);
-    DeviceMap[DeviceId].robot->sendMessage(byteArray);
+    DeviceMap[SelectedId].robot->sendMessage(byteArray);
 }
 
 void HomeWindow::on_toolButton_robot_move_goto_cancel_clicked()
@@ -481,7 +492,7 @@ void HomeWindow::on_toolButton_robot_move_goto_cancel_clicked()
     byteArray.append(0x0A);
     byteArray.append(0x02);
     byteArray.append(0x00 & 0xff);
-    DeviceMap[DeviceId].robot->sendMessage(byteArray);
+    DeviceMap[SelectedId].robot->sendMessage(byteArray);
 }
 
 void HomeWindow::on_toolButton_robot_time_set_clicked()
@@ -506,18 +517,18 @@ void HomeWindow::on_toolButton_robot_time_set_clicked()
     byteArray.append(reinterpret_cast<const char *>(&arg1), sizeof(arg1));
     byteArray.append(reinterpret_cast<const char *>(&arg2), sizeof(arg2));
     byteArray.append(reinterpret_cast<const char *>(&arg3), sizeof(arg3));
-    DeviceMap[DeviceId].robot->sendMessage(byteArray);
+    DeviceMap[SelectedId].robot->sendMessage(byteArray);
 }
 
 void HomeWindow::on_toolButton_device_management_isShow_clicked()
 {
-    ui->widget_device_add->setVisible(!ui->widget_device_add->isVisible());
+    ui->widget_device_manage->setVisible(!ui->widget_device_manage->isVisible());
 }
 
 void HomeWindow::on_toolButton_device_add_clicked()
 {
     QJsonObject devices = config["devices"].toObject();
-    QString key = ui->comboBox_device_add_id->currentText();
+    QString key = ui->comboBox_device_manage_id->currentText();
     if (devices.contains(key))
     {
         QToolTip::showText(ui->toolButton_device_add->mapToGlobal(QPoint(0, 0)),
@@ -534,7 +545,7 @@ void HomeWindow::on_toolButton_device_add_clicked()
     DeviceMap[id].type = DeviceType(DeviceType_Robot_test);
 
     QJsonObject device;
-    device["type"] = ui->comboBox_device_add_type->currentText().toInt();
+    device["type"] = ui->comboBox_device_manage_type->currentText().toInt();
     devices[i2s(id)] = device;
     config["devices"] = devices;
 
@@ -545,7 +556,7 @@ void HomeWindow::on_toolButton_device_add_clicked()
 void HomeWindow::on_toolButton_device_update_clicked()
 {
     QJsonObject devices = config["devices"].toObject();
-    QString key = ui->comboBox_device_add_id->currentText();
+    QString key = ui->comboBox_device_manage_id->currentText();
     if (!devices.contains(key))
     {
         QToolTip::showText(ui->toolButton_device_update->mapToGlobal(QPoint(0, 0)),
@@ -556,7 +567,7 @@ void HomeWindow::on_toolButton_device_update_clicked()
 
     int id = key.toInt();
     QJsonObject device;
-    device["type"] = ui->comboBox_device_add_type->currentData().toInt();
+    device["type"] = ui->comboBox_device_manage_type->currentData().toInt();
     devices[i2s(id)] = device;
     config["devices"] = devices;
 }
@@ -564,7 +575,7 @@ void HomeWindow::on_toolButton_device_update_clicked()
 void HomeWindow::on_toolButton_device_delete_clicked()
 {
     QJsonObject devices = config["devices"].toObject();
-    QString key = ui->comboBox_device_add_id->currentText();
+    QString key = ui->comboBox_device_manage_id->currentText();
     if (!devices.contains(key))
     {
         QToolTip::showText(ui->toolButton_device_delete->mapToGlobal(QPoint(0, 0)),
@@ -586,7 +597,7 @@ void HomeWindow::on_toolButton_device_delete_clicked()
     config["devices"] = devices;
 }
 
-void HomeWindow::on_comboBox_device_add_id_currentTextChanged(const QString &arg1)
+void HomeWindow::on_comboBox_device_manage_id_currentTextChanged(const QString &arg1)
 {
     QJsonObject devices = config["devices"].toObject();
     if (devices.contains(arg1))
@@ -594,10 +605,10 @@ void HomeWindow::on_comboBox_device_add_id_currentTextChanged(const QString &arg
         int type = devices[arg1].toObject()["type"].toInt(-1);
         if (type != -1)
         {
-            int index = ui->comboBox_device_add_type->findData(type);
+            int index = ui->comboBox_device_manage_type->findData(type);
             if (index != -1)
             {
-                ui->comboBox_device_add_type->setCurrentIndex(index);
+                ui->comboBox_device_manage_type->setCurrentIndex(index);
             }
         }
     }
@@ -610,4 +621,206 @@ void HomeWindow::on_toolButton_map_show_clicked()
 }
 
 
+void HomeWindow::on_toolButton_camera_robot_up_pressed()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 0;//0－开始，1－停止
+    action["dwPTZCommand"] = TILT_UP;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_up_released()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 1;//0－开始，1－停止
+    action["dwPTZCommand"] = TILT_UP;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_down_pressed()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 0;//0－开始，1－停止
+    action["dwPTZCommand"] = TILT_DOWN;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_down_released()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 1;//0－开始，1－停止
+    action["dwPTZCommand"] = TILT_DOWN;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_left_pressed()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 0;//0－开始，1－停止
+    action["dwPTZCommand"] = PAN_LEFT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_left_released()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 1;//0－开始，1－停止
+    action["dwPTZCommand"] = PAN_LEFT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_right_pressed()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 0;//0－开始，1－停止
+    action["dwPTZCommand"] = PAN_RIGHT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_right_released()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 1;//0－开始，1－停止
+    action["dwPTZCommand"] = PAN_RIGHT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_left_up_pressed()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 0;//0－开始，1－停止
+    action["dwPTZCommand"] = UP_LEFT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_left_up_released()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 1;//0－开始，1－停止
+    action["dwPTZCommand"] = UP_LEFT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_right_up_pressed()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 0;//0－开始，1－停止
+    action["dwPTZCommand"] = UP_RIGHT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_right_up_released()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 1;//0－开始，1－停止
+    action["dwPTZCommand"] = UP_RIGHT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_left_down_pressed()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 0;//0－开始，1－停止
+    action["dwPTZCommand"] = DOWN_LEFT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_left_down_released()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 1;//0－开始，1－停止
+    action["dwPTZCommand"] = DOWN_LEFT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_right_down_pressed()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 0;//0－开始，1－停止
+    action["dwPTZCommand"] = DOWN_RIGHT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_right_down_released()
+{
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = 1;//0－开始，1－停止
+    action["dwPTZCommand"] = DOWN_RIGHT;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton__camera_PTZControl_LIGHT_PWRON_clicked()
+{
+    static int dwStop = 1;
+    dwStop = dwStop ? 0:1;
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = dwStop;//0－开始，1－停止
+    action["dwPTZCommand"] = LIGHT_PWRON;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton__camera_PTZControl_WIPER_PWRON_clicked()
+{
+    static int dwStop = 1;
+    dwStop = dwStop ? 0:1;
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = dwStop;//0－开始，1－停止
+    action["dwPTZCommand"] = WIPER_PWRON;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_robot_auto_clicked()
+{
+    static int dwStop = 1;
+    dwStop = dwStop ? 0:1;
+    QJsonObject action;
+    action["lChannel"] = selectedCameralChannel;
+    action["dwStop"] = dwStop;//0－开始，1－停止
+    action["dwPTZCommand"] = PAN_AUTO;
+    DeviceMap[SelectedId].robot->run_action_operation(PointAction_Vision_PTZControl, action);
+}
+
+
+void HomeWindow::on_toolButton_camera_preview_cancel_clicked()
+{
+    if(cameraWidgets.at(currentItemCameraWidget)->player.isPlaying()){
+        cameraWidgets.at(currentItemCameraWidget)->player.stop();
+    }
+}
 

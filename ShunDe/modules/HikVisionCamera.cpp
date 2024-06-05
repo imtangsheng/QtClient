@@ -146,9 +146,9 @@ bool HikVisionCamera::updateCameraPose_Pan_Tilt(int pan, int tilt)
 
 bool HikVisionCamera::PTZControl(int lChannel,int dwPTZCommand, int dwStop)
 {
-    qDebug()<<"HikVisionCamera::PTZControl";
+    qDebug()<<"HikVisionCamera::PTZControl"<<lChannel<<dwPTZCommand<<dwStop;
     //目前只支持补光灯
-    bool success = NET_DVR_PTZControl_Other(lUserID,lChannel , LIGHT_PWRON, dwStop);
+    bool success = NET_DVR_PTZControl_Other(lUserID,lChannel , dwPTZCommand, dwStop);
 
     if(!success) qDebug()<<"云台角度失败!错误码:"+i2s(NET_DVR_GetLastError());
     return true;

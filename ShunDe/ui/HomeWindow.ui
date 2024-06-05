@@ -787,7 +787,7 @@
              </layout>
             </item>
             <item>
-             <widget class="QWidget" name="widget_device_add" native="true">
+             <widget class="QWidget" name="widget_device_manage" native="true">
               <layout class="QVBoxLayout" name="verticalLayout_6">
                <property name="spacing">
                 <number>0</number>
@@ -817,7 +817,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="comboBox_device_add_id">
+                  <widget class="QComboBox" name="comboBox_device_manage_id">
                    <property name="maximumSize">
                     <size>
                      <width>36</width>
@@ -840,7 +840,7 @@
                   </widget>
                  </item>
                  <item>
-                  <widget class="QComboBox" name="comboBox_device_add_type">
+                  <widget class="QComboBox" name="comboBox_device_manage_type">
                    <property name="maximumSize">
                     <size>
                      <width>16777215</width>
