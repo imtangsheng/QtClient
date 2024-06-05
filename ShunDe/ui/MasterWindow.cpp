@@ -286,8 +286,7 @@ void MasterWindow::on_toolButton_inspection_query_value_clicked()
 
 }
 
-
-
+#include <xlsxio_write.h>
 
 void MasterWindow::on_toolButton__inspectionPoints_export_file_download_clicked()
 {
@@ -314,14 +313,38 @@ void MasterWindow::on_toolButton__inspectionPoints_export_file_download_clicked(
         if (filePath.isEmpty())
             return;
         // 将 XLSX 后缀修改为 CSV 后缀
-        filePath = filePath.left(filePath.lastIndexOf('.')) + ".csv";
-        if(saveFileToExcel(filePath))
-        QMessageBox::information(this, "导出成功", "数据已成功导出到 Excel 文件。");
+        //filePath = filePath.left(filePath.lastIndexOf('.')) + ".csv";
+        //if(saveFileToExcel(filePath))
+        //QMessageBox::information(this, "导出成功", "数据已成功导出到 Excel 文件。");
         break;
     default:
-        return;
+        //return;
         break;
 
     }
+
+    //open .xlsx file for writing (will overwrite if it already exists)
+    xlsxiowriter handle;
+    if ((handle = xlsxiowrite_open(filePath.toUtf8(), "MySheet")) == NULL) {
+        fprintf(stderr, "Error creating .xlsx file\n");
+        return;
+    }
+
+    //write column names
+    xlsxiowrite_add_column(handle, "Col1", 16);
+    xlsxiowrite_add_column(handle, "Col2", 0);
+    xlsxiowrite_next_row(handle);
+
+    //write data
+    int i;
+    for (i = 0; i < 1000; i++) {
+        xlsxiowrite_add_cell_string(handle, "Test");
+        xlsxiowrite_add_cell_int(handle, i);
+        xlsxiowrite_next_row(handle);
+    }
+
+    //close .xlsx file
+    xlsxiowrite_close(handle);
+
 }
 
