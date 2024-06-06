@@ -4,6 +4,7 @@
 #include <QCommandLineParser>
 #include "mainwindow.h"
 #include "public/AppSystem.h"
+#include <QDir>
 
 //QSettings APP_SETTINGS;
 QSettings AppSettings(PATH_APP_SETTINGS,QSettings::IniFormat); //无编码配置，已经移除，使用UTF-8
@@ -12,6 +13,17 @@ QSettings AppSettings(PATH_APP_SETTINGS,QSettings::IniFormat); //无编码配置
 
 int main(int argc, char *argv[])
 {
+    // 获取应用程序所在目录
+    QString appDir = QCoreApplication::applicationDirPath();
+    //遍历 libs 目录下所有的子目录
+    QDir libsDir(QDir(appDir).filePath("libs"));
+    QStringList subLibsDirs = libsDir.entryList(QDir::Dirs | QDir::NoDotAndDotDot);
+    for(const QString& subdir: subLibsDirs){
+        QString libDir = QDir(libsDir.absoluteFilePath(subdir)).filePath("lib");
+        //添加 lib 目录到搜索路径
+        QCoreApplication::addLibraryPath(libDir);
+    }
+
     QApplication app(argc, argv);
     QCommandLineParser parser;
     parser.setApplicationDescription("My Application");
