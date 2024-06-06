@@ -5,6 +5,8 @@
 #include <QFileDialog>
 #include <QToolTip>
 #include <QDir>
+#include <QDir>
+#include <QCalendarWidget>
 
 VideoWindow::VideoWindow(QWidget *parent) : QMainWindow(parent),
                                             ui(new Ui::VideoWindow)
@@ -87,6 +89,12 @@ void VideoWindow::init()
 
     ui->toolButton_videoPause->setVisible(false);
     ui->horizontalSlider_volume->setVisible(false);
+
+    /*视频文件日期设置界面*/
+    ui->dateEdit_videofiles->setDate(QDate::currentDate());
+    ui->dateEdit_videofiles->calendarWidget()->setWeekdayTextFormat(Qt::Saturday,QTextCharFormat());
+    ui->dateEdit_videofiles->calendarWidget()->setWeekdayTextFormat(Qt::Sunday,QTextCharFormat());
+    ui->dateEdit_videofiles->calendarWidget()->setDateTextFormat(QDate(),QTextCharFormat());
 
     /*[end]处理设置文件，配置读取初始化*/
     AppSettings.beginGroup(objectName());
@@ -188,10 +196,10 @@ void VideoWindow::readAllFilesFromLocalPath(const QString &directory)
     // 使用 entryInfoList() 方法获取文件和子目录的详细信息列表
     foreach (QFileInfo fileInfo, dir.entryInfoList(QDir::Files))
     {
-        qDebug() << "fileInfo" << fileInfo; // QFileInfo(G:\data\CJCS.TXT)
-        qDebug() << "fileInfo.fileName()" << fileInfo.fileName();
-        qDebug() << "fileInfo.absoluteFilePath" << fileInfo.absoluteFilePath() << fileInfo.absoluteFilePath().remove(0, directory.length());
-        qDebug() << "fileInfo.Path" << fileInfo.path() << directory.length() << fileInfo.path().remove(0, directory.length());
+        //qDebug() << "fileInfo" << fileInfo; // QFileInfo(G:\data\CJCS.TXT)
+        //qDebug() << "fileInfo.fileName()" << fileInfo.fileName();
+        //qDebug() << "fileInfo.absoluteFilePath" << fileInfo.absoluteFilePath() << fileInfo.absoluteFilePath().remove(0, directory.length());
+        //qDebug() << "fileInfo.Path" << fileInfo.path() << directory.length() << fileInfo.path().remove(0, directory.length());
         filesListLocal << fileInfo.absoluteFilePath();
     }
     foreach (QFileInfo dirInfo, dir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot))
@@ -248,6 +256,78 @@ bool VideoWindow::startPlay(const QString &file)
     }
     return true;
 }
+
+void VideoWindow::getVideoFilesInfoByDir(const QString &directory)
+{
+    QDir dir(directory);
+    //dir.setFilter(QDir::Files);
+    dir.setSorting(QDir::Time | QDir::Reversed);
+    QFileInfoList files = dir.entryInfoList(QDir::Files) ;
+    QStringList videoExtensionList = fileExtensions.split("|");
+
+    for(const QFileInfo& file: std::as_const(files)){
+        for(const QString& ext : videoExtensionList){
+            if(file.suffix().toLower() == ext.mid(1)){
+                VideoInfo info;
+                info.filePath =file.absoluteFilePath();
+                info.fileName = file.fileName();
+                info.dateTime = file.lastModified();
+                info.date = file.lastModified().date();
+                //时长
+                if (playHistoryJson.contains(file.absoluteFilePath())){
+                    info.duration = playHistoryJson[file.absoluteFilePath()].toObject()["duration"].toInteger() / 1000;
+                }
+                videoFilesListLocal.append(info);
+                break;
+            }
+        }
+    }
+
+    foreach (QFileInfo dirInfo, dir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot))
+    {
+        //qDebug() << "fileInfo dirInfo:" << dirInfo; // QFileInfo(G:\data\)
+        getVideoFilesInfoByDir(dirInfo.absoluteFilePath());
+    }
+
+}
+
+void VideoWindow::update_CalendarWidget_videoDate_show()
+{
+    ui->dateEdit_videofiles->calendarWidget()->setDateTextFormat(QDate(),QTextCharFormat());
+    QTextCharFormat format;
+    format.setForeground(Qt::red);
+    for(const VideoInfo& info : videoFilesListLocal) {
+        if(info.dateTime.isValid())
+            ui->dateEdit_videofiles->calendarWidget()->setDateTextFormat(info.dateTime.date(),format);
+    }
+}
+
+void VideoWindow::setItem_tableWidget_playerList(const int &row, const VideoInfo &info)
+{
+    ui->tableWidget_playerList->setItem(row,TableWidgetItem_Column_FileName,new QTableWidgetItem(info.fileName));
+    ui->tableWidget_playerList->setItem(row,TableWidgetItem_Column_DateTime,new QTableWidgetItem(info.dateTime.toString("yyyy/MM/dd-hh:mm:ss")));
+    ui->tableWidget_playerList->setItem(row,TableWidgetItem_Column_Time,new QTableWidgetItem(QTime(0, 0).addMSecs(info.duration).toString("hh:mm:ss")));
+
+}
+
+void VideoWindow::set_tableWidget_playerList_byDate(const QDate &date)
+{
+    //视频列表更新数据
+    map_tableWidgetIndex_to_videoFilesListLocalIndex.clear();
+    ui->tableWidget_playerList->clearContents();
+    ui->tableWidget_playerList->setRowCount(0);
+    for (int var = 0; var < videoFilesListLocal.size(); ++var) {
+        const VideoInfo& info = videoFilesListLocal.at(var);
+        if(info.dateTime.date() == date){
+            int row = ui->tableWidget_playerList->rowCount(); // 添加一行到表格中
+            ui->tableWidget_playerList->insertRow(row);
+            setItem_tableWidget_playerList(row,info);
+            map_tableWidgetIndex_to_videoFilesListLocalIndex[row] = var;
+        }
+    }
+}
+
+
 
 void VideoWindow::mouseEnterVideo()
 {
@@ -464,7 +544,7 @@ void VideoWindow::update_tableWidget_playerList(const QString &filesPath)
 {
     qDebug() << "VideoWindow::update_tableWidget_playerList(const QString &" << filesPath;
 
-    ui->lineEdit_pathPlayerList->setText(filesPath);
+
     // 读取所有的文件
     filesListLocal.clear();
     readAllFilesFromLocalPath(filesPath);
@@ -586,6 +666,7 @@ void VideoWindow::updateDurationInfo(qint64 currentInfo)
     }
     ui->label_videoProgress->setText(sStr);
 }
+
 
 void VideoWindow::on_toolButton_moreSetting_clicked()
 {
@@ -794,12 +875,52 @@ void VideoWindow::on_tableWidget_playerList_itemDoubleClicked(QTableWidgetItem *
 
 void VideoWindow::on_tableWidget_playerList_doubleClicked(const QModelIndex &index)
 {
-    qDebug() << "VideoWindow::on_tableWidget_playerList_doubleClicked(const QModelIndex &" << index.row() << filesListLocal.at(index.row());
-    startPlay(filesListLocal.at(index.row()));
+    qDebug() << "VideoWindow::on_tableWidget_playerList_doubleClicked(const QModelIndex &" << index.row();
+    //startPlay(filesListLocal.at(index.row()));
+    startPlay(videoFilesListLocal.at(map_tableWidgetIndex_to_videoFilesListLocalIndex[index.row()]).filePath);
 }
 
 void VideoWindow::on_comboBox_updatePlayerList_currentTextChanged(const QString &arg1)
 {
     qDebug() << "VideoWindow::on_comboBox_updatePlayerList_currentTextChanged(const QString &" << arg1 << ui->comboBox_updatePlayerList->currentData();
-    update_tableWidget_playerList(ui->comboBox_updatePlayerList->currentData().toString());
+    //update_tableWidget_playerList(ui->comboBox_updatePlayerList->currentData().toString());
+
 }
+
+void VideoWindow::on_comboBox_updatePlayerList_activated(int index)
+{
+    //activated() 信号只会在用户手动选择了下拉列表中的某个项目时才会被触发,而 currentIndexChanged() 信号则会在任何情况下都会被触发,即使是程序内部设置了当前索引。
+    qDebug() << "on_comboBox_updatePlayerList_activated(int "<<index;
+    QString fileDir = ui->comboBox_updatePlayerList->currentData().toString();
+    ui->lineEdit_pathPlayerList->setText(fileDir);
+
+    //数据清空
+    videoFilesListLocal.clear();
+    getVideoFilesInfoByDir(fileDir);
+    update_CalendarWidget_videoDate_show();
+
+    //视频列表更新数据
+    map_tableWidgetIndex_to_videoFilesListLocalIndex.clear();
+    ui->tableWidget_playerList->clearContents();
+    ui->tableWidget_playerList->setRowCount(videoFilesListLocal.size());
+
+    for (int var = 0; var < videoFilesListLocal.size(); ++var) {
+        map_tableWidgetIndex_to_videoFilesListLocalIndex[var] = var;
+        setItem_tableWidget_playerList(var,videoFilesListLocal.at(var));
+    }
+
+}
+
+void VideoWindow::on_dateEdit_videofiles_userDateChanged(const QDate &date)
+{
+    qDebug() << "VideoWindow::on_dateEdit_videofiles_userDateChanged(const QDate &date)"<<date;
+    set_tableWidget_playerList_byDate(date);
+    //取消选中 日期颜色恢复
+    ui->dateEdit_videofiles->calendarWidget()->setSelectedDate(QDate());
+}
+
+void VideoWindow::on_pushButton_videofiles_data_set_clicked()
+{
+    set_tableWidget_playerList_byDate(ui->dateEdit_videofiles->date());
+}
+

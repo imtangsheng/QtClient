@@ -22,5 +22,8 @@
         <file>asset/mianWidget/pupup_right.svg</file>
         <file>asset/mianWidget/videoFiles.svg</file>
         <file>asset/mianWidget/videoSettings.svg</file>
+        <file>asset/mianWidget/date_calendar.svg</file>
+        <file>asset/mianWidget/date_next.svg</file>
+        <file>asset/mianWidget/date_previous.svg</file>
     </qresource>
 </RCC>

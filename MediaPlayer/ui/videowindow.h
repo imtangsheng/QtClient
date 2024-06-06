@@ -5,6 +5,20 @@
 #include <QMainWindow>
 #include "ui_videowindow.h"
 
+#define TableWidgetItem_Column_FileName 0
+#define TableWidgetItem_Column_DateTime 1
+#define TableWidgetItem_Column_Time 3
+#define TableWidgetItem_Column_Size 2
+
+struct VideoInfo
+{
+    QString filePath;
+    QString fileName;
+    QDateTime dateTime;
+    QDate date;
+    qint64 duration = 0;
+};
+
 namespace Ui
 {
     class VideoWindow;
@@ -24,6 +38,13 @@ public:
 
     void readAllFilesFromLocalPath(const QString &directory);
     bool startPlay(const QString &file);
+    /**视频文件操作方法**/
+    QList<VideoInfo> videoFilesListLocal;
+    void getVideoFilesInfoByDir(const QString& directory);
+    void update_CalendarWidget_videoDate_show();
+    void setItem_tableWidget_playerList(const int& row,const VideoInfo& info);
+    void set_tableWidget_playerList_byDate(const QDate& date);
+    QMap<int,int> map_tableWidgetIndex_to_videoFilesListLocalIndex;
 
 public slots:
     void mouseEnterVideo();
@@ -80,55 +101,40 @@ private slots:
     void on_Button_moreWidget_isFloatable_clicked();
 
     void on_toolButton_videoPlay_clicked();
-
     void on_toolButton_videoPause_clicked();
-
     void on_toolButton_videoStop_clicked();
-
     void on_toolButton_fullScreen_clicked();
-
     void on_toolButton_moreSetting_clicked();
-
     void on_horizontalSlider_position_valueChanged(int value);
-
     void on_horizontalSlider_position_sliderMoved(int position);
-
     void on_toolButton_microphoneMute_clicked();
-
     void on_horizontalSlider_volume_valueChanged(int value);
-
     void on_toolButton_fastBback_clicked();
-
     void on_toolButton_fastForward_clicked();
-
     void on_comboBox_rate_currentIndexChanged(int index);
 
     void on_toolButton_openFiles_clicked();
-
     void on_pushButton_playerPath_update_clicked();
 
     //void on_comboBox_playerPath_currentIndexChanged(int index);
     void on_comboBox_playerPath_currentTextChanged(const QString &arg1);
 
     void on_pushButton_playerPath_add_clicked();
-
     void on_pushButton_playerPath_delete_clicked();
-
     void on_pushButton_setEditPlayerPath_clicked();
-
     void on_pushButton_setPlayPageStep_clicked();
-
     void on_pushButton_setPlaySource_clicked();
-
     void on_checkBox_autoPlay_stateChanged(int arg1);
-
     void on_pushButton_setFileExtensions_clicked();
 
     void on_tableWidget_playerList_itemDoubleClicked(QTableWidgetItem *item);
-
     void on_tableWidget_playerList_doubleClicked(const QModelIndex &index);
 
     void on_comboBox_updatePlayerList_currentTextChanged(const QString &arg1);
+    void on_comboBox_updatePlayerList_activated(int index);
+    void on_dateEdit_videofiles_userDateChanged(const QDate &date);
+
+    void on_pushButton_videofiles_data_set_clicked();
 
 private:
     Ui::VideoWindow *ui;

@@ -15,7 +15,7 @@ class MediaPlayer : public QObject, PluginInterface
 
 public:
     explicit MediaPlayer(QObject *parent = nullptr);
-    ~MediaPlayer();
+    ~MediaPlayer() override;
     void init();
     //    void initialize() override;
 public:
