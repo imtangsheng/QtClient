@@ -1175,6 +1175,11 @@ QComboBox QAbstractItemView::item:selected {
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="font">
+          <font>
+           <pointsize>12</pointsize>
+          </font>
+         </property>
          <property name="toolTip">
           <string>播放列表</string>
          </property>
@@ -1213,7 +1218,7 @@ QTabWidget::pane {
           <attribute name="toolTip">
            <string>播放列表</string>
           </attribute>
-          <layout class="QVBoxLayout" name="verticalLayout_6">
+          <layout class="QVBoxLayout" name="verticalLayout_6" stretch="0,0,0,10,0">
            <property name="spacing">
             <number>0</number>
            </property>
@@ -1234,7 +1239,7 @@ QTabWidget::pane {
              <item>
               <widget class="QLabel" name="label_5">
                <property name="text">
-                <string>视频类别</string>
+                <string>视频类别：</string>
                </property>
               </widget>
              </item>
@@ -1255,7 +1260,7 @@ QTabWidget::pane {
              <item>
               <widget class="QLabel" name="label_6">
                <property name="text">
-                <string>视频目录</string>
+                <string>视频目录：</string>
                </property>
               </widget>
              </item>
@@ -1273,7 +1278,7 @@ QTabWidget::pane {
              <item>
               <widget class="QLabel" name="label_4">
                <property name="text">
-                <string>日期筛选</string>
+                <string>日期筛选：</string>
                </property>
               </widget>
              </item>
@@ -1414,16 +1419,6 @@ QTableCornerButton::section {
              <attribute name="verticalHeaderDefaultSectionSize">
               <number>30</number>
              </attribute>
-             <row>
-              <property name="text">
-               <string>1</string>
-              </property>
-             </row>
-             <row>
-              <property name="text">
-               <string>2</string>
-              </property>
-             </row>
              <column>
               <property name="text">
                <string>名称</string>
@@ -1436,64 +1431,9 @@ QTableCornerButton::section {
              </column>
              <column>
               <property name="text">
-               <string>大小</string>
-              </property>
-             </column>
-             <column>
-              <property name="text">
                <string>时长</string>
               </property>
              </column>
-             <item row="0" column="0">
-              <property name="text">
-               <string>test1</string>
-              </property>
-             </item>
-             <item row="0" column="1">
-              <property name="text">
-               <string>20240403</string>
-              </property>
-             </item>
-             <item row="0" column="2">
-              <property name="text">
-               <string>1M</string>
-              </property>
-             </item>
-             <item row="0" column="3">
-              <property name="text">
-               <string>00:23</string>
-              </property>
-             </item>
-             <item row="1" column="0">
-              <property name="text">
-               <string>test2</string>
-              </property>
-             </item>
-             <item row="1" column="1">
-              <property name="text">
-               <string>20240101</string>
-              </property>
-             </item>
-             <item row="1" column="2">
-              <property name="text">
-               <string>2M</string>
-              </property>
-             </item>
-             <item row="1" column="3">
-              <property name="text">
-               <string>01:00</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
-            <widget class="QWidget" name="widget" native="true">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>113</height>
-              </size>
-             </property>
             </widget>
            </item>
            <item>
@@ -1583,7 +1523,7 @@ QTableCornerButton::section {
                <number>12</number>
               </property>
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="2,10,1">
                 <item>
                  <widget class="QComboBox" name="comboBox_playerPath">
                   <property name="layoutDirection">
@@ -1739,7 +1679,7 @@ QTableCornerButton::section {
                    <string notr="true">border: 2px solid #263238;</string>
                   </property>
                   <property name="text">
-                   <string/>
+                   <string>5</string>
                   </property>
                   <property name="placeholderText">
                    <string>请输入整数</string>
@@ -1889,6 +1829,19 @@ QTableCornerButton::section {
               <item>
                <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
+                 <spacer name="horizontalSpacer_3">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+                <item>
                  <widget class="QCheckBox" name="checkBox_autoPlay">
                   <property name="layoutDirection">
                    <enum>Qt::RightToLeft</enum>
@@ -1914,19 +1867,6 @@ background-color: rgb(55, 71, 79);</string>
                    <bool>false</bool>
                   </property>
                  </widget>
-                </item>
-                <item>
-                 <spacer name="horizontalSpacer_3">
-                  <property name="orientation">
-                   <enum>Qt::Horizontal</enum>
-                  </property>
-                  <property name="sizeHint" stdset="0">
-                   <size>
-                    <width>40</width>
-                    <height>20</height>
-                   </size>
-                  </property>
-                 </spacer>
                 </item>
                </layout>
               </item>

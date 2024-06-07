@@ -110,8 +110,20 @@ void VideoWindow::init()
     }
     AppJson = AppSettings.value("AppJson", QJsonObject()).toJsonObject();
     playHistoryJson = AppSettings.value("PlayHistory", QJsonObject()).toJsonObject();
-
     AppSettings.endGroup();
+
+    if(playHistoryJson.contains("currentFilePath")){
+        // 检查文件路径是否存在
+        QString filesPath = playHistoryJson["currentFilePath"].toString();
+        QFileInfo fileInfo(filesPath);
+        if (!fileInfo.exists() || !fileInfo.isDir()) {
+            // 如果文件路径不存在或不是目录,则输出错误提示并返回
+            playHistoryJson.remove("currentFilePath");
+            qDebug() << "Error: File path does not exist or is not a directory."<<filesPath;
+        }else{
+            set_videoFilesListLocal_and_tableWidget_playerList_byFilePath(filesPath);
+        }
+    }
 }
 
 void VideoWindow::startShow()
@@ -136,7 +148,7 @@ void VideoWindow::startShow()
     //    AppJson["playPageStep"]
     if (AppJson.contains("playPageStep"))
     {
-        ui->lineEdit_playPageStep->setText(i2s(AppJson["playPageStep"].toInt(10 * 1000)));
+        ui->lineEdit_playPageStep->setText(i2s(AppJson["playPageStep"].toInt(10*1000) / 1000));
     }
     ui->lineEdit_playPageStep->setValidator(new QIntValidator(ui->lineEdit_playPageStep));
 
@@ -161,15 +173,6 @@ void VideoWindow::startShow()
     {
         ui->horizontalSlider_volume->setValue(AppJson["volume"].toInt(100));
     }
-    // 其他测试项目
-    //     ui->video->player.setSource(QUrl::fromLocalFile("G:/data/雪花啤酒/test.mp4"));
-    //     ui->video->player.setSource(QUrl("rtsp://admin:dacang80@192.168.1.99:554/Streaming/Channels/1"));
-    //     ui->video->player.play();
-    //     source = QUrl("rtsp://admin:dacang80@192.168.1.153:554/Streaming/Channels/101");
-    //    source = QUrl("G:/data/雪花啤酒/test.mp4");
-    //    player->setSource(source);
-    //    player->play();
-    //    update_tableWidget_playerList("G:/data/雪花啤酒/");
 
     ui->toolButton_listNext->setVisible(false);
     ui->toolButton_listPrevious->setVisible(false);
@@ -188,33 +191,6 @@ void VideoWindow::quit()
     ui->video->quit();
     ui->WidgetMore->close();
     qDebug() << "VideoWindow::quit()";
-}
-
-void VideoWindow::readAllFilesFromLocalPath(const QString &directory)
-{
-    QDir dir(directory);
-    // 使用 entryInfoList() 方法获取文件和子目录的详细信息列表
-    foreach (QFileInfo fileInfo, dir.entryInfoList(QDir::Files))
-    {
-        //qDebug() << "fileInfo" << fileInfo; // QFileInfo(G:\data\CJCS.TXT)
-        //qDebug() << "fileInfo.fileName()" << fileInfo.fileName();
-        //qDebug() << "fileInfo.absoluteFilePath" << fileInfo.absoluteFilePath() << fileInfo.absoluteFilePath().remove(0, directory.length());
-        //qDebug() << "fileInfo.Path" << fileInfo.path() << directory.length() << fileInfo.path().remove(0, directory.length());
-        filesListLocal << fileInfo.absoluteFilePath();
-    }
-    foreach (QFileInfo dirInfo, dir.entryInfoList(QDir::AllDirs | QDir::NoDotAndDotDot))
-    {
-        qDebug() << "fileInfo dirInfo:" << dirInfo; // QFileInfo(G:\data\)
-        readAllFilesFromLocalPath(dirInfo.absoluteFilePath());
-    }
-
-    // 使用 entryList() 方法获取文件和子目录的名称列表(只会显示名称)
-    //    foreach (QString file, dir.entryList(QDir::Files)) {
-    //        qDebug()<<"readAllFilesFromLocalPath file:"<<file;
-    //    }
-    //    foreach (QString fileDir,dir.entryList(QDir::Dirs | QDir::NoDotAndDotDot)){
-    //        qDebug()<<"readAllFilesFromLocalPath file:"<<fileDir;
-    //    }
 }
 
 bool VideoWindow::startPlay(const QString &file)
@@ -270,7 +246,7 @@ void VideoWindow::getVideoFilesInfoByDir(const QString &directory)
             if(file.suffix().toLower() == ext.mid(1)){
                 VideoInfo info;
                 info.filePath =file.absoluteFilePath();
-                info.fileName = file.fileName();
+                info.fileName = file.baseName();
                 info.dateTime = file.lastModified();
                 info.date = file.lastModified().date();
                 //时长
@@ -325,6 +301,30 @@ void VideoWindow::set_tableWidget_playerList_byDate(const QDate &date)
             map_tableWidgetIndex_to_videoFilesListLocalIndex[row] = var;
         }
     }
+    // 自适应大小
+    ui->tableWidget_playerList->resizeColumnsToContents();
+}
+
+void VideoWindow::set_videoFilesListLocal_and_tableWidget_playerList_byFilePath(const QString &filesPath)
+{
+    ui->lineEdit_pathPlayerList->setText(filesPath);
+
+    //数据清空
+    videoFilesListLocal.clear();
+    getVideoFilesInfoByDir(filesPath);
+    update_CalendarWidget_videoDate_show();
+
+    //视频列表更新数据
+    map_tableWidgetIndex_to_videoFilesListLocalIndex.clear();
+    ui->tableWidget_playerList->clearContents();
+    ui->tableWidget_playerList->setRowCount(videoFilesListLocal.size());
+
+    for (int var = 0; var < videoFilesListLocal.size(); ++var) {
+        map_tableWidgetIndex_to_videoFilesListLocalIndex[var] = var;
+        setItem_tableWidget_playerList(var,videoFilesListLocal.at(var));
+    }
+    // 自适应大小
+    ui->tableWidget_playerList->resizeColumnsToContents();
 }
 
 
@@ -540,68 +540,6 @@ void VideoWindow::playerList_update()
     }
 }
 
-void VideoWindow::update_tableWidget_playerList(const QString &filesPath)
-{
-    qDebug() << "VideoWindow::update_tableWidget_playerList(const QString &" << filesPath;
-
-
-    // 读取所有的文件
-    filesListLocal.clear();
-    readAllFilesFromLocalPath(filesPath);
-
-    qDebug() << "filesListLocal:" << filesListLocal;
-    // 使用规则表达式，区分大小，字符匹配
-    filesListLocal = filesListLocal.filter(QRegularExpression(".*(" + fileExtensions + ")"));
-    qDebug() << "filesListLocal:" << filesListLocal;
-
-    ui->tableWidget_playerList->clearContents();
-    ui->tableWidget_playerList->setRowCount(0);
-    // 遍历文件列表
-    foreach (QString absoluteFilePath, filesListLocal)
-    {
-        QFileInfo fileInfo(absoluteFilePath);
-        //        qDebug()<<"fileInfo.lastRead():"<<fileInfo.lastRead().toString()<<fileInfo.birthTime();
-
-        //        int videoDuration = getVideoDuration(filePath);
-        int row = ui->tableWidget_playerList->rowCount(); // 添加一行到表格中
-        ui->tableWidget_playerList->insertRow(row);
-        // 0-名称 1-创建时间 2-大小
-        ui->tableWidget_playerList->setItem(row, 0, new QTableWidgetItem(fileInfo.fileName()));
-        ui->tableWidget_playerList->setItem(row, 1, new QTableWidgetItem(
-                                                        // 文件最后修改时间
-                                                        fileInfo.lastModified().toString("yyyy/MM/dd-hh:mm:ss")));
-        ui->tableWidget_playerList->setItem(row, 2, new QTableWidgetItem(i2s(fileInfo.size() / (1024 * 1024)) + " MB"));
-
-        // 3-时长
-        if (playHistoryJson.contains(absoluteFilePath))
-        {
-
-            qint64 duration = playHistoryJson[absoluteFilePath].toObject()["duration"].toInteger() / 1000;
-            QTime totalTime((duration / 3600) % 60, (duration / 60) % 60, duration % 60,
-                            (duration * 1000) % 1000);
-
-            ui->tableWidget_playerList->setItem(row, 3, new QTableWidgetItem(totalTime.toString("mm:ss")));
-        }
-        // 获取视频时长（假设使用某个函数获取视频时长）
-        //        QEventLoop eventLoop;
-        //        QMediaPlayer mediaPlayer;
-        //        QObject::connect(&mediaPlayer, &QMediaPlayer::mediaStatusChanged, [&eventLoop](QMediaPlayer::MediaStatus status){
-        //            if (status == QMediaPlayer::LoadedMedia) {
-        //                eventLoop.quit();
-        //            }
-        //        });
-        //        mediaPlayer.setSource(QUrl::fromLocalFile(absoluteFilePath));
-        //        eventLoop.exec();
-        //        qint64 duration = mediaPlayer.duration();
-        //        qDebug()<<"遍历文件列表fileInfo.lastRead():"<<fileInfo.lastRead().toString()<<fileInfo.birthTime()<<duration;
-        //        ui->tableWidget_playerList->setItem(row, 3, new QTableWidgetItem(
-        //            i2s(mediaPlayer.duration())));
-    }
-
-    // 自适应大小
-    ui->tableWidget_playerList->resizeColumnsToContents();
-}
-
 void VideoWindow::on_Button_moreWidget_isFloatable_clicked()
 {
     //    if (ui->dockWidgetContents_WidgetMore->isHidden())
@@ -765,7 +703,7 @@ void VideoWindow::on_toolButton_openFiles_clicked()
         qDebug() << "Selected file: " << filePath << QDir(filePath).absolutePath();
         player->setSource(QUrl::fromLocalFile(filePath));
 
-        update_tableWidget_playerList(QDir(filePath).absolutePath());
+        set_videoFilesListLocal_and_tableWidget_playerList_byFilePath(QDir(filePath).absolutePath());
     }
 }
 
@@ -876,38 +814,17 @@ void VideoWindow::on_tableWidget_playerList_itemDoubleClicked(QTableWidgetItem *
 void VideoWindow::on_tableWidget_playerList_doubleClicked(const QModelIndex &index)
 {
     qDebug() << "VideoWindow::on_tableWidget_playerList_doubleClicked(const QModelIndex &" << index.row();
-    //startPlay(filesListLocal.at(index.row()));
     startPlay(videoFilesListLocal.at(map_tableWidgetIndex_to_videoFilesListLocalIndex[index.row()]).filePath);
 }
 
-void VideoWindow::on_comboBox_updatePlayerList_currentTextChanged(const QString &arg1)
-{
-    qDebug() << "VideoWindow::on_comboBox_updatePlayerList_currentTextChanged(const QString &" << arg1 << ui->comboBox_updatePlayerList->currentData();
-    //update_tableWidget_playerList(ui->comboBox_updatePlayerList->currentData().toString());
-
-}
 
 void VideoWindow::on_comboBox_updatePlayerList_activated(int index)
 {
     //activated() 信号只会在用户手动选择了下拉列表中的某个项目时才会被触发,而 currentIndexChanged() 信号则会在任何情况下都会被触发,即使是程序内部设置了当前索引。
     qDebug() << "on_comboBox_updatePlayerList_activated(int "<<index;
     QString fileDir = ui->comboBox_updatePlayerList->currentData().toString();
-    ui->lineEdit_pathPlayerList->setText(fileDir);
-
-    //数据清空
-    videoFilesListLocal.clear();
-    getVideoFilesInfoByDir(fileDir);
-    update_CalendarWidget_videoDate_show();
-
-    //视频列表更新数据
-    map_tableWidgetIndex_to_videoFilesListLocalIndex.clear();
-    ui->tableWidget_playerList->clearContents();
-    ui->tableWidget_playerList->setRowCount(videoFilesListLocal.size());
-
-    for (int var = 0; var < videoFilesListLocal.size(); ++var) {
-        map_tableWidgetIndex_to_videoFilesListLocalIndex[var] = var;
-        setItem_tableWidget_playerList(var,videoFilesListLocal.at(var));
-    }
+    playHistoryJson["currentFilePath"] = fileDir;
+    set_videoFilesListLocal_and_tableWidget_playerList_byFilePath(fileDir);
 
 }
 

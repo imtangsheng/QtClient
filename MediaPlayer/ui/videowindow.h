@@ -7,8 +7,8 @@
 
 #define TableWidgetItem_Column_FileName 0
 #define TableWidgetItem_Column_DateTime 1
-#define TableWidgetItem_Column_Time 3
-#define TableWidgetItem_Column_Size 2
+#define TableWidgetItem_Column_Time 2
+//#define TableWidgetItem_Column_Size 3
 
 struct VideoInfo
 {
@@ -35,8 +35,6 @@ public:
     void init();
     void startShow();
     void quit();
-
-    void readAllFilesFromLocalPath(const QString &directory);
     bool startPlay(const QString &file);
     /**视频文件操作方法**/
     QList<VideoInfo> videoFilesListLocal;
@@ -45,6 +43,7 @@ public:
     void setItem_tableWidget_playerList(const int& row,const VideoInfo& info);
     void set_tableWidget_playerList_byDate(const QDate& date);
     QMap<int,int> map_tableWidgetIndex_to_videoFilesListLocalIndex;
+    void set_videoFilesListLocal_and_tableWidget_playerList_byFilePath(const QString &filesPath);
 
 public slots:
     void mouseEnterVideo();
@@ -95,7 +94,6 @@ protected slots:
 
     /*视频播放列表方法*/
     void playerList_update();
-    void update_tableWidget_playerList(const QString &filesPath);
 
 private slots:
     void on_Button_moreWidget_isFloatable_clicked();
@@ -130,7 +128,6 @@ private slots:
     void on_tableWidget_playerList_itemDoubleClicked(QTableWidgetItem *item);
     void on_tableWidget_playerList_doubleClicked(const QModelIndex &index);
 
-    void on_comboBox_updatePlayerList_currentTextChanged(const QString &arg1);
     void on_comboBox_updatePlayerList_activated(int index);
     void on_dateEdit_videofiles_userDateChanged(const QDate &date);
 
@@ -148,7 +145,6 @@ private:
     QString currentPlaySource;
     // 定义视频文件列表方法
     QString fileExtensions = ".mp4|.MP4|.avi|.mkv";
-    QStringList filesListLocal;
     QJsonObject playHistoryJson;
 };
 
