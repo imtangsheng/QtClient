@@ -15,6 +15,10 @@ HomeWindow::HomeWindow(QWidget *parent) : QMainWindow(parent),
                                           ui(new Ui::HomeWindow)
 {
     ui->setupUi(this);
+    if(!masterWindow->isVisible()){
+        masterWindow = MasterWindow::getInstance();
+    }
+    init();
 }
 
 HomeWindow::~HomeWindow()
@@ -30,8 +34,9 @@ HomeWindow::~HomeWindow()
     qDebug() << "HomeWindow::~HomeWindow()";
 }
 
-void HomeWindow::start()
+void HomeWindow::init()
 {
+    qDebug() << "void HomeWindow::init()";
     config = AppJson["HomeWindow"].toObject();
     QJsonObject devices = config["devices"].toObject();
 
@@ -46,14 +51,16 @@ void HomeWindow::start()
     ui->comboBox_device_manage_type->addItem("1云台I代", DeviceType_Other);
     ui->comboBox_device_manage_type->addItem("2云台II", DeviceType_Robot);
     ui->comboBox_device_manage_type->addItem("3云台I代", DeviceType_Robot_test);
+}
 
+void HomeWindow::start()
+{
+    qDebug() << "void HomeWindow::start()";
     //待增加服务器监听模块
     //    for (DeviceType type : DeviceType) {
 
     //    }
-    qDebug() << "void HomeWindow::init() config[\"devices\"].isNull() " << config["devices"].isNull() << devices.isEmpty();
     qDebug() << "void HomeWindow::init() config[\"ipAddress\"] " << config["ipAddress"].toString("0.0.0.0")<<config["port"].toInt(12345);
-
     SelectedId = 0;
 
     RelayoutCameraWidget();
@@ -84,6 +91,8 @@ void HomeWindow::quit()
     config["devices"] = devices;
 
     AppJson["HomeWindow"] = config;
+
+    deleteLater();
     qDebug() << "void HomeWindow::quit()";
 }
 
@@ -230,6 +239,17 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
 //        });
     }
     return 0;
+}
+
+void HomeWindow::showEvent(QShowEvent *event)
+{
+    qDebug() << "HomeWindow::showEvent(QShowEvent *event)"<<event ;
+    static bool is_first_show = true;
+    if(is_first_show){
+        start();
+        is_first_show = false;
+    }
+
 }
 
 bool HomeWindow::CameraWidgetPlay(const int &id,const int &channel, const QUrl &source)

@@ -78,8 +78,11 @@ public:
     explicit HikVisionCamera(QWidget *parent = nullptr);
     ~HikVisionCamera();
     void init();
+    void start();
+    void quit();
     //摄像头操作方法
     QJsonObject camera;
+    void set_camera_config(QJsonObject obj);
 
     bool updateCameraPose_Pan_Tilt(int pan, int tilt);// ISAPI 协议
 
@@ -90,8 +93,6 @@ public:
     bool CaptureJPEGPicture(int lChannel,QString fileName);
     bool Realtime_Thermometry(QString fileName);
     // ISAPI 协议
-
-    QNetworkReply *reply;
     QNetworkAccessManager manager;
     QString request_URL;
     QByteArray request_xmlData;
@@ -103,13 +104,21 @@ public:
     void init_NetworkRequest();
     // SDK 协议
     // 注册设备
-    LONG lUserID;
+    struct LoginInfo
+    {
+        QString sDeviceAddress = "192.168.1.64";
+        int wPort = 8000;
+        QString sUserName = "admin";
+        QString sPassword = "dacang80";
+    };
+    LoginInfo loginInfo;
+    LONG lUserID = -1;
     void init_HCNetSDK();
-    void Login_V40();
-    void start();
-
-
-
+    bool Login_V40();
+    bool SetupAlarmChan_V41();
+    void cleanup_HCNetSDK();
+    //启用布防
+    LONG lHandle = -1;
 private:
     Ui::HikVisionCamera *ui;
 };

@@ -19,6 +19,7 @@ class HomeWindow : public QMainWindow
 public:
     explicit HomeWindow(QWidget *parent = nullptr);
     ~HomeWindow();
+    void init();
     void start();
     void quit();
     void RelayoutCameraWidget();
@@ -31,6 +32,9 @@ public:
     QFuture<int> future;
     bool startTcpServerListen(const QString &ipAddress = "0.0.0.0", const quint16 &port = 12345);
     int ProcessNewConnection(QTcpSocket *socket);
+
+private:
+    void showEvent(QShowEvent *event) override;
 
 public slots:
     bool CameraWidgetPlay(const int &id, const int &channel,const QUrl &source);
@@ -62,15 +66,10 @@ private slots:
     void on_toolButton_robot_time_set_clicked();
 
     void on_toolButton_device_management_isShow_clicked();
-
     void on_toolButton_device_add_clicked();
-
     void on_toolButton_device_update_clicked();
-
     void on_toolButton_device_delete_clicked();
-
     void on_comboBox_device_manage_id_currentTextChanged(const QString &arg1);
-
     void on_toolButton_map_show_clicked();
 
     /*云台控制指令*/
@@ -97,7 +96,7 @@ private slots:
 
     void on_toolButton_camera_preview_cancel_clicked();
 
-private:
+private:   
     QJsonObject config;
     Ui::HomeWindow *ui;
     int cameraWidgetsNum = 4; // 自定义的cameraWidgets列表的大小

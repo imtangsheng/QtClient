@@ -1,17 +1,14 @@
 #include "HikVisionCamera.h"
 #include "ui_HikVisionCamera.h"
-
-#include <QAuthenticator>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
-
-
-#include "AppUtil.h"
-
-
 #include <QDateTime>
 #include <QDir>
 #include <QString>
+#include <QAuthenticator>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include "AppUtil.h"
+#include "modules/sqlite.h"
+
 
 /**
 获取云台坐标
@@ -57,24 +54,132 @@ TILT_UP_ZOOM_IN 72 云台上仰和焦距变大(倍率变大)
 TILT_UP_ZOOM_OUT 73 云台上仰和焦距变小(倍率变小)
 
 **/
+//*报警布防*//
+//时间解析宏定义
+#define GET_YEAR(_time_)      (((_time_)>>26) + 2000)
+#define GET_MONTH(_time_)     (((_time_)>>22) & 15)
+#define GET_DAY(_time_)       (((_time_)>>17) & 31)
+#define GET_HOUR(_time_)      (((_time_)>>12) & 31)
+#define GET_MINUTE(_time_)    (((_time_)>>6)  & 63)
+#define GET_SECOND(_time_)    (((_time_)>>0)  & 63)
+void CALLBACK cbMessageCallback(LONG lCommand, NET_DVR_ALARMER *pAlarmer, char *pAlarmInfo, DWORD dwBufLen, void* pUser)
+{
+    switch (lCommand)
+    {
+    case COMM_ALARM_RULE: //异常行为识别报警信息
+    {
+        NET_VCA_RULE_ALARM struVcaAlarm = { 0 };
+        memcpy(&struVcaAlarm, pAlarmInfo, sizeof(NET_VCA_RULE_ALARM));
+
+        QDateTime struAbsTime;
+        struAbsTime.setDate(QDate(GET_YEAR(struVcaAlarm.dwAbsTime), GET_MONTH(struVcaAlarm.dwAbsTime), GET_DAY(struVcaAlarm.dwAbsTime)));
+        struAbsTime.setTime(QTime(GET_HOUR(struVcaAlarm.dwAbsTime), GET_MINUTE(struVcaAlarm.dwAbsTime), GET_SECOND(struVcaAlarm.dwAbsTime)));
+
+        //保存抓拍场景图片
+        if (struVcaAlarm.dwPicDataLen > 0 && struVcaAlarm.pImage != NULL)
+        {
+            QString cFilename = QString("VcaAlarmPic[%1][%2].jpg")
+                .arg(QString::fromLocal8Bit(struVcaAlarm.struDevInfo.struDevIP.sIpV4))
+                .arg(struAbsTime.toString("yyyyMMddhhmmss"));
+
+            QFile file(cFilename);
+            if (file.open(QIODevice::WriteOnly))
+            {
+                file.write(reinterpret_cast<const char*>(struVcaAlarm.pImage), struVcaAlarm.dwPicDataLen);
+                file.close();
+            }
+        }
+
+        WORD wEventType = struVcaAlarm.struRuleInfo.wEventTypeEx;
+
+        qDebug() << "\n\n"
+                 << QString("异常行为识别报警[0x%1]: Abs[%2] Dev[ip:%3,port:%4,ivmsChan:%5] Smart[%6] EventTypeEx[%7]")
+                        .arg(QString::number(lCommand, 16))
+                        .arg(struAbsTime.toString("yyyy-MM-dd hh:mm:ss"))
+                        .arg(QString::fromLocal8Bit(struVcaAlarm.struDevInfo.struDevIP.sIpV4))
+                        .arg(struVcaAlarm.struDevInfo.wPort)
+                        .arg(struVcaAlarm.struDevInfo.byIvmsChannel)
+                        .arg(struVcaAlarm.bySmart)
+                        .arg(wEventType);
+
+        NET_VCA_TARGET_INFO tmpTargetInfo;
+        memcpy(&tmpTargetInfo, &struVcaAlarm.struTargetInfo, sizeof(NET_VCA_TARGET_INFO));
+        qDebug() << QString("目标信息:ID[%1]RECT[%2][%3][%4][%5]")
+                        .arg(tmpTargetInfo.dwID)
+                        .arg(tmpTargetInfo.struRect.fX)
+                        .arg(tmpTargetInfo.struRect.fY)
+                        .arg(tmpTargetInfo.struRect.fWidth)
+                        .arg(tmpTargetInfo.struRect.fHeight);
+
+        switch (wEventType)
+        {
+        case ENUM_VCA_EVENT_INTRUSION: //区域入侵报警
+        {
+            qDebug() << QString("区域入侵报警: wDuration[%1], Sensitivity[%2]")
+                            .arg(struVcaAlarm.struRuleInfo.uEventParam.struIntrusion.wDuration)
+                            .arg(struVcaAlarm.struRuleInfo.uEventParam.struIntrusion.bySensitivity);
+
+            qDebug() << "规则区域: ";
+            // 保存规则区域坐标
+            QString ruleRegion;
+            NET_VCA_POLYGON tempPolygon;
+            memcpy(&tempPolygon, &struVcaAlarm.struRuleInfo.uEventParam.struIntrusion.struRegion, sizeof(NET_VCA_POLYGON));
+            for (int i = 0; i < (int)tempPolygon.dwPointNum; i++)
+            {
+                qDebug() << QString("[%1, %2]").arg(tempPolygon.struPos[i].fX).arg(tempPolygon.struPos[i].fY);
+                ruleRegion += QString("[%1, %2]").arg(tempPolygon.struPos[i].fX).arg(tempPolygon.struPos[i].fY);
+                if (i < (int)tempPolygon.dwPointNum - 1)
+                    ruleRegion += ", ";
+            }
+
+            EventCenterData eventHik;
+            eventHik.time = struAbsTime;
+            eventHik.source = QString::fromLocal8Bit(struVcaAlarm.struDevInfo.struDevIP.sIpV4);;
+            eventHik.type = "区域入侵";
+            eventHik.level = EventLevel_Warning;
+            eventHik.details = QString("区域入侵报警: wDuration[%1], Sensitivity[%2]")
+                                  .arg(struVcaAlarm.struRuleInfo.uEventParam.struIntrusion.wDuration)
+                                  .arg(struVcaAlarm.struRuleInfo.uEventParam.struIntrusion.bySensitivity);
+            eventHik.details += QString("\n规则区域: %1").arg(ruleRegion);
+
+            eventHik.status = "";
+            SQL->add_EventCenter(eventHik);
+
+            break;
+        }
+        default:
+        {
+            qDebug() << QString("其他报警，报警信息类型: 0x%1").arg(QString::number(lCommand, 16));
+            break;
+        }
+        }
+        break;
+    }
+
+    default:
+    {
+        qDebug() << QString("其他报警，报警信息类型: 0x%1").arg(QString::number(lCommand, 16));
+        break;
+    }
+    }
+
+    return;
+}
+
 
 HikVisionCamera::HikVisionCamera(QWidget *parent) :
-    QWidget(parent),reply(nullptr),
+    QWidget(parent),
     ui(new Ui::HikVisionCamera)
 {
     ui->setupUi(this);
 
     init_NetworkRequest();
-    init_HCNetSDK();
-    Login_V40();
     init();
 }
 
 HikVisionCamera::~HikVisionCamera()
 {
-    // 释放资源
-    reply->deleteLater();
-
+    qDebug()<<"HikVisionCamera::~HikVisionCamera() 0 ";
     delete ui;
     qDebug()<<"HikVisionCamera::~HikVisionCamera()";
 }
@@ -89,6 +194,29 @@ void HikVisionCamera::init()
          qDebug() << "Response:处理认证"<<reply; });
 
     //start();
+}
+
+void HikVisionCamera::start()
+{
+    init_HCNetSDK();
+    if(Login_V40()){
+        SetupAlarmChan_V41();
+    }
+
+}
+
+void HikVisionCamera::quit()
+{
+    cleanup_HCNetSDK();
+    qDebug()<<"HikVisionCamera::quit()";
+}
+
+void HikVisionCamera::set_camera_config(QJsonObject obj)
+{
+    loginInfo.sDeviceAddress = obj["sDeviceAddress"].toString("192.168.1.64");
+    loginInfo.wPort = obj["wPort"].toInt(8000);
+    loginInfo.sUserName = obj["sUserName"].toString("admin");
+    loginInfo.sPassword = obj["sPassword"].toString("dacang80");
 }
 
 bool HikVisionCamera::updateCameraPose_Pan_Tilt(int pan, int tilt)
@@ -287,6 +415,7 @@ bool HikVisionCamera::api_request_ISAPI(const QString& url,QByteArray requestDat
 {
     QUrl api_path = QUrl(url);
     QNetworkRequest request(api_path);
+    QNetworkReply *reply;
     switch (methods) {
     case Http_GET:
         reply = manager.get(request);
@@ -309,11 +438,15 @@ bool HikVisionCamera::api_request_ISAPI(const QString& url,QByteArray requestDat
     if (reply->error() != QNetworkReply::NoError){
         // 处理请求错误
         qDebug() << "Error:" << reply->errorString();
+        // 释放资源
+        reply->deleteLater();
         return false;
     }
     // 读取响应数据
     response = reply->readAll();
     qDebug() << "Response:" << response;
+    // 释放资源
+    reply->deleteLater();
     return true;
 }
 
@@ -345,15 +478,15 @@ void HikVisionCamera::init_HCNetSDK()
     // 函数的其他逻辑
 }
 
-void HikVisionCamera::Login_V40()
+bool HikVisionCamera::Login_V40()
 {
     //登录参数，包括设备地址、登录用户、密码等
     NET_DVR_USER_LOGIN_INFO struLoginInfo = {0};
     struLoginInfo.bUseAsynLogin = 0; //同步登录方式
-    strcpy(struLoginInfo.sDeviceAddress, "192.168.1.38"); //设备IP地址
-    struLoginInfo.wPort = 8000; //设备服务端口
-    strcpy(struLoginInfo.sUserName, "admin"); //设备登录用户名
-    strcpy(struLoginInfo.sPassword, "dacang80"); //设备登录密码
+    strcpy(struLoginInfo.sDeviceAddress, loginInfo.sDeviceAddress.toStdString().c_str()); //设备IP地址
+    struLoginInfo.wPort = loginInfo.wPort; //设备服务端口
+    strcpy(struLoginInfo.sUserName, loginInfo.sUserName.toStdString().c_str()); //设备登录用户名
+    strcpy(struLoginInfo.sPassword, loginInfo.sPassword.toStdString().c_str()); //设备登录密码
 
     //设备信息, 输出参数
     NET_DVR_DEVICEINFO_V40 struDeviceInfoV40 = {0};
@@ -363,34 +496,50 @@ void HikVisionCamera::Login_V40()
     {
         qWarning()<<QString("海康设备Login failed, error code: %1\n").arg(NET_DVR_GetLastError());
         NET_DVR_Cleanup();
-        return;
+        return false;
     }
     qDebug()<<QString("海康设备Login  code: %1\n").arg(lUserID);
+    return true;
 }
 
-void HikVisionCamera::start()
+bool HikVisionCamera::SetupAlarmChan_V41()
 {
-    init_HCNetSDK();
-    //---------------------------------------
-    //登录参数，包括设备地址、登录用户、密码等
-    NET_DVR_USER_LOGIN_INFO struLoginInfo = {0};
-    struLoginInfo.bUseAsynLogin = 0; //同步登录方式
-    strcpy(struLoginInfo.sDeviceAddress, "192.168.1.38"); //设备IP地址
-    struLoginInfo.wPort = 8000; //设备服务端口
-    strcpy(struLoginInfo.sUserName, "admin"); //设备登录用户名
-    strcpy(struLoginInfo.sPassword, "dacang80"); //设备登录密码
+    //设置报警回调函数
+    /*注：多台设备对接时也只需要调用一次设置一个回调函数，不支持不同设备的事件在不同的回调函数里面返回*/
+    NET_DVR_SetDVRMessageCallBack_V50(0, cbMessageCallback, NULL);
 
-    //设备信息, 输出参数
-    NET_DVR_DEVICEINFO_V40 struDeviceInfoV40 = {0};
+    //启用布防
+    NET_DVR_SETUPALARM_PARAM struAlarmParam = { 0 };
+    struAlarmParam.dwSize = sizeof(struAlarmParam);
+    //其他报警布防参数不需要设置，不支持
 
-    lUserID = NET_DVR_Login_V40(&struLoginInfo, &struDeviceInfoV40);
-    if (lUserID < 0)
+    lHandle = NET_DVR_SetupAlarmChan_V41(lUserID, &struAlarmParam);
+    if (lHandle < 0)
     {
-        qWarning()<<QString("海康设备Login failed, error code: %1\n").arg(NET_DVR_GetLastError());
+        printf("NET_DVR_SetupAlarmChan_V41 error, %d\n", NET_DVR_GetLastError());
+        NET_DVR_Logout(lUserID);
         NET_DVR_Cleanup();
-        return;
+        return false;
     }
-    qDebug()<<QString("海康设备Login  code: %1\n").arg(lUserID);
+    //事件信息在回调函数里面获取
+    return true;
+}
+
+void HikVisionCamera::cleanup_HCNetSDK()
+{
+    //撤销布防上传通道
+    qDebug()<<"HikVisionCamera::cleanup_HCNetSDK()";
+    if (lHandle != -1){
+        if(!NET_DVR_CloseAlarmChan_V30(lHandle))
+        qDebug()<<QString("NET_DVR_CloseAlarmChan_V30 error, %1").arg(NET_DVR_GetLastError());
+    }
+    if (lUserID != -1){
+        //注销用户
+        NET_DVR_Logout(lUserID);
+        //释放SDK资源
+        NET_DVR_Cleanup();
+    }
+
 
 }
 

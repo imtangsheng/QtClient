@@ -1,5 +1,4 @@
 #include "sqlite.h"
-SQLite* SQL;
 #include <QTimeEdit>
 
 QMap<int, QString> EventCenter_column_name;
@@ -7,10 +6,10 @@ QMap<int, QString> EventCenter_column_name;
 
 QMap<int, QString> InspectionTasks_column_name;
 #define InspectionTasks "InspectionTasks"
-
-
 #define InspectionCheckpoints "InspectionCheckpoints"
 
+SQLite* SQLite::instance = nullptr;
+SQLite* SQL;
 
 class EventTimeDelegate : public QStyledItemDelegate {
 public:
@@ -61,6 +60,27 @@ SQLite::~SQLite()
     qDebug() << "SQLite::~SQLite()";
 }
 
+SQLite *SQLite::getInstance(QWidget *parent)
+{
+    if(instance == nullptr){
+        instance = new SQLite(parent);
+        //std::atexit(shutdownHandler);
+    }
+    return instance;
+}
+
+void SQLite::shutdownHandler()
+{
+    qDebug() << "SQLite::shutdownHandler()";
+    static bool is_delete = true;
+    if(is_delete && instance != nullptr ){
+        delete instance;
+        instance = nullptr;
+        is_delete = false;
+    }
+}
+
+
 QSqlError SQLite::initDb(const QString& name, const QString& connectionName) {
     if (!QSqlDatabase::contains(connectionName)) {
         db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
@@ -76,6 +96,7 @@ QSqlError SQLite::initDb(const QString& name, const QString& connectionName) {
         qWarning() << "Failed to open database:" << db.lastError().text();
         return db.lastError();
     }
+    query = QSqlQuery(db);
     return QSqlError();
 }
 
@@ -111,12 +132,13 @@ QSqlError SQLite::init_EventCenter()
         const auto events_SQL = QLatin1String(R"(
             CREATE TABLE IF NOT EXISTS EventCenter (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                time DATETIME,
                 source TEXT,
                 type TEXT,
-                level TEXT,
+                level INTEGER,
                 details TEXT,
-                status TEXT)
+                status TEXT
+            )
         )");
         if(!query.exec(events_SQL))
             return query.lastError();
@@ -160,6 +182,26 @@ bool SQLite::add_EventCenter(const QString &source, const QString &type, const Q
     EventCenter_Model->setData(EventCenter_Model->index(row, 4), level);
     EventCenter_Model->setData(EventCenter_Model->index(row, 5), details);
     EventCenter_Model->setData(EventCenter_Model->index(row, 6), status);
+    if (EventCenter_Model->submitAll()) {
+        EventCenter_Model->select();
+        return true;
+    } else {
+        qWarning() << "Failed to insert Event Center:" << EventCenter_Model->lastError().text();
+        return false;
+    }
+}
+
+bool SQLite::add_EventCenter(const EventCenterData &data)
+{
+    int row = 0;//第一行插入
+    EventCenter_Model->insertRow(row);
+    //EventCenter_Model->setData(EventCenter_Model->index(row, 0), id);
+    EventCenter_Model->setData(EventCenter_Model->index(row, 1), data.time);
+    EventCenter_Model->setData(EventCenter_Model->index(row, 2), data.source);
+    EventCenter_Model->setData(EventCenter_Model->index(row, 3), data.type);
+    EventCenter_Model->setData(EventCenter_Model->index(row, 4), data.level);
+    EventCenter_Model->setData(EventCenter_Model->index(row, 5), data.details);
+    EventCenter_Model->setData(EventCenter_Model->index(row, 6), data.status);
     if (EventCenter_Model->submitAll()) {
         EventCenter_Model->select();
         return true;

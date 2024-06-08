@@ -21,6 +21,7 @@ public:
     explicit MasterWindow(QWidget *parent = nullptr);
     ~MasterWindow();
     Ui::MasterWindow *ui;
+    static MasterWindow* getInstance(QWidget *parent = nullptr);
 
     void start();
     void quit();
@@ -29,6 +30,9 @@ public:
 
     bool saveFileToCSV(const QString &filePath);
     bool saveFileToExcel(const QString &filePath);
+
+private:
+    void showEvent(QShowEvent *event);
 
 private slots:
     void on_pushButton_test_clicked();
@@ -42,7 +46,7 @@ private slots:
     void on_toolButton__inspectionPoints_export_file_download_clicked();
 
 private:
-
+    static MasterWindow* instance;
 };
 
 extern MasterWindow *masterWindow;

@@ -8,8 +8,28 @@
 #include "ui_sqlite.h"
 
 /*
- * inspectionTasks 表:用于存储巡检任务的相关信息。
- * inspectionCheckpoints 表:用于存储每个巡检任务下的具体巡检点信息。
+ * EventCenter表:用于报警信息的相关信息。
+*/
+enum EventLevel{
+    EventLevel_Debug,
+    EventLevel_Info,
+    EventLevel_Warning,
+    EventLevel_Error,
+};
+
+struct EventCenterData {
+    QDateTime time;
+    QString source;
+    QString type;
+    EventLevel level;
+    QString details;
+    QString status;
+};
+
+
+/*
+ * InspectionTasks 表:用于存储巡检任务的相关信息。
+ * InspectionCheckpoints 表:用于存储每个巡检任务下的具体巡检点信息。
 */
 struct InspectionTaskData {
     QString taskUuid;
@@ -47,8 +67,11 @@ class SQLite : public QWidget
 public:
     explicit SQLite(QWidget *parent = nullptr);
     ~SQLite();
+
+    static SQLite *getInstance(QWidget *parent = nullptr);
+    static void shutdownHandler();
     //应用程序中需要启动一次，不用重复启用，默认为最后一个数据库
-    QSqlError initDb(const QString& name=nullptr, const QString& connectionName="default");
+    QSqlError initDb(const QString& name="sql.db", const QString& connectionName="default");
     //数据库定义
     // 创建一个 SQLite 数据库连接
     QSqlDatabase db;
@@ -60,6 +83,7 @@ public:
     QSqlTableModel* EventCenter_Model;
     QSqlError init_EventCenter();
     bool add_EventCenter(const QString &source, const QString &type, const QString &level, const QString &details, const QString &status);
+    bool add_EventCenter(const EventCenterData& data);
     bool filter_EventCenter(int column,const QString& value);
 
     //巡检任务表
@@ -85,7 +109,7 @@ public:
     Ui::SQLite *ui;
 
 private:
-
+    static SQLite* instance;
 };
 
 extern SQLite* SQL;

@@ -15,6 +15,7 @@ CameraWidget::CameraWidget(QWidget *parent) :
 CameraWidget::~CameraWidget()
 {
     delete ui;
+    qDebug()<<"CameraWidget::~CameraWidget()";
 }
 
 void CameraWidget::init()

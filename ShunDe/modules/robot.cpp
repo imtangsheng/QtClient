@@ -64,6 +64,7 @@ Robot::~Robot()
 {
     qDebug() << "Robot::~Robot() 0";
     if(worker_inspection_thread->isRunning()) worker_inspection_thread->quit();
+
     worker_inspection_thread->deleteLater();
     delete client;
     delete data;
@@ -88,6 +89,8 @@ void Robot::init()
         QJsonObject camera = config["camera"].toObject();
 
         hikVisionCamera.camera = camera;
+        hikVisionCamera.loginInfo.sDeviceAddress = camera["video_ip"].toString();
+        hikVisionCamera.loginInfo.sPassword = camera["video_password"].toString();
 
         ui->comboBox_robot_type->setCurrentIndex(config["robotType"].toInt(0));
 
@@ -175,6 +178,7 @@ void Robot::start()
     connect(&inspection, &Inspection::updata_task_run_time, worker_inspection_thread, &WorkerInspectionThread::updata_task_run_time);
 
     inspection.start();
+    hikVisionCamera.start();
 }
 
 void Robot::clientOnlineEvent()
@@ -215,6 +219,7 @@ void Robot::quit()
     }
     // worker_inspection_thread->deleteLater();
     // deleteLater();//自动释放
+    hikVisionCamera.quit();
     qDebug() << "void Robot::quit()";
 }
 

@@ -234,6 +234,15 @@ void WorkerInspectionThread::run()
             m_robot->inspection_data.current_task_point_current_progress = tr("导航未完成");
             m_robot->update_inspection_data_show(InspectionUpdata_task_current_poiont_progress);
             qDebug() << QTime::currentTime() << "导航失败，未完成";
+            EventCenterData eventPoint;
+            eventPoint.time = QDateTime::currentDateTime();
+            eventPoint.source = point["pointName"].toString();
+            eventPoint.type = "导航";
+            eventPoint.level = EventLevel_Warning;
+            QString position = QString("位置: %1 m").arg(point["position"].toDouble(),0,'f',3);;
+            eventPoint.details = QString("%1,%2,%3,%4").arg(m_robot->name,taskData.taskName,point["pointName"].toString(),position);
+            eventPoint.status = "";
+            SQL->add_EventCenter(eventPoint);
             the_warnings = true;
             // QThread::sleep(5);
         }
@@ -256,6 +265,16 @@ void WorkerInspectionThread::run()
                 if (!m_robot->run_action_operation(PointAction(keyAction.toInt()), action[keyAction].toObject()))
                 {
                     the_warnings = true;
+                    EventCenterData eventPoint;
+                    eventPoint.time = QDateTime::currentDateTime();
+                    eventPoint.source = point["pointName"].toString();
+                    eventPoint.type = "任务点操作";
+                    eventPoint.level = EventLevel_Warning;
+                    QString eventPoint_position = QString("位置: %1 m").arg(point["position"].toDouble(),0,'f',3);
+                    QString eventPoint_action = m_robot->inspection.get_action_operation_display(PointAction(keyAction.toInt()),action[keyAction].toObject());
+                    eventPoint.details = QString("%1,%2,%3,%4,%5").arg(m_robot->name,taskData.taskName,point["pointName"].toString(),eventPoint_position,eventPoint_action);
+                    eventPoint.status = "";
+                    SQL->add_EventCenter(eventPoint);
                     qDebug() << QTime::currentTime() << "任务点操作失败，未完成";
                 };
             } // action

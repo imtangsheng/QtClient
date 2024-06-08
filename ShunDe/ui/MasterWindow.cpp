@@ -6,7 +6,9 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+MasterWindow* MasterWindow::instance = nullptr;
 MasterWindow *masterWindow;
+
 #include <QCoreApplication>
 #include <QDir>
 
@@ -53,9 +55,7 @@ MasterWindow::MasterWindow(QWidget *parent) :
     // 连接 listWidget 的 currentRowChanged 信号到 stackedWidget 的 setCurrentIndex 槽
     connect(ui->listWidget_stackedWidget_Titler, &QListWidget::currentRowChanged, ui->stackedWidget_Window, &QStackedWidget::setCurrentIndex);
 
-    SQL=new SQLite();
-
-    start();
+    SQL = SQLite::getInstance();
 }
 
 MasterWindow::~MasterWindow()
@@ -64,11 +64,24 @@ MasterWindow::~MasterWindow()
     qDebug()<<"MasterWindow::~MasterWindow()";
 }
 
+MasterWindow *MasterWindow::getInstance(QWidget *parent)
+{
+    if(instance == nullptr){
+        instance = new MasterWindow(parent);
+        //std::atexit(shutdownHandler);
+    }
+    return instance;
+}
+
 void MasterWindow::start()
 {
     SQL->initDb("test.db");
 
-    QSqlError error = SQL->init_inspectionTasks();
+    QSqlError error = SQL->init_EventCenter();
+    if (error.isValid()) {
+        qWarning() << "Failed to initialize EventCenter MasterWindow:" << error.text();
+    }
+    error = SQL->init_inspectionTasks();
     if (error.isValid()) {
         qWarning() << "Failed to initialize inspection tasks:" << error.text();
     }else{
@@ -101,7 +114,7 @@ void MasterWindow::start()
 
 void MasterWindow::quit()
 {
-    delete SQL;
+    SQL->shutdownHandler();
     qDebug()<<"MasterWindow::quit()";
 }
 
@@ -187,6 +200,17 @@ bool MasterWindow::saveFileToExcel(const QString &filePath)
         return false;
     }
     return true;
+}
+
+void MasterWindow::showEvent(QShowEvent *event)
+{
+    qDebug() << "MasterWindow::showEvent(QShowEvent *event)" ;
+    static bool is_first_show = true;
+    if(is_first_show){
+        start();
+        is_first_show = false;
+    }
+
 }
 
 void MasterWindow::on_pushButton_test_clicked()
