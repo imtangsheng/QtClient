@@ -4,6 +4,7 @@
 WorkerInspectionThread::WorkerInspectionThread(Robot *robot, QObject *parent)
     : QThread{parent}, m_robot(robot)
 {
+
 }
 
 WorkerInspectionThread::~WorkerInspectionThread()
@@ -233,7 +234,7 @@ void WorkerInspectionThread::run()
         {
             m_robot->inspection_data.current_task_point_current_progress = tr("导航未完成");
             m_robot->update_inspection_data_show(InspectionUpdata_task_current_poiont_progress);
-            qDebug() << QTime::currentTime() << "导航失败，未完成";
+            qDebug() << QTime::currentTime() << "导航失败，未完成，记录数据";
             EventCenterData eventPoint;
             eventPoint.time = QDateTime::currentDateTime();
             eventPoint.source = point["pointName"].toString();
@@ -245,6 +246,7 @@ void WorkerInspectionThread::run()
             SQL->add_EventCenter(eventPoint);
             the_warnings = true;
             // QThread::sleep(5);
+            qDebug() << QTime::currentTime() << "导航失败,记录";
         }
 
         // #2->2 任务点操作
@@ -264,6 +266,7 @@ void WorkerInspectionThread::run()
 
                 if (!m_robot->run_action_operation(PointAction(keyAction.toInt()), action[keyAction].toObject()))
                 {
+                     qDebug() << QTime::currentTime() << "务点操作失败，未完成";
                     the_warnings = true;
                     EventCenterData eventPoint;
                     eventPoint.time = QDateTime::currentDateTime();
@@ -275,7 +278,7 @@ void WorkerInspectionThread::run()
                     eventPoint.details = QString("%1,%2,%3,%4,%5").arg(m_robot->name,taskData.taskName,point["pointName"].toString(),eventPoint_position,eventPoint_action);
                     eventPoint.status = "";
                     SQL->add_EventCenter(eventPoint);
-                    qDebug() << QTime::currentTime() << "任务点操作失败，未完成";
+                    qDebug() << QTime::currentTime() << "任务点操作失败，记录";
                 };
             } // action
             // 点任务显示

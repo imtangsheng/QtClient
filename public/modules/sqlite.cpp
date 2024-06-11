@@ -60,12 +60,40 @@ SQLite::~SQLite()
     qDebug() << "SQLite::~SQLite()";
 }
 
+#include <QCoreApplication>
+
 SQLite *SQLite::getInstance(QWidget *parent)
 {
-    if(instance == nullptr){
-        instance = new SQLite(parent);
+    qDebug() << "SQLite::getInstance(QWidget *parent)";
+    //同线程可以，插件不可以共享
+//    if(instance == nullptr){
+//        SQLite* var = qobject_cast<SQLite*>(qApp->property("sql_instance").value<QObject*>());
+//        if(var){
+//            qDebug() << "SQLite::getInstance(QWidget *parent)获取之前已经存在的实例"<<var;
+//            instance = var;
+//        }else{
+//            qDebug() << "SQLite::getInstance(QWidget *parent) 新建实例"<<var;
+//            instance = new SQLite(parent);
+//            qApp->setProperty("sql_instance",QVariant::fromValue(instance));
+//        }
+//    }
         //std::atexit(shutdownHandler);
+
+    if(instance == nullptr){
+        static QSharedMemory sql_instance("sql_instance");
+        if (sql_instance.attach(QSharedMemory::ReadOnly)) {
+            memcpy(&instance, sql_instance.data(), sizeof(SQLite*));
+        }else{
+            if (sql_instance.create(sizeof(SQLite*))) {
+                instance = new SQLite(parent);
+                sql_instance.lock();
+                memcpy(sql_instance.data(), &instance, sizeof(SQLite*));
+                sql_instance.unlock();
+                //sharedMemory.detach();//如果这是附加到共享内存段的最后一个进程，则系统将释放共享内存段，即内容被销毁。
+            }
+        }
     }
+    qDebug() << "SQLite::getInstance(QWidget *parent)"<<instance;
     return instance;
 }
 
@@ -82,6 +110,7 @@ void SQLite::shutdownHandler()
 
 
 QSqlError SQLite::initDb(const QString& name, const QString& connectionName) {
+    qDebug() << "SQLite::initDb(const QString& name, const QString& connectionName)"<<this;
     if (!QSqlDatabase::contains(connectionName)) {
         db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
         if (name.isEmpty()) {db.setDatabaseName(":memory:");}

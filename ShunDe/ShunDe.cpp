@@ -14,12 +14,11 @@ ShunDe::ShunDe(QObject *parent) : QObject(parent)
 
 ShunDe::~ShunDe()
 {
-//    delete homeWindow;
-//    delete masterWindow;
+    qDebug() << "ShunDe::~ShunDe() 开始";
+    //delete masterWindow;
+    //delete homeWindow;
     delete widgets;
-    qDebug()<<"创建的插件ShunDe::~ShunDe()释放";
 }
-
 void ShunDe::init()
 {
     widgets = new HomeWidgets;
@@ -33,19 +32,20 @@ void ShunDe::init()
     AppJson = AppSettings.value("AppJson", QJsonObject()).toJsonObject();
     AppSettings.endGroup();
 
-    masterWindow = new MasterWindow(widgets);
-    homeWindow = new HomeWindow(widgets);
+    masterWindow = MasterWindow::getInstance(widgets);
+    homeWindow = new HomeWindow(widgets); //HomeWindow::start() 中使用了masterWindow对象
 
-    masterWindow->start();
-    homeWindow->start();
+//    masterWindow->start();
+//    homeWindow->start();
 
     qDebug()<<"创建的插件ShunDe::init()";
 }
 
 void ShunDe::quit()
 {
-    homeWindow->quit();
+
     masterWindow->quit();
+    homeWindow->quit();
     widgets->quit();
 
     AppSettings.beginGroup(ObjectName);

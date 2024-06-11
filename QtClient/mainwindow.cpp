@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    connect(ui->statusBar,&QStatusBar::showMessage,this,&MainWindow::showMessage);
 //    connect(ui->statusBar,&QStatusBar::clearMessage,this,&MainWindow::clearMessage);
     SUB_MAIN = new SubMain;
-    SQL = new SQLite;
+    SQL = SQLite::getInstance();
     _Awake();
 
 }
@@ -63,7 +63,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     AppSettings.endGroup();
     emit quit();
     delete SUB_MAIN;
-    delete SQL;
+    SQL->shutdownHandler();
 //    deleteLater();//直接使用会奔溃
     qDebug() << "MainWindow::closeEvent(QCloseEvent *event) END";
 }
@@ -179,18 +179,18 @@ void MainWindow::_Start()
     ui->tabWidget_mainWindow->setCurrentIndex(jsonMainConfig["TabCurrent"].toInt());
 
     /*事件中心显示操作*/
-    SQL->initDb();
+    SQL->initDb("test.db");
     QSqlError error = SQL->init_EventCenter();
     if(error.isValid()){
         // 初始化失败
-        qWarning() << "Failed to initialize Event Center:" << error.text();
+        qWarning() << "Failed to initialize Event Center MainWindow:" << error.text();
         //return ;
+    }else {
+        ui->tableView_events->setModel(SQL->EventCenter_Model);
+        ui->tableView_events->resizeColumnsToContents();
+        ui->tableView_events->setSortingEnabled(true);
+        ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     }
-    ui->tableView_events->setModel(SQL->EventCenter_Model);
-    ui->tableView_events->resizeColumnsToContents();
-    ui->tableView_events->setSortingEnabled(true);
-    ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
-
 
     test();
 }

@@ -7,6 +7,7 @@
 #include <QToolTip>
 #include "AppOS.h"
 #include "function/worker_inspection_thread.h"
+#include "modules/sqlite.h"
 
 //switch (getRobotType())
 //{
@@ -58,6 +59,23 @@ Robot::Robot(QWidget *parent) : QWidget(parent),
     ui->toolButton_widget_cameraChannel_isShow->setMenu(toolMenu);
 
     //ui->label_inspection_current_task_point_current_action_progress_value->setText(QString("%1 %").arg(100));
+
+    SQL = SQLite::getInstance();
+    SQL->initDb("test.db");
+    QSqlError error;
+    error = SQL->init_EventCenter();
+    if (error.isValid()) {
+        qWarning() << "Failed to initialize EventCenter MasterWindow:" << error.text();
+    }
+    error = SQL->init_inspectionTasks();
+    if (error.isValid()) {
+        qWarning() << "Failed to initialize inspection tasks:" << error.text();
+    }
+    error = SQL->init_inspectionCheckpoints();
+    if (error.isValid()) {// 初始化失败
+        qWarning() << "Failed to initialize inspection Checkpoints:" << error.text();
+    }
+
 }
 
 Robot::~Robot()

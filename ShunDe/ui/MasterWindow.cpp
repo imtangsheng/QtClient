@@ -76,11 +76,7 @@ MasterWindow *MasterWindow::getInstance(QWidget *parent)
 void MasterWindow::start()
 {
     SQL->initDb("test.db");
-
-    QSqlError error = SQL->init_EventCenter();
-    if (error.isValid()) {
-        qWarning() << "Failed to initialize EventCenter MasterWindow:" << error.text();
-    }
+    QSqlError error;
     error = SQL->init_inspectionTasks();
     if (error.isValid()) {
         qWarning() << "Failed to initialize inspection tasks:" << error.text();
