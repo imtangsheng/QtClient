@@ -186,6 +186,7 @@ void MainWindow::_Start()
         ui->tableView_events->setModel(gSql->EventCenter_Model);
         ui->tableView_events->resizeColumnsToContents();
         ui->tableView_events->setSortingEnabled(true);
+        ui->tableView_events->setItemDelegateForColumn(ItemDelegateEventLevel,new EventLevelDelegate);
         ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     }
 

@@ -4,7 +4,6 @@
 #include <QTableView>
 #include <QWidget>
 #include <QtSql>
-
 #include "ui_sqlite.h"
 
 /*
@@ -54,7 +53,7 @@ struct InspectionCheckpointData {
 };
 
 #define ItemDelegateImageShow 3 //巡检结果列显示图片
-
+#define ItemDelegateEventLevel 4 //异常报警事件等级显示
 
 namespace Ui {
 class SQLite;
@@ -321,5 +320,45 @@ private:
     }
 };
 
+
+class EventLevelDelegate : public QItemDelegate {
+    Q_OBJECT
+
+public:
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+    {
+        if (index.column() == ItemDelegateEventLevel) {
+            const EventLevel eventLevel = static_cast<EventLevel>(index.data(Qt::DisplayRole).toInt());
+            QString text;
+            switch (eventLevel) {
+            case EventLevel::EventLevel_Debug:
+                text = tr("提示");
+                break;
+            case EventLevel::EventLevel_Info:
+                text = tr("显示");
+                break;
+            case EventLevel::EventLevel_Warning:
+                text = tr("警告");
+                painter->save();
+                painter->setPen(Qt::yellow);
+                break;
+            case EventLevel::EventLevel_Error:
+                text = tr("错误");
+                painter->save();
+                painter->setPen(Qt::red);
+                break;
+            default:
+                text = tr("未知等级:%1").arg(eventLevel);
+            }
+
+            painter->drawText(option.rect, Qt::AlignCenter, text);
+            if (eventLevel == EventLevel::EventLevel_Error) {
+                painter->restore();
+            }
+        } else {
+            QItemDelegate::paint(painter, option, index);
+        }
+    }
+};
 
 #endif // SQLITE_H
