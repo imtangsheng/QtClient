@@ -68,7 +68,7 @@ public:
     explicit SQLite(QWidget *parent = nullptr);
     ~SQLite();
 
-    static SQLite *getInstance(QWidget *parent = nullptr);
+    static SQLite *instance(QWidget *parent = nullptr,const QString& db_filename="sql.db");
     static void shutdownHandler();
     //应用程序中需要启动一次，不用重复启用，默认为最后一个数据库
     QSqlError initDb(const QString& name="sql.db", const QString& connectionName="default");
@@ -109,10 +109,10 @@ public:
     Ui::SQLite *ui;
 
 private:
-    static SQLite* instance;
+    static SQLite* m_instance;
 };
 
-extern SQLite* SQL;
+extern SQLite* gSql;
 
 /*支持图片查看器*/
 #include <QApplication>
@@ -173,7 +173,7 @@ public:
                 QImage image(imagePath);
                 if (!image.isNull()) {
                     // 创建一个模态的对话框
-                    QDialog dialog(SQL, Qt::Window);
+                    QDialog dialog(gSql, Qt::Window);
                     dialog.setWindowTitle(tr("图像查看器"));
                     QVBoxLayout layout(&dialog);
                     layout.setContentsMargins(0,0,0,0);
@@ -263,7 +263,7 @@ private:
 
     void showImageViewer(const QStringList& imagePaths) {
         // 创建一个模态的对话框
-        QDialog dialog(SQL, Qt::Window);
+        QDialog dialog(gSql, Qt::Window);
         dialog.setWindowTitle(tr("图像查看器"));
         QVBoxLayout layout(&dialog);
         layout.setContentsMargins(0, 0, 0, 0);

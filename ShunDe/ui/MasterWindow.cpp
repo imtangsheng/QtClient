@@ -55,7 +55,7 @@ MasterWindow::MasterWindow(QWidget *parent) :
     // 连接 listWidget 的 currentRowChanged 信号到 stackedWidget 的 setCurrentIndex 槽
     connect(ui->listWidget_stackedWidget_Titler, &QListWidget::currentRowChanged, ui->stackedWidget_Window, &QStackedWidget::setCurrentIndex);
 
-    SQL = SQLite::getInstance();
+    gSql = SQLite::instance();
 }
 
 MasterWindow::~MasterWindow()
@@ -75,13 +75,12 @@ MasterWindow *MasterWindow::getInstance(QWidget *parent)
 
 void MasterWindow::start()
 {
-    SQL->initDb("test.db");
     QSqlError error;
-    error = SQL->init_inspectionTasks();
+    error = gSql->init_inspectionTasks();
     if (error.isValid()) {
         qWarning() << "Failed to initialize inspection tasks:" << error.text();
     }else{
-        ui->tableView_inspection_data->setModel(SQL->inspectionTasksModel);
+        ui->tableView_inspection_data->setModel(gSql->inspectionTasksModel);
         ui->tableView_inspection_data->setColumnHidden(0,true);
         ui->tableView_inspection_data->setSortingEnabled(true);//排序
         //ui->tableView_inspection_data->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -90,11 +89,11 @@ void MasterWindow::start()
         ui->tableView_inspection_data->resizeColumnsToContents();
     }
 
-    error = SQL->init_inspectionCheckpoints();
+    error = gSql->init_inspectionCheckpoints();
     if (error.isValid()) {// 初始化失败
         qWarning() << "Failed to initialize inspection Checkpoints:" << error.text();
     }else{
-        ui->tableView_inspectionCheckpoints->setModel(SQL->inspectionCheckpoints_Model);
+        ui->tableView_inspectionCheckpoints->setModel(gSql->inspectionCheckpoints_Model);
         ui->tableView_inspectionCheckpoints->resizeColumnsToContents();
         //隐藏"任务ID"列
         ui->tableView_inspectionCheckpoints->setColumnHidden(1,true);
@@ -110,7 +109,6 @@ void MasterWindow::start()
 
 void MasterWindow::quit()
 {
-    SQL->shutdownHandler();
     qDebug()<<"MasterWindow::quit()";
 }
 
@@ -238,10 +236,10 @@ void MasterWindow::on_tableView_inspection_data_doubleClicked(const QModelIndex 
     QString id = ui->tableView_inspection_data->model()->data(ui->tableView_inspection_data->model()->index(index.row(), 0)).toString();
     qDebug()<<"MasterWindow::on_tableView_inspection_data_doubleClicked(const QModelIndex &"<<index<<id;
     // 设置筛选条件
-    SQL->inspectionCheckpoints_Model->setFilter(QString("taskId = '%1'").arg(id));
+    gSql->inspectionCheckpoints_Model->setFilter(QString("taskId = '%1'").arg(id));
 
     // 提交筛选条件a
-    if (SQL->inspectionCheckpoints_Model->select()) {
+    if (gSql->inspectionCheckpoints_Model->select()) {
         // 筛选成功，更新视图
 //        ui->tableView_inspectionCheckpoints->setModel(SQL->inspectionCheckpoints_Model);
 //        ui->tableView_inspectionCheckpoints->resizeColumnsToContents();
@@ -251,7 +249,7 @@ void MasterWindow::on_tableView_inspection_data_doubleClicked(const QModelIndex 
 //        ui->tableView_inspectionCheckpoints->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     } else {
         // 筛选失败，输出错误信息
-        qWarning() << "Failed to load inspection checkpoints:" << SQL->inspectionCheckpoints_Model->lastError().text();
+        qWarning() << "Failed to load inspection checkpoints:" << gSql->inspectionCheckpoints_Model->lastError().text();
     }
 }
 
@@ -260,11 +258,11 @@ void MasterWindow::on_toolButton_inspection_query_time_clicked()
 {
     qDebug()<<"MasterWindow::on_toolButton_inspection_query_time_clicked()";
     // 设置筛选条件
-    SQL->inspectionTasksModel->setFilter(QString("startTime >= '%1' AND startTime <= '%2'")
+    gSql->inspectionTasksModel->setFilter(QString("startTime >= '%1' AND startTime <= '%2'")
         .arg(ui->dateTimeEdit_inspection_time_begin->dateTime().toString(Qt::ISODate))
         .arg(ui->dateTimeEdit_inspection_time_end->dateTime().toString(Qt::ISODate)));
     // 提交筛选条件
-    if (SQL->inspectionTasksModel->select()) {
+    if (gSql->inspectionTasksModel->select()) {
         // 筛选成功，更新视图
 //        ui->tableView_inspection_data->setModel(SQL->inspectionTasksModel);
 //        ui->tableView_inspection_data->resizeColumnsToContents();
@@ -273,9 +271,9 @@ void MasterWindow::on_toolButton_inspection_query_time_clicked()
 //        ui->tableView_inspection_data->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     } else {
         // 筛选失败，输出错误信息
-        qWarning() << "筛选失败，错误信息Failed to initialize inspection tasks:" << SQL->inspectionTasksModel->lastError().text();
+        qWarning() << "筛选失败，错误信息Failed to initialize inspection tasks:" << gSql->inspectionTasksModel->lastError().text();
         QToolTip::showText(ui->toolButton_inspection_query_time->mapToGlobal(QPoint(0, 0)),
-                           "筛选失败，错误信息:"+SQL->inspectionTasksModel->lastError().text(),
+                           "筛选失败，错误信息:"+gSql->inspectionTasksModel->lastError().text(),
                            ui->toolButton_inspection_query_time);
     }
 }
@@ -293,14 +291,14 @@ void MasterWindow::on_toolButton_inspection_query_value_clicked()
     int selectedRow = currentIndex.row();
     int selectedColumn = currentIndex.column();
     // 根据选中单元格的列序号,获取对应的数据
-    QString selectedData = SQL->inspectionTasksModel->data(SQL->inspectionTasksModel->index(selectedRow, selectedColumn)).toString();
+    QString selectedData = gSql->inspectionTasksModel->data(gSql->inspectionTasksModel->index(selectedRow, selectedColumn)).toString();
     // 提交筛选条件
-    if (!SQL->filter_inspectionTasks(selectedColumn,selectedData)) {
+    if (!gSql->filter_inspectionTasks(selectedColumn,selectedData)) {
         // 筛选失败，输出错误信息
         // 筛选失败，输出错误信息
-        qWarning() << "筛选失败，错误信息:" << SQL->inspectionTasksModel->lastError().text();
+        qWarning() << "筛选失败，错误信息:" << gSql->inspectionTasksModel->lastError().text();
         QToolTip::showText(ui->toolButton_inspection_query_value->mapToGlobal(QPoint(0, 0)),
-            "筛选失败，错误信息:"+SQL->inspectionTasksModel->lastError().text(),
+                           "筛选失败，错误信息:"+gSql->inspectionTasksModel->lastError().text(),
             ui->toolButton_inspection_query_value);
     }
 

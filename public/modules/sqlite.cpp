@@ -8,8 +8,10 @@ QMap<int, QString> InspectionTasks_column_name;
 #define InspectionTasks "InspectionTasks"
 #define InspectionCheckpoints "InspectionCheckpoints"
 
-SQLite* SQLite::instance = nullptr;
-SQLite* SQL;
+//懒汉式，在第一次使用时才创建单例实例，但需要额外的同步机制来保证线程安全
+//饿汉式，在类加载时就创建单例实例，线程安全
+SQLite* SQLite::m_instance = nullptr;
+SQLite* gSql;
 
 class EventTimeDelegate : public QStyledItemDelegate {
 public:
@@ -50,6 +52,9 @@ SQLite::SQLite(QWidget *parent) :
     ui(new Ui::SQLite)
 {
     ui->setupUi(this);
+    // 在构造函数中注册退出处理函数，退出处理函数都必须是无参数、无返回值的函数
+    //std::atexit(shutdownHandler);
+    qAddPostRoutine(shutdownHandler);
 }
 
 SQLite::~SQLite()
@@ -62,9 +67,9 @@ SQLite::~SQLite()
 
 #include <QCoreApplication>
 
-SQLite *SQLite::getInstance(QWidget *parent)
+SQLite *SQLite::instance(QWidget *parent,const QString& db_filename)
 {
-    qDebug() << "SQLite::getInstance(QWidget *parent)";
+    //qDebug() << "SQLite::instance(QWidget *parent)";
     //同线程可以，插件不可以共享
 //    if(instance == nullptr){
 //        SQLite* var = qobject_cast<SQLite*>(qApp->property("sql_instance").value<QObject*>());
@@ -77,34 +82,39 @@ SQLite *SQLite::getInstance(QWidget *parent)
 //            qApp->setProperty("sql_instance",QVariant::fromValue(instance));
 //        }
 //    }
-        //std::atexit(shutdownHandler);
 
-    if(instance == nullptr){
+    if(m_instance == nullptr){
         static QSharedMemory sql_instance("sql_instance");
         if (sql_instance.attach(QSharedMemory::ReadOnly)) {
-            memcpy(&instance, sql_instance.data(), sizeof(SQLite*));
+            memcpy(&m_instance, sql_instance.data(), sizeof(SQLite*));
         }else{
             if (sql_instance.create(sizeof(SQLite*))) {
-                instance = new SQLite(parent);
+                //使用双重检查锁定，实现线程安全的懒汉式单例模式
+                static QMutex mutex;
+                mutex.lock();
+                m_instance = new SQLite(parent);
+                m_instance->initDb(db_filename);
+                mutex.unlock();
+
                 sql_instance.lock();
-                memcpy(sql_instance.data(), &instance, sizeof(SQLite*));
+                memcpy(sql_instance.data(), &m_instance, sizeof(SQLite*));
                 sql_instance.unlock();
-                //sharedMemory.detach();//如果这是附加到共享内存段的最后一个进程，则系统将释放共享内存段，即内容被销毁。
+                //sql_instance.detach();//如果这是附加到共享内存段的最后一个进程，则系统将释放共享内存段，即内容被销毁。
             }
         }
     }
-    qDebug() << "SQLite::getInstance(QWidget *parent)"<<instance;
-    return instance;
+    qDebug() << "SQLite::instance(QWidget *parent)"<<m_instance;
+    return m_instance;
 }
 
 void SQLite::shutdownHandler()
 {
     qDebug() << "SQLite::shutdownHandler()";
-    static bool is_delete = true;
-    if(is_delete && instance != nullptr ){
-        delete instance;
-        instance = nullptr;
-        is_delete = false;
+    if(m_instance != nullptr ){
+        //delete instance;//静态变量,它是一个裸指针,没有任何智能指针管理它的生命周期。可能指向一个已经被其他地方删除的对象,可能会导致内存泄漏或其他严重的内存管理问题。这是因为 instance 指针没有跟踪对象的所有权,无法确保对象被正确地释放。
+        delete SQLite::instance(); // 析构函数会被调用,从而释放相关的资源
+        //m_instance->deleteLater();//将 SQLite 对象的删除操作添加到事件队列中,并返回立即,一个事件循环中,Qt 会从事件队列中取出这个删除操作,并执行 delete m_instance; 来释放 SQLite 对象。需要手动调用
+        m_instance = nullptr;
     }
 }
 

@@ -143,7 +143,7 @@ void CALLBACK cbMessageCallback(LONG lCommand, NET_DVR_ALARMER *pAlarmer, char *
             eventHik.details += QString("\n规则区域: %1").arg(ruleRegion);
 
             eventHik.status = "";
-            SQL->add_EventCenter(eventHik);
+            gSql->add_EventCenter(eventHik);
 
             break;
         }

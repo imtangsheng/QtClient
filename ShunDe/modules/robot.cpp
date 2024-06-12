@@ -60,18 +60,17 @@ Robot::Robot(QWidget *parent) : QWidget(parent),
 
     //ui->label_inspection_current_task_point_current_action_progress_value->setText(QString("%1 %").arg(100));
 
-    SQL = SQLite::getInstance();
-    SQL->initDb("test.db");
+    gSql = SQLite::instance();
     QSqlError error;
-    error = SQL->init_EventCenter();
+    error = gSql->init_EventCenter();
     if (error.isValid()) {
         qWarning() << "Failed to initialize EventCenter MasterWindow:" << error.text();
     }
-    error = SQL->init_inspectionTasks();
+    error = gSql->init_inspectionTasks();
     if (error.isValid()) {
         qWarning() << "Failed to initialize inspection tasks:" << error.text();
     }
-    error = SQL->init_inspectionCheckpoints();
+    error = gSql->init_inspectionCheckpoints();
     if (error.isValid()) {// 初始化失败
         qWarning() << "Failed to initialize inspection Checkpoints:" << error.text();
     }

@@ -243,7 +243,7 @@ void WorkerInspectionThread::run()
             QString position = QString("位置: %1 m").arg(point["position"].toDouble(),0,'f',3);;
             eventPoint.details = QString("%1,%2,%3,%4").arg(m_robot->name,taskData.taskName,point["pointName"].toString(),position);
             eventPoint.status = "";
-            SQL->add_EventCenter(eventPoint);
+            gSql->add_EventCenter(eventPoint);
             the_warnings = true;
             // QThread::sleep(5);
             qDebug() << QTime::currentTime() << "导航失败,记录";
@@ -277,7 +277,7 @@ void WorkerInspectionThread::run()
                     QString eventPoint_action = m_robot->inspection.get_action_operation_display(PointAction(keyAction.toInt()),action[keyAction].toObject());
                     eventPoint.details = QString("%1,%2,%3,%4,%5").arg(m_robot->name,taskData.taskName,point["pointName"].toString(),eventPoint_position,eventPoint_action);
                     eventPoint.status = "";
-                    SQL->add_EventCenter(eventPoint);
+                    gSql->add_EventCenter(eventPoint);
                     qDebug() << QTime::currentTime() << "任务点操作失败，记录";
                 };
             } // action
@@ -306,7 +306,7 @@ void WorkerInspectionThread::run()
         checkpointData.checkpointContent = m_robot->inspection_data.current_task_point_content_strList.join(",");
 
         //checkpointData.remark = "";
-        SQL->add_InspectionCheckpoint(checkpointData);
+        gSql->add_InspectionCheckpoint(checkpointData);
 
     } // points
     // #3任务完成操作
@@ -316,6 +316,6 @@ void WorkerInspectionThread::run()
     taskData.numOfNormalPoints = m_robot->inspection_data.completed;
     taskData.checkResult = m_robot->inspection_data.task_current_state;
 
-    SQL->add_inspectionTasks(taskData);
+    gSql->add_inspectionTasks(taskData);
 
 }
