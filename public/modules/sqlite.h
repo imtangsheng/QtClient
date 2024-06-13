@@ -195,21 +195,20 @@ public:
     }
 };
 
-class ImageDelegate_List : public QItemDelegate
+class ImageListDelegate : public QItemDelegate
 {
     Q_OBJECT
 
 public:
-    int spacing = 0;
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
     {
         if (index.column() == ItemDelegateImageShow) { // "巡检结果"列 使用，号隔开
+            qDebug()<<QTime::currentTime()<<"ImageDelegateList paint";
             QStringList imagePaths = index.model()->data(index, Qt::DisplayRole).toString().split(",", Qt::SkipEmptyParts);
             if (!imagePaths.isEmpty()) {
                 int imageCount = imagePaths.size();
-                int thumbnailSize = qMin(option.rect.width() / imageCount, option.rect.height());
-
-
+                qDebug()<<QTime::currentTime()<<"QStyleOptionViewItem option:"<<option.rect.width()<<option.rect.height();
+                int thumbnailSize = qMin(option.rect.width() / imageCount, option.rect.height());//缩略图
                 for (int i = 0; i < imageCount; ++i) {
                     QRect imageRect(option.rect.left() + i * (thumbnailSize + spacing),
                                    option.rect.top(),
@@ -224,7 +223,8 @@ public:
 
     bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override
     {
-        if (event->type() == QEvent::MouseButtonDblClick && index.column() == 3) { // 双击"巡检结果"列
+        qDebug()<<QTime::currentTime()<<"ImageDelegate_List editorEvent";
+        if (event->type() == QEvent::MouseButtonDblClick && index.column() == ItemDelegateImageShow) { // 双击"巡检结果"列
             QStringList imagePaths = index.model()->data(index, Qt::DisplayRole).toString().split(",", Qt::SkipEmptyParts);
             if (!imagePaths.isEmpty()) {
                 showImageViewer(imagePaths);
@@ -236,6 +236,7 @@ public:
 
     bool helpEvent(QHelpEvent *event, QAbstractItemView *view, const QStyleOptionViewItem &option, const QModelIndex &index) override
     {
+        qDebug()<<QTime::currentTime()<<"ImageDelegate_List helpEvent";
         if (event->type() == QEvent::ToolTip && index.column() == ItemDelegateImageShow) {
             QStringList imagePaths = index.model()->data(index, Qt::DisplayRole).toString().split(",", Qt::SkipEmptyParts);
             if (!imagePaths.isEmpty()) {
@@ -247,21 +248,34 @@ public:
     }
 
 private:
+    int spacing = 0;
+    mutable QCache<QString, QPixmap> imageCache;
+
     void paintImage(QPainter* painter, const QString& imagePath, const QRect& imageRect, const QRect& cellRect) const {
-        QImage image(imagePath);
-        if (!image.isNull()) {
-            QRect scaledRect = imageRect.adjusted(spacing, spacing, -spacing, -spacing);
-            scaledRect.setSize(image.size().scaled(scaledRect.size(), Qt::KeepAspectRatio));
-            scaledRect.moveCenter(imageRect.center());
-            painter->drawImage(scaledRect, image);
+        qDebug()<<QTime::currentTime()<<"ImageDelegate_List paintImage";
+        if (imageCache.contains(imagePath)) {
+            painter->drawPixmap(imageRect, *imageCache[imagePath]);
         } else {
-            painter->fillRect(imageRect, Qt::lightGray);
-            painter->drawText(cellRect, Qt::AlignCenter, imagePath);
+            QImage image(imagePath);
+            if (!image.isNull()) {
+                QRect scaledRect = imageRect.adjusted(spacing, spacing, -spacing, -spacing);
+                scaledRect.setSize(image.size().scaled(scaledRect.size(), Qt::KeepAspectRatio));
+                scaledRect.moveCenter(imageRect.center());
+                QPixmap pixmap = QPixmap::fromImage(image);
+                imageCache.insert(imagePath, new QPixmap(pixmap));
+                painter->drawPixmap(scaledRect, *imageCache[imagePath]);
+                //painter->drawImage(scaledRect, image);
+            } else {
+                painter->fillRect(imageRect, Qt::lightGray);
+                painter->drawText(cellRect, Qt::AlignLeft, imagePath);
+                qDebug()<<QTime::currentTime()<<"ImageDelegate_List paintImage"<<imagePath;
+            }
         }
     }
 
     void showImageViewer(const QStringList& imagePaths) {
         // 创建一个模态的对话框
+        qDebug()<<QTime::currentTime()<<"ImageDelegate_List showImageViewer";
         QDialog dialog(gSql, Qt::Window);
         dialog.setWindowTitle(tr("图像查看器"));
         QVBoxLayout layout(&dialog);
@@ -311,6 +325,7 @@ private:
     }
 
     void updateLabelImage(QLabel& label, const QString& imagePath) {
+        qDebug()<<QTime::currentTime()<<"ImageDelegate_List updateLabelImage";
         QImage image(imagePath);
         if (!image.isNull()) {
             label.setPixmap(QPixmap::fromImage(image));
@@ -327,6 +342,7 @@ class EventLevelDelegate : public QItemDelegate {
 public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override
     {
+        qDebug()<<"EventLevelDelegate  paint";
         if (index.column() == ItemDelegateEventLevel) {
             const EventLevel eventLevel = static_cast<EventLevel>(index.data(Qt::DisplayRole).toInt());
             QString text;

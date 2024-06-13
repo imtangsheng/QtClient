@@ -429,7 +429,13 @@ border: 2px solid #263238;
            </layout>
           </item>
           <item>
-           <widget class="QTableView" name="tableView_inspectionCheckpoints"/>
+           <widget class="QTableView" name="tableView_inspectionCheckpoints">
+            <property name="styleSheet">
+             <string notr="true">QTableView { 
+qproperty-textElideMode: ElideMiddle; 
+}</string>
+            </property>
+           </widget>
           </item>
          </layout>
         </item>

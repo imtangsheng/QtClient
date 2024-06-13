@@ -72,7 +72,13 @@ MasterWindow *MasterWindow::getInstance(QWidget *parent)
     }
     return instance;
 }
-
+/**
+QHeaderView::Stretch 是 QHeaderView 中的一种列宽度调整模式,它的作用是根据表格内容自动调整列宽,使所有列宽度相等。
+QHeaderView::Interactive: 允许用户通过拖动列分隔线来手动调整列宽。这是默认的调整模式。
+QHeaderView::Fixed: 列宽度固定,不会自动调整。
+QHeaderView::ResizeToContents: 根据列中内容的大小自动调整列宽。
+QHeaderView::Custom: 使用自定义的列宽调整逻辑。
+*/
 void MasterWindow::start()
 {
     QSqlError error;
@@ -83,9 +89,9 @@ void MasterWindow::start()
         ui->tableView_inspection_data->setModel(gSql->inspectionTasksModel);
         ui->tableView_inspection_data->setColumnHidden(0,true);
         ui->tableView_inspection_data->setSortingEnabled(true);//排序
-        //ui->tableView_inspection_data->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
         // 设置标题栏可以交互式调整宽度
         ui->tableView_inspection_data->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+        ui->tableView_inspection_data->horizontalHeader()->setSectionResizeMode(6,QHeaderView::Stretch);//checkResult 6
         ui->tableView_inspection_data->resizeColumnsToContents();
     }
 
@@ -94,12 +100,17 @@ void MasterWindow::start()
         qWarning() << "Failed to initialize inspection Checkpoints:" << error.text();
     }else{
         ui->tableView_inspectionCheckpoints->setModel(gSql->inspectionCheckpoints_Model);
-        ui->tableView_inspectionCheckpoints->resizeColumnsToContents();
         //隐藏"任务ID"列
         ui->tableView_inspectionCheckpoints->setColumnHidden(1,true);
         ui->tableView_inspectionCheckpoints->setSortingEnabled(true);//排序
-        ui->tableView_inspectionCheckpoints->setItemDelegateForColumn(ItemDelegateImageShow,new ImageDelegate_List);//第3列显示
-        ui->tableView_inspectionCheckpoints->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+        //ui->tableView_inspectionCheckpoints->setStyleSheet("QTableView {qproperty-textElideMode: ElideMiddle;}");//让表格自动为过长的文本添加省略号,以限制单元格的宽度
+        ui->tableView_inspectionCheckpoints->setItemDelegateForColumn(ItemDelegateImageShow,new ImageListDelegate);//第3列显示
+        ui->tableView_inspectionCheckpoints->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);//让用户通过拖动表格的列分隔线来手动调整列宽。
+        // 设置第 ItemDelegateImageShow 列宽度调整模式,它的作用是根据表格内容自动调整列宽,使所有列宽度相等。
+        ui->tableView_inspectionCheckpoints->horizontalHeader()->setSectionResizeMode(ItemDelegateImageShow, QHeaderView::Stretch);
+        //ui->tableView_inspectionCheckpoints->setColumnWidth(ItemDelegateImageShow, 50);
+        //ui->tableView_inspectionCheckpoints->horizontalHeader()->resizeSection(1, 10);
+        ui->tableView_inspectionCheckpoints->resizeColumnsToContents();// 调整列宽以适应内容，使用会导致显示该行列宽的显示为文字长度，非常宽
     }
 
     ui->dateTimeEdit_inspection_time_begin->setDateTime(QDateTime::currentDateTime().date().startOfDay());
@@ -227,6 +238,7 @@ void MasterWindow::on_pushButton_test_clicked()
 //    SQL->add_InspectionCheckpoint(checkpointName,checkpointContent,checkResult_point,remark,checkTime);
 
     qDebug()<<"MasterWindow::on_pushButton_test_clicked()";
+    //ui->tableView_inspectionCheckpoints->resizeColumnsToContents();
 }
 
 

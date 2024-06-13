@@ -199,7 +199,7 @@ QSqlError SQLite::init_EventCenter()
     EventCenter_Model->setHeaderData(2,Qt::Horizontal,"事件源");//source
     EventCenter_Model->setHeaderData(3,Qt::Horizontal,"事件类型");//type
     EventCenter_Model->setHeaderData(4,Qt::Horizontal,"事件级别");//level
-    EventCenter_Model->setHeaderData(5,Qt::Horizontal,"事件细节");//details
+    EventCenter_Model->setHeaderData(5,Qt::Horizontal,"事件细节");//details 5
     EventCenter_Model->setHeaderData(6,Qt::Horizontal,"状态");//status
     EventCenter_Model->select();
     return QSqlError();
@@ -299,7 +299,7 @@ QSqlError SQLite::init_inspectionTasks()
     inspectionTasksModel->setHeaderData(3, Qt::Horizontal, tr("正常点数"));//numOfNormalPoints
     inspectionTasksModel->setHeaderData(4, Qt::Horizontal, tr("错误点数"));//numOfErrorPoints
     inspectionTasksModel->setHeaderData(5, Qt::Horizontal, tr("报警点数"));//numOfAlarmPoints
-    inspectionTasksModel->setHeaderData(6, Qt::Horizontal, tr("巡检结果"));//checkResult
+    inspectionTasksModel->setHeaderData(6, Qt::Horizontal, tr("巡检结果"));//checkResult 6
     inspectionTasksModel->setHeaderData(7, Qt::Horizontal, tr("巡检时间"));//startTime
     inspectionTasksModel->setHeaderData(8, Qt::Horizontal, tr("其他"));//other
     inspectionTasksModel->select();

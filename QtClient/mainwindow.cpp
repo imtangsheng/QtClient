@@ -187,7 +187,8 @@ void MainWindow::_Start()
         ui->tableView_events->resizeColumnsToContents();
         ui->tableView_events->setSortingEnabled(true);
         ui->tableView_events->setItemDelegateForColumn(ItemDelegateEventLevel,new EventLevelDelegate);
-        ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
+        ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+        ui->tableView_events->horizontalHeader()->setSectionResizeMode(5,QHeaderView::Stretch);//details 5
     }
 
     test();
