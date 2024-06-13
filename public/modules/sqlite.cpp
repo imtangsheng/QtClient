@@ -89,17 +89,15 @@ SQLite *SQLite::instance(QWidget *parent,const QString& db_filename)
             memcpy(&m_instance, sql_instance.data(), sizeof(SQLite*));
         }else{
             if (sql_instance.create(sizeof(SQLite*))) {
-                //使用双重检查锁定，实现线程安全的懒汉式单例模式
-                static QMutex mutex;
-                mutex.lock();
-                m_instance = new SQLite(parent);
-                m_instance->initDb(db_filename);
-                mutex.unlock();
-
-                sql_instance.lock();
-                memcpy(sql_instance.data(), &m_instance, sizeof(SQLite*));
-                sql_instance.unlock();
-                //sql_instance.detach();//如果这是附加到共享内存段的最后一个进程，则系统将释放共享内存段，即内容被销毁。
+                std::once_flag flag;
+                std::call_once(flag,[=]{
+                    m_instance = new SQLite(parent);
+                    m_instance->initDb(db_filename);
+                    sql_instance.lock();
+                    memcpy(sql_instance.data(), &m_instance, sizeof(SQLite*));
+                    sql_instance.unlock();
+                    //sql_instance.detach();//如果这是附加到共享内存段的最后一个进程，则系统将释放共享内存段，即内容被销毁。
+                 });
             }
         }
     }
@@ -204,9 +202,6 @@ QSqlError SQLite::init_EventCenter()
     EventCenter_Model->setHeaderData(5,Qt::Horizontal,"事件细节");//details
     EventCenter_Model->setHeaderData(6,Qt::Horizontal,"状态");//status
     EventCenter_Model->select();
-
-    //    tableView_inspectionTasks->setModel(inspectionTasksModel);
-    //    tableView_inspectionTasks->resizeColumnsToContents();
     return QSqlError();
 }
 
@@ -308,10 +303,6 @@ QSqlError SQLite::init_inspectionTasks()
     inspectionTasksModel->setHeaderData(7, Qt::Horizontal, tr("巡检时间"));//startTime
     inspectionTasksModel->setHeaderData(8, Qt::Horizontal, tr("其他"));//other
     inspectionTasksModel->select();
-
-//    tableView_inspectionTasks->setModel(inspectionTasksModel);
-//    tableView_inspectionTasks->resizeColumnsToContents();
-
     return QSqlError();
 }
 
@@ -404,9 +395,6 @@ QSqlError SQLite::init_inspectionCheckpoints()
     inspectionCheckpoints_Model->setHeaderData(5, Qt::Horizontal, tr("备注"));//remark
     inspectionCheckpoints_Model->setHeaderData(6, Qt::Horizontal, tr("巡检时间"));//
     inspectionCheckpoints_Model->select();
-
-    //    tableView_inspectionTasks->setModel(inspectionTasksModel);
-    //    tableView_inspectionTasks->resizeColumnsToContents();
     return QSqlError();
 }
 
