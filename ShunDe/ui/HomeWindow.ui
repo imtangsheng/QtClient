@@ -240,8 +240,8 @@
         <rect>
          <x>0</x>
          <y>0</y>
-         <width>2000</width>
-         <height>720</height>
+         <width>1044</width>
+         <height>406</height>
         </rect>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_8">

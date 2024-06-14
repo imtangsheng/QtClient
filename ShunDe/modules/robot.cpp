@@ -1,10 +1,14 @@
 #include "robot.h"
+#include <QBarCategoryAxis>
+#include <QBarSeries>
+#include <QBarSet>
 #include <QDesktopServices>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMessageBox>
 #include <QScreen>
 #include <QToolTip>
+#include <QValueAxis>
 #include "AppOS.h"
 #include "function/worker_inspection_thread.h"
 #include "modules/sqlite.h"
@@ -49,14 +53,7 @@ Robot::Robot(QWidget *parent) : QWidget(parent),
 {
     ui->setupUi(this);
     //    inspection.setParent(this);
-    QMenu *toolMenu = new QMenu(this);
-    // QMenu menu(this);
-    toolMenu->addAction("Test", this, [this](){
-        qDebug() << "showContextMenu(const QPoint &pos)" << this->isFullScreen();
-        test();
-    });
 
-    ui->toolButton_widget_cameraChannel_isShow->setMenu(toolMenu);
 
     //ui->label_inspection_current_task_point_current_action_progress_value->setText(QString("%1 %").arg(100));
 
@@ -93,11 +90,13 @@ Robot::~Robot()
 void Robot::test()
 {
     qDebug() << "Robot::test()";
-    hikVisionCamera.start();
+
+
 }
 
 void Robot::init()
 {
+    /*#0-机器人配置初始化*/
     config = AppJson[this->objectName()].toObject()[i2s(id)].toObject();
 
     setRobotType(RobotType(config["robotType"].toInt(0)));
@@ -140,7 +139,16 @@ void Robot::init()
     name = config["name"].toString("机器人设备" + i2s(id));
     updateRobotNameShow(name);
 
-    ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
+    //ui->pushButton_robot->setIcon(QIcon(":/asset/Robot/Robot.svg"));
+
+    /*#1-1 机器人全局变量初始化*/
+    ui->spinBox_vision_wait_default->setValue(config["vision_wait_default"].toInt(vision_wait_default));
+    ui->spinBox_vision_default_PTZPreset_dwPresetIndex->setValue(config["vision_default_PTZPreset_dwPresetIndex"].toInt(vision_default_PTZPreset_dwPresetIndex));
+    ui->doubleSpinBox_vision_default_PTZPOS_wPanPos->setValue(config["vision_default_PTZPOS_wPanPos"].toDouble(vision_default_PTZPOS_wPanPos));
+    ui->doubleSpinBox_vision_default_PTZPOS_wTiltPos->setValue(config["vision_default_PTZPOS_wTiltPos"].toDouble(vision_default_PTZPOS_wTiltPos));
+
+
+    /*#1-2 机器人报表初始化*/
     connect(inspection.ui->toolButton_point_position_get, &QToolButton::clicked, this, [=]()
             {
                 qDebug() << "toolButton_point_position_get,&QToolButton::clicked" << pose;
@@ -174,16 +182,23 @@ void Robot::init()
 
 
     });
-
-    //*机器人设置*//
-    ui->spinBox_vision_wait_default->setValue(config["vision_wait_default"].toInt(vision_wait_default));
-    ui->spinBox_vision_default_PTZPreset_dwPresetIndex->setValue(config["vision_default_PTZPreset_dwPresetIndex"].toInt(vision_default_PTZPreset_dwPresetIndex));
-    ui->doubleSpinBox_vision_default_PTZPOS_wPanPos->setValue(config["vision_default_PTZPOS_wPanPos"].toDouble(vision_default_PTZPOS_wPanPos));
-    ui->doubleSpinBox_vision_default_PTZPOS_wTiltPos->setValue(config["vision_default_PTZPOS_wTiltPos"].toDouble(vision_default_PTZPOS_wTiltPos));
-
     connect(&inspection,&Inspection::run_action_operation,this,&Robot::run_action_operation);
+
+    /*#1-3 机器人报警图表初始化*/
+    init_chartView();
+
+
+    /*#机器人内实例的-组合与聚合-启用*/
     start();
 
+    QMenu *toolMenu = new QMenu(this);
+    // QMenu menu(this);
+    toolMenu->addAction("Test", this, [this](){
+        qDebug() << "showContextMenu(const QPoint &pos)" << this->isFullScreen();
+        test();
+    });
+
+    ui->toolButton_widget_cameraChannel_isShow->setMenu(toolMenu);
     //qDebug() << "void Robot::init()" << config;
 }
 
@@ -710,6 +725,96 @@ QPoint Robot::getPicturePosFromPose(const int32_t &pose)
     return QPoint(pose,0);
 }
 
+//chart = new QChart();
+//    QSharedPointer<QChart> chart_(new QChart());
+//    QSharedPointer<QChart> chart;
+//    // 初始化 QSharedPointer
+//    chart = QSharedPointer<QChart>(new QChart());
+
+//    QScopedPointer<QChart, QScopedPointerDeleter<QChart>> chart_2(new QChart());
+//    QScopedPointer<QChart, QScopedPointerDeleter<QChart>> chart2;
+//    // 初始化 QScopedPointer
+//    chart2.reset(new QChart());
+
+//    std::unique_ptr<QChart> chart_3(new QChart());
+//    std::unique_ptr<QChart> chart3;
+//    // 初始化 std::unique_ptr
+//    chart3 = std::make_unique<QChart>();
+void Robot::init_chartView()
+{
+    chart.reset(new QChart());
+    chart->setContentsMargins(-9,-9,-9,-9);
+    chart->setBackgroundRoundness(0);
+    chart->setBackgroundBrush(Qt::transparent); // 设置透明背景
+    series = new QBarSeries(chart.get());
+    series->setLabelsPosition(QAbstractBarSeries::LabelsInsideEnd);//设置柱状图标签显示的位置
+    series->setLabelsVisible(true);//设置柱状图标签可见
+
+    axisY = new QValueAxis();
+    axisY->setTitleText("报警次数");
+    axisY->setRange(0, 10); // 给Y轴留出一些空间
+    chart->addAxis(axisY,Qt::AlignLeft);
+    series->attachAxis(axisY);
+
+    axisX = new QBarCategoryAxis();
+    chart->addAxis(axisX,Qt::AlignBottom);
+    series->attachAxis(axisX);
+
+    chart->addSeries(series);
+
+    chart->legend()->setVisible(true);
+    chart->legend()->setAlignment(Qt::AlignBottom);
+    chart->setTheme(QChart::ChartThemeBlueCerulean);
+
+    ui->widget_alarm_chart->setChart(chart.get());
+    ui->widget_alarm_chart->setRenderHint(QPainter::Antialiasing);
+    chart->setTitle(tr("今日报警数据"));
+
+    on_comboBox_alarm_time_activated(0);
+    //QDate currentDate = QDate::currentDate();
+    //showRobotAlarmInChart(QDateTime(currentDate, QTime(0, 0, 0)),QDateTime(currentDate, QTime(23, 59, 59)));
+
+}
+
+void Robot::showRobotAlarmInChart(const QDateTime &begin, const QDateTime &end)
+{
+    // 统计不同报警等级的报警类型数据
+    QMap<int, QMap<QString, int>> alarmData;
+    QSqlTableModel* model = gSql->EventCenter_Model;
+    model->setFilter(QString("time >= '%1' AND time <= '%2'")
+                    .arg(begin.toString(Qt::ISODate))
+                    .arg(end.toString(Qt::ISODate)));
+    int rowCount = model->rowCount();
+    for (int i = 0; i < rowCount; ++i) {
+        QSqlRecord record = model->record(i);
+        if(record.value("source").toString() == name){
+            QString type = record.value("type").toString();
+            int level = record.value("level").toInt();
+            alarmData[level][type]++;
+        }
+    }
+    // 找到最大值,动态调整Y轴范围
+    int maxValue = 10;
+    series->clear();
+    axisX->clear();
+    for (int level : alarmData.keys()) {
+        if(level == 2) axisX->append("报警");
+        else if(level == 3) axisX->append("错误");
+        else axisX->append("其他");
+
+        for(QString type : alarmData[level].keys()){
+            QBarSet* set = new QBarSet(type);
+            int count = alarmData[level][type];
+            *set << count;
+            if (count > maxValue) {maxValue = count;}
+            series->append(set);
+        }
+    }
+    axisY->setRange(0, maxValue); // 给Y轴留出一些空间
+    series->attachAxis(axisX);//"Axis already attached to series." 不能注释，不然不显示
+    series->attachAxis(axisY);
+}
+
 void Robot::updateRobotNameShow(const QString &name)
 {
 
@@ -927,7 +1032,7 @@ void Robot::on_pushButton_robot_gas_isShow_clicked()
 
 void Robot::on_toolButton__gas_alarm_set_clicked()
 {
-
+    qDebug() << "on_toolButton__gas_alarm_set_clicked()";
 }
 
 void Robot::on_toolButton_vision_default_set_clicked()
@@ -967,5 +1072,56 @@ void Robot::on_pushButton_scripts_filePath_run_clicked()
         return;
     }
 
+}
+
+
+void Robot::on_pushButton_alarm_chart_title_isShow_clicked()
+{
+    ui->widget_alarm_window->setVisible(!ui->widget_alarm_window->isVisible());
+}
+
+
+void Robot::on_comboBox_alarm_time_activated(int index)
+{
+    //0-今天 1-本周 2-本月 其他-自定义时间
+    QDateTime startDateTime, endDateTime;
+    QDate currentDate = QDate::currentDate();
+    switch (index) {
+    case 0:
+        startDateTime = QDateTime(currentDate, QTime(0, 0, 0));
+        endDateTime = QDateTime(currentDate, QTime(23, 59, 59));
+        chart->setTitle(tr("今天报警数据"));
+        break;
+    case 1:{
+        int dayOfWeek = currentDate.dayOfWeek();
+        startDateTime = QDateTime(currentDate.addDays(-dayOfWeek + 1), QTime(0, 0, 0));
+        endDateTime = QDateTime(currentDate.addDays(7 - dayOfWeek), QTime(23, 59, 59));
+        chart->setTitle(tr("本周报警数据"));
+        break;}
+    case 2:{
+        startDateTime = QDateTime(QDate(currentDate.year(), currentDate.month(), 1), QTime(0, 0, 0));
+        endDateTime = QDateTime(startDateTime.date().addMonths(1).addDays(-1), QTime(23, 59, 59));
+        chart->setTitle(tr("本月报警数据"));
+        break;}
+    default:
+        chart->setTitle(tr("自定义时间报警数据"));
+        break;
+    }
+    if(startDateTime.isValid()){
+        ui->dateTimeEdit_alarm_time_begin->setDateTime(startDateTime);
+    }else{
+        startDateTime = ui->dateTimeEdit_alarm_time_begin->dateTime();
+    }
+    if(endDateTime.isValid()){
+        ui->dateTimeEdit_alarm_time_end->setDateTime(endDateTime);
+    }else{
+        endDateTime = ui->dateTimeEdit_alarm_time_end->dateTime();
+    }
+    if(startDateTime>endDateTime){
+        QMessageBox::information(this, "提示", QString("选择的开始时间 %1 大于结束时间%2").arg(startDateTime.toString(Qt::ISODate),endDateTime.toString(Qt::ISODate)));
+        return;
+    }
+    qDebug()<<"on_comboBox_alarm_time_activated"<<startDateTime<< endDateTime;
+    showRobotAlarmInChart(startDateTime,endDateTime);
 }
 

@@ -237,7 +237,7 @@ void WorkerInspectionThread::run()
             qDebug() << QTime::currentTime() << "导航失败，未完成，记录数据";
             EventCenterData eventPoint;
             eventPoint.time = QDateTime::currentDateTime();
-            eventPoint.source = point["pointName"].toString();
+            eventPoint.source = m_robot->name;
             eventPoint.type = "导航";
             eventPoint.level = EventLevel_Warning;
             QString position = QString("位置: %1 m").arg(point["position"].toDouble(),0,'f',3);;
@@ -270,7 +270,7 @@ void WorkerInspectionThread::run()
                     the_warnings = true;
                     EventCenterData eventPoint;
                     eventPoint.time = QDateTime::currentDateTime();
-                    eventPoint.source = point["pointName"].toString();
+                    eventPoint.source = m_robot->name;
                     eventPoint.type = "任务点操作";
                     eventPoint.level = EventLevel_Warning;
                     QString eventPoint_position = QString("位置: %1 m").arg(point["position"].toDouble(),0,'f',3);

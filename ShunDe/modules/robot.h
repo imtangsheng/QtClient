@@ -7,6 +7,9 @@
 #include <QTcpServer>
 #include <QTcpSocket>
 #include <QJsonObject>
+#include <QBarSeries>
+#include <QValueAxis>
+#include <QBarCategoryAxis>
 #include "ui_robot.h"
 #include "function/inspection.h"
 #include "HikVisionCamera.h"
@@ -221,6 +224,14 @@ public:
     int32_t getPoseFromPicturePos(const QPoint &pos);
     QPoint getPicturePosFromPose(const int32_t &pose);
 
+    /**机器人报警统计图表**/
+    QScopedPointer<QChart, QScopedPointerDeleter<QChart>> chart;
+    QBarCategoryAxis* axisX;
+    QValueAxis* axisY;
+    QBarSeries* series;
+    void init_chartView();
+    void showRobotAlarmInChart(const QDateTime& begin,const QDateTime& end);
+
 private:
     QReadWriteLock m_rwLock;
     // QString ipAddress = "127.0.0.1"; // 服务器IP地址
@@ -251,6 +262,9 @@ private slots:
     void on_toolButton_vision_default_set_clicked();
     void on_pushButton_scripts_filePath_get_clicked();
     void on_pushButton_scripts_filePath_run_clicked();
+
+    void on_pushButton_alarm_chart_title_isShow_clicked();
+    void on_comboBox_alarm_time_activated(int index);
 };
 
 struct Device

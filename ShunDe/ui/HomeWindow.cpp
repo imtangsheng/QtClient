@@ -142,6 +142,7 @@ bool HomeWindow::addNewRobotDevice(int id)
     ui->LayoutDevice->addWidget(DeviceMap[id].robot->ui->widgetMenu);//机器人设备菜单
     ui->Layout_Robot_Inspection->addWidget(DeviceMap[id].robot->inspection.ui->widget_inspection);//机器人巡检设置
     ui->Layout_Robot_Data->addWidget(DeviceMap[id].robot->ui->widget_robot_data);//机器人设备菜单
+    ui->Layout_Robot_Data->addWidget(DeviceMap[id].robot->ui->widget_robot_show);//机器人要显示的信息，报警数据
     masterWindow->ui->horizontalLayout_DeviceConfigSettings->insertWidget(id,DeviceMap[id].robot->ui->widgetConfig,Qt::LeftToRight);//机器人参数设置ui
     //masterWindow->ui->horizontalLayout_DeviceInspection->insertWidget(id,DeviceMap[id].robot->inspection.ui->widget_inspection,Qt::LeftToRight);//机器人巡检设置ui
     connect(DeviceMap[id].robot, &Robot::setCameraWidgetPlay, this, &HomeWindow::CameraWidgetPlay);
