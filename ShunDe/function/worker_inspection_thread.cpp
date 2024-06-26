@@ -116,9 +116,9 @@ void WorkerInspectionThread::updata_task_run_time(const QString &taskName)
         int msec = m_robot->inspection.getFirstTime(time);
         if (msec == -1)
         {
-            qWarning() << "任务时间错误，任务名称:" << taskName << "time:" << time;
+            qWarning() << "任务FirstTime时间错误，任务名称:" << taskName << "time:" << time;
         }
-        //qDebug() << "任务名称:" << taskName << "time:" << time << "msec" << msec;
+        //qDebug() << "任务FirstTime:" << taskName << "time:" << time << "msec" << msec;
         task_time_array_insert_data(taskName, time["time"].toString(), QDateTime::currentDateTime().addMSecs(msec));
         timer->start(msec);
         timers.append(timer);

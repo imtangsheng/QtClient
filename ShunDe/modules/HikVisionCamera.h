@@ -115,10 +115,18 @@ public:
     LONG lUserID = -1;
     void init_HCNetSDK();
     bool Login_V40();
-    bool SetupAlarmChan_V41();
+    bool SetupAlarmChan_V41();//报警开启
+    bool StartRemoteConfig();//测温开启
+
+    void SaveRealData();//客户端录像
+
     void cleanup_HCNetSDK();
     //启用布防
     LONG lHandle = -1;
+
+public slots:
+    void load();
+
 private:
     Ui::HikVisionCamera *ui;
 };

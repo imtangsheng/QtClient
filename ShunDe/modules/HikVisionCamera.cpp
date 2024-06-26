@@ -66,6 +66,60 @@ void CALLBACK cbMessageCallback(LONG lCommand, NET_DVR_ALARMER *pAlarmer, char *
 {
     switch (lCommand)
     {
+    case COMM_THERMOMETRY_ALARM: //温度预警或者温度报警
+    {
+        NET_DVR_THERMOMETRY_ALARM struThermometryAlarm = {0};
+        memcpy(&struThermometryAlarm, pAlarmInfo, sizeof(NET_DVR_THERMOMETRY_ALARM));
+        if (0 == struThermometryAlarm.byRuleCalibType)
+        {
+            qWarning("点测温: Channel:%d, RuleID:%d, ThermometryUnit:%d, PresetNo:%d, RuleTemperature:%.1f, CurrTemperature:%.1f, PTZ Info[Pan:%f, Tilt:%f, Zoom:%f], AlarmLevel:%d, AlarmType:%d, AlarmRule:%d, RuleCalibType:%d,  Point[x:%f, y:%f], PicLen:%d, ThermalPicLen:%d, ThermalInfoLen:%d", struThermometryAlarm.dwChannel, struThermometryAlarm.byRuleID, struThermometryAlarm.byThermometryUnit, struThermometryAlarm.wPresetNo, struThermometryAlarm.fRuleTemperature, struThermometryAlarm.fCurrTemperature, struThermometryAlarm.struPtzInfo.fPan, struThermometryAlarm.struPtzInfo.fTilt, struThermometryAlarm.struPtzInfo.fZoom, struThermometryAlarm.byAlarmLevel, struThermometryAlarm.byAlarmType, struThermometryAlarm.byAlarmRule, struThermometryAlarm.byRuleCalibType, struThermometryAlarm.struPoint.fX, struThermometryAlarm.struPoint.fY, struThermometryAlarm.dwPicLen, struThermometryAlarm.dwThermalPicLen, struThermometryAlarm.dwThermalInfoLen);
+        }
+        else if (1 == struThermometryAlarm.byRuleCalibType || 2 == struThermometryAlarm.byRuleCalibType)
+        {
+            int iPointNum = struThermometryAlarm.struRegion.dwPointNum;
+            for (int i = 0; i < iPointNum; i++)
+            {
+                float fX = struThermometryAlarm.struRegion.struPos[i].fX;
+                float fY = struThermometryAlarm.struRegion.struPos[i].fY;
+                qWarning("测温区域坐标点:X%d:%f,Y%d:%f;", iPointNum + 1, fX, iPointNum + 1, fY);
+            }
+            qWarning("线测温或者框测温: Channel:%d, RuleID:%d,HighestPoint[x:%f, y:%f],ThermometryUnit:%d, PresetNo:%d, RuleTemperature:%.1f, CurrTemperature:%.1f, PTZ Info[Pan:%f, Tilt:%f, Zoom:%f], AlarmLevel:%d, AlarmType:%d, AlarmRule:%d, RuleCalibType:%d, PicLen:%d, ThermalPicLen:%d, ThermalInfoLen:%d", struThermometryAlarm.dwChannel, struThermometryAlarm.byRuleID,
+                struThermometryAlarm.struHighestPoint.fX, struThermometryAlarm.struHighestPoint.fY,
+                struThermometryAlarm.byThermometryUnit, struThermometryAlarm.wPresetNo, struThermometryAlarm.fRuleTemperature, struThermometryAlarm.fCurrTemperature,
+                struThermometryAlarm.struPtzInfo.fPan, struThermometryAlarm.struPtzInfo.fTilt, struThermometryAlarm.struPtzInfo.fZoom, struThermometryAlarm.byAlarmLevel, struThermometryAlarm.byAlarmType, struThermometryAlarm.byAlarmRule, struThermometryAlarm.byRuleCalibType, struThermometryAlarm.dwPicLen, struThermometryAlarm.dwThermalPicLen, struThermometryAlarm.dwThermalInfoLen);
+        }
+        break;}
+
+    case COMM_THERMOMETRY_DIFF_ALARM: //温差报警
+    {
+        NET_DVR_THERMOMETRY_DIFF_ALARM struThermometryDiffAlarm = {0};
+        memcpy(&struThermometryDiffAlarm, pAlarmInfo, sizeof(NET_DVR_THERMOMETRY_DIFF_ALARM));
+        if (0 == struThermometryDiffAlarm.byRuleCalibType)
+        {
+            qWarning("温差报警: Channel:%d, AlarmID1:%d, AlarmID2:%d, PresetNo:%d, RuleTemperatureDiff:%.1f, CurTemperatureDiff:%.1f, AlarmLevel:%d, AlarmType:%d, AlarmRule:%d, RuleCalibType:%d, Point1[x:%f, y:%f], point2[x:%f, y:%f], PTZ Info[Pan:%f, Tilt:%f, Zoom:%f], PicLen:%d, ThermalPicLen:%d, ThermalInfoLen:%d, ThermometryUnit:%d", struThermometryDiffAlarm.dwChannel, struThermometryDiffAlarm.byAlarmID1, struThermometryDiffAlarm.byAlarmID2, struThermometryDiffAlarm.wPresetNo, struThermometryDiffAlarm.fRuleTemperatureDiff, struThermometryDiffAlarm.fCurTemperatureDiff, struThermometryDiffAlarm.byAlarmLevel, struThermometryDiffAlarm.byAlarmType, struThermometryDiffAlarm.byAlarmRule, struThermometryDiffAlarm.byRuleCalibType, struThermometryDiffAlarm.struPoint[0].fX, struThermometryDiffAlarm.struPoint[0].fY, struThermometryDiffAlarm.struPoint[1].fX, struThermometryDiffAlarm.struPoint[1].fY, struThermometryDiffAlarm.struPtzInfo.fPan, struThermometryDiffAlarm.struPtzInfo.fTilt, struThermometryDiffAlarm.struPtzInfo.fZoom, struThermometryDiffAlarm.dwPicLen, struThermometryDiffAlarm.dwThermalPicLen, struThermometryDiffAlarm.dwThermalInfoLen, struThermometryDiffAlarm.byThermometryUnit);
+        }
+        else if (1 == struThermometryDiffAlarm.byRuleCalibType || 2 == struThermometryDiffAlarm.byRuleCalibType)
+        {
+            int i = 0;
+            int iPointNum = struThermometryDiffAlarm.struRegion[0].dwPointNum;
+            for (i = 0; i < iPointNum; i++)
+            {
+                float fX = struThermometryDiffAlarm.struRegion[0].struPos[i].fX;
+                float fY = struThermometryDiffAlarm.struRegion[0].struPos[i].fY;
+                qWarning("测温区域1坐标点: X%d:%f,Y%d:%f;", iPointNum + 1, fX, iPointNum + 1, fY);
+            }
+            iPointNum = struThermometryDiffAlarm.struRegion[1].dwPointNum;
+            for (i = 0; i < iPointNum; i++)
+            {
+                float fX = struThermometryDiffAlarm.struRegion[1].struPos[i].fX;
+                float fY = struThermometryDiffAlarm.struRegion[1].struPos[i].fY;
+                qWarning("测温区域2坐标点: X%d:%f,Y%d:%f;", iPointNum + 1, fX, iPointNum + 1, fY);
+            }
+
+            qWarning("温差报警: Channel:%d, AlarmID1:%d, AlarmID2:%d, PresetNo:%d, RuleTemperatureDiff:%.1f, CurTemperatureDiff:%.1f, AlarmLevel:%d, AlarmType:%d, AlarmRule:%d, RuleCalibType:%d,  PTZ Info[Pan:%f, Tilt:%f, Zoom:%f], PicLen:%d, ThermalPicLen:%d, ThermalInfoLen:%d, ThermometryUnit:%d", struThermometryDiffAlarm.dwChannel, struThermometryDiffAlarm.byAlarmID1, struThermometryDiffAlarm.byAlarmID2, struThermometryDiffAlarm.wPresetNo, struThermometryDiffAlarm.fRuleTemperatureDiff, struThermometryDiffAlarm.fCurTemperatureDiff, struThermometryDiffAlarm.byAlarmLevel, struThermometryDiffAlarm.byAlarmType, struThermometryDiffAlarm.byAlarmRule, struThermometryDiffAlarm.byRuleCalibType, struThermometryDiffAlarm.struPtzInfo.fPan, struThermometryDiffAlarm.struPtzInfo.fTilt, struThermometryDiffAlarm.struPtzInfo.fZoom, struThermometryDiffAlarm.dwPicLen, struThermometryDiffAlarm.dwThermalPicLen, struThermometryDiffAlarm.dwThermalInfoLen, struThermometryDiffAlarm.byThermometryUnit);
+        }
+        break;}
+
     case COMM_ALARM_RULE: //异常行为识别报警信息
     {
         NET_VCA_RULE_ALARM struVcaAlarm = { 0 };
@@ -115,7 +169,8 @@ void CALLBACK cbMessageCallback(LONG lCommand, NET_DVR_ALARMER *pAlarmer, char *
         {
         case ENUM_VCA_EVENT_INTRUSION: //区域入侵报警
         {
-            qDebug() << QString("区域入侵报警: wDuration[%1], Sensitivity[%2]")
+            //1-120秒，建议5秒，判断是有效报警的时间  在ATM系统中触发文件阈值为 1-1000秒
+            qDebug() << QString("区域入侵报警: 触发时间阈值：%1, 灵敏度参数：%2")
                             .arg(struVcaAlarm.struRuleInfo.uEventParam.struIntrusion.wDuration)
                             .arg(struVcaAlarm.struRuleInfo.uEventParam.struIntrusion.bySensitivity);
 
@@ -137,7 +192,7 @@ void CALLBACK cbMessageCallback(LONG lCommand, NET_DVR_ALARMER *pAlarmer, char *
             eventHik.source = QString::fromLocal8Bit(struVcaAlarm.struDevInfo.struDevIP.sIpV4);;
             eventHik.type = "区域入侵";
             eventHik.level = EventLevel_Warning;
-            eventHik.details = QString("区域入侵报警: wDuration[%1], Sensitivity[%2]")
+            eventHik.details = QString("区域入侵报警: 触发时间阈值：%1, 灵敏度参数：%2")
                                   .arg(struVcaAlarm.struRuleInfo.uEventParam.struIntrusion.wDuration)
                                   .arg(struVcaAlarm.struRuleInfo.uEventParam.struIntrusion.bySensitivity);
             eventHik.details += QString("\n规则区域: %1").arg(ruleRegion);
@@ -155,15 +210,81 @@ void CALLBACK cbMessageCallback(LONG lCommand, NET_DVR_ALARMER *pAlarmer, char *
         }
         break;
     }
+    case COMM_GISINFO_UPLOAD:  //云台水平角度
+    {
+        NET_DVR_GIS_UPLOADINFO struUploadinfo = {0};
+        memcpy(&struUploadinfo, pAlarmInfo, sizeof(NET_DVR_GIS_UPLOADINFO));
 
+        QString alarm_IP = QString(struUploadinfo.struDevInfo.struDevIP.sIpV4);
+        qDebug()<<"机器人IP地址："<<alarm_IP<<struUploadinfo.fAzimuth;
+        qDebug()<<struUploadinfo.struPtzPos.fPanPos;
+        break;}
+    case COMM_VCA_ALARM:    //区域入侵结束
+    {
+        QString message = QString::fromUtf8(pAlarmInfo);
+        qDebug()<<COMM_VCA_ALARM<<"区域入侵结束:"<<message;
+        break;}
+    case COMM_FIREDETECTION_ALARM:      //火点识别
+    {
+        QString message = QString::fromUtf8(pAlarmInfo);
+        qDebug()<<COMM_FIREDETECTION_ALARM<<"火点识别"<<message;
+        break;}
     default:
     {
-        qDebug() << QString("其他报警，报警信息类型: 0x%1").arg(QString::number(lCommand, 16));
-        break;
-    }
+        qDebug() << QString("其他报警，报警信息类型: 0x%1").arg(QString::number(lCommand, 16))<<QString::fromUtf8(pAlarmInfo);
+        break;}
     }
 
     return;
+}
+
+void CALLBACK GetThermInfoCallback(DWORD dwType, void* lpBuffer, DWORD dwBufLen, void* pUserData)
+{
+    if (dwType == NET_SDK_CALLBACK_TYPE_DATA)
+    {
+        NET_DVR_THERMOMETRY_UPLOAD struThermometry = { 0 };
+        memcpy(&struThermometry, lpBuffer, sizeof(NET_DVR_THERMOMETRY_UPLOAD));
+
+        NET_DVR_TIME struAbsTime = { 0 };
+        struAbsTime.dwYear = GET_YEAR(struThermometry.dwAbsTime);
+        struAbsTime.dwMonth = GET_MONTH(struThermometry.dwAbsTime);
+        struAbsTime.dwDay = GET_DAY(struThermometry.dwAbsTime);
+        struAbsTime.dwHour = GET_HOUR(struThermometry.dwAbsTime);
+        struAbsTime.dwMinute = GET_MINUTE(struThermometry.dwAbsTime);
+        struAbsTime.dwSecond = GET_SECOND(struThermometry.dwAbsTime);
+        //规则标定类型 0-点，1-框，2-线
+        qDebug()<< QString("实时测温结果:规则[] 预置点号[] 类型[] 测温单位[] 数据状态类型")
+                <<struThermometry.byRuleID<<struThermometry.wPresetNo<< struThermometry.byRuleCalibType<< struThermometry.byThermometryUnit
+                <<struThermometry.byDataType
+                <<struAbsTime.dwYear << struAbsTime.dwMonth<< struAbsTime.dwDay<<":"<<struAbsTime.dwHour<<struAbsTime.dwMinute<<struAbsTime.dwSecond;
+
+        //点测温
+        if (struThermometry.byRuleCalibType == 0)
+        {
+            qDebug()<<QString("点测温信息:%1").arg(struThermometry.struPointThermCfg.fTemperature);
+        }
+
+        //框/线测温
+        if ((struThermometry.byRuleCalibType == 1) || (struThermometry.byRuleCalibType == 2))
+        {
+            qDebug()<<("框/线测温信息:最高温[]最低温[]平均温[]温差[]")
+                <<struThermometry.struLinePolygonThermCfg.fMaxTemperature<< struThermometry.struLinePolygonThermCfg.fMinTemperature
+                <<struThermometry.struLinePolygonThermCfg.fAverageTemperature<<struThermometry.struLinePolygonThermCfg.fTemperatureDiff;
+        }
+    }
+    else if (dwType == NET_SDK_CALLBACK_TYPE_STATUS)
+    {
+        DWORD dwStatus = *(DWORD*)lpBuffer;
+        if (dwStatus == NET_SDK_CALLBACK_STATUS_SUCCESS)
+        {
+            qDebug()<<("dwStatus:NET_SDK_CALLBACK_STATUS_SUCCESS\n");
+        }
+        else if (dwStatus == NET_SDK_CALLBACK_STATUS_FAILED)
+        {
+            DWORD dwErrCode = *(DWORD*)((char *)lpBuffer + 4);
+            qDebug()<<("NET_DVR_GET_MANUALTHERM_INFO failed, Error code")<< dwErrCode;
+        }
+    }
 }
 
 
@@ -175,6 +296,7 @@ HikVisionCamera::HikVisionCamera(QWidget *parent) :
 
     init_NetworkRequest();
     init();
+    //QObject::connect(this, &HikVisionCamera::init, &GetThermInfoCallback);
 }
 
 HikVisionCamera::~HikVisionCamera()
@@ -194,14 +316,14 @@ void HikVisionCamera::init()
          qDebug() << "Response:处理认证"<<reply; });
 
     //start();
+    QMetaObject::invokeMethod(this,"load",Qt::QueuedConnection);
+    //QTimer::singleShot(10,this,SLOT(load()));
+    //QTimer::singleShot(10,[&](){load();});
 }
 
 void HikVisionCamera::start()
 {
-    init_HCNetSDK();
-    if(Login_V40()){
-        SetupAlarmChan_V41();
-    }
+
 
 }
 
@@ -516,13 +638,80 @@ bool HikVisionCamera::SetupAlarmChan_V41()
     lHandle = NET_DVR_SetupAlarmChan_V41(lUserID, &struAlarmParam);
     if (lHandle < 0)
     {
-        printf("NET_DVR_SetupAlarmChan_V41 error, %d\n", NET_DVR_GetLastError());
+        qDebug()<<("NET_DVR_SetupAlarmChan_V41 error, %d")<<NET_DVR_GetLastError();
         NET_DVR_Logout(lUserID);
         NET_DVR_Cleanup();
         return false;
     }
     //事件信息在回调函数里面获取
     return true;
+}
+
+bool HikVisionCamera::StartRemoteConfig()
+{
+    DWORD dwChannel = 2;  //热成像通道
+
+    //启动实时温度检测
+    NET_DVR_REALTIME_THERMOMETRY_COND struThermCond = { 0 };
+    struThermCond.dwSize = sizeof(struThermCond);
+    struThermCond.byRuleID = 1;       //规则ID，0代表获取全部规则，具体规则ID从1开始
+    struThermCond.dwChan = dwChannel; //从1开始，0xffffffff代表获取全部通道
+
+    LONG lHandle = NET_DVR_StartRemoteConfig(lUserID, NET_DVR_GET_REALTIME_THERMOMETRY, &struThermCond, sizeof(struThermCond), GetThermInfoCallback, NULL);
+    if (lHandle < 0)
+    {
+        qDebug()<<"NET_DVR_GET_REALTIME_THERMOMETRY failed, error code: %d\n"<<NET_DVR_GetLastError();
+    }
+    else
+    {
+        qDebug()<<("NET_DVR_GET_REALTIME_THERMOMETRY is successful!");
+    }
+
+    //关闭长连接配置接口所创建的句柄，释放资源
+    if (!NET_DVR_StopRemoteConfig(lHandle))
+    {
+        qDebug()<<("NET_DVR_StopRemoteConfig failed, error code: %d\n")<<NET_DVR_GetLastError();
+    }
+
+    return true;
+}
+
+void HikVisionCamera::SaveRealData()
+{
+    //---------------------------------------
+    //启动预览并设置回调数据流
+    LONG lRealPlayHandle;
+    //HWND hWnd = GetConsoleWindowAPI();     //获取窗口句柄
+    NET_DVR_PREVIEWINFO struPlayInfo = {0};
+    struPlayInfo.hPlayWnd = NULL;//hWnd;         //需要SDK解码时句柄设为有效值，仅取流不解码时可设为空
+    struPlayInfo.lChannel     = 1;       //预览通道号
+    struPlayInfo.dwStreamType = 0;       //0-主码流，1-子码流，2-码流3，3-码流4，以此类推
+    struPlayInfo.dwLinkMode   = 0;       //0- TCP方式，1- UDP方式，2- 多播方式，3- RTP方式，4-RTP/RTSP，5-RSTP/HTTP
+    struPlayInfo.bBlocked     = 1;       //0- 非阻塞取流，1- 阻塞取流
+
+    lRealPlayHandle = NET_DVR_RealPlay_V40(lUserID, &struPlayInfo, NULL, NULL);
+    qDebug()<<"NET_DVR_RealPlay_V40"<<lUserID<<lRealPlayHandle;
+    if (lRealPlayHandle < 0)
+    {
+        qWarning()<<QString("预览失败，错误码, error code: %1\n").arg(NET_DVR_GetLastError());
+        return;
+    }
+    QString sFileName= "test.mp4";
+
+    bool bValues = NET_DVR_SaveRealData(lRealPlayHandle, sFileName.toLocal8Bit().data());
+    if(bValues){
+        Sleep(10000);
+        if(!NET_DVR_StopSaveRealData(lRealPlayHandle)){
+            qWarning()<<QString("关闭存盘失败，错误码, error code: %1\n").arg(NET_DVR_GetLastError());
+        }
+    }else{
+        qWarning()<<QString("开启存盘失败，错误码, error code: %1\n").arg(NET_DVR_GetLastError());
+    }
+
+    //---------------------------------------
+    //关闭预览
+    NET_DVR_StopRealPlay(lRealPlayHandle);
+
 }
 
 void HikVisionCamera::cleanup_HCNetSDK()
@@ -541,6 +730,15 @@ void HikVisionCamera::cleanup_HCNetSDK()
     }
 
 
+}
+
+void HikVisionCamera::load()
+{
+    qDebug() << " HikVisionCamera::load() 延迟加载";
+    init_HCNetSDK();
+    if(Login_V40()){
+        SetupAlarmChan_V41();
+    }
 }
 
 
