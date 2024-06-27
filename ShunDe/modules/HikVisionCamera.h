@@ -114,7 +114,7 @@ public:
     LoginInfo loginInfo;
     LONG lUserID = -1;
     void init_HCNetSDK();
-    bool Login_V40();
+
     bool SetupAlarmChan_V41();//报警开启
     bool StartRemoteConfig();//测温开启
 
@@ -125,10 +125,18 @@ public:
     LONG lHandle = -1;
 
 public slots:
+    bool Login_V40();
+
+    void updataCameraConfig();
     void load();
+    void eventVideoSava(const QString& filepath);
+    void eventHeartBeat();
+
 
 private:
     Ui::HikVisionCamera *ui;
+    QEventLoop m_loopVideoSava;
+
 };
 
 #endif // HIKVISIONCAMERA_H

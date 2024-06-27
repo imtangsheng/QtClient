@@ -249,7 +249,6 @@ void FilesUtil::NetworkReplyReadyRead()
     foreach (const QNetworkReply::RawHeaderPair &header, headers)
     {
         qDebug() << "Ready Read:" << header.first << ": " << header.second;
-        //        printf("%s: %s\n", qPrintable(header.first), qPrintable(header.second));
     }
     qDebug() << "Content-Type:" << networkReply->header(QNetworkRequest::ContentTypeHeader);
     // 或者直接打印个别重要属性

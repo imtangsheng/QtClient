@@ -1,5 +1,8 @@
 #include "Apputil.h"
 
+QString gPathCameraPicture = "/";
+QString gPathCameraVideo = "/";
+
 IsSucce ReadJsonData(QJsonObject &jsonObj, const QString &filePath)
 {
     QFile file(filePath);

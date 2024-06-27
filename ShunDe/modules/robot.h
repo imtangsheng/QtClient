@@ -232,6 +232,9 @@ public:
     void init_chartView();
     void showRobotAlarmInChart(const QDateTime& begin,const QDateTime& end);
 
+public slots:
+    void updataCameraConfig();
+
 private:
     QReadWriteLock m_rwLock;
     // QString ipAddress = "127.0.0.1"; // 服务器IP地址
@@ -265,6 +268,10 @@ private slots:
 
     void on_pushButton_alarm_chart_title_isShow_clicked();
     void on_comboBox_alarm_time_activated(int index);
+    void on_toolButton_vision_fileSavaPath_picture_get_clicked();
+    void on_toolButton_vision_fileSavaPath_picture_set_clicked();
+    void on_toolButton_vision_fileSavaPath_video_get_clicked();
+    void on_toolButton_vision_fileSavaPath_video_set_clicked();
 };
 
 struct Device

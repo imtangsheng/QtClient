@@ -12,6 +12,7 @@
 #include "AppOS.h"
 #include "function/worker_inspection_thread.h"
 #include "modules/sqlite.h"
+#include "AppUtil.h"
 
 //switch (getRobotType())
 //{
@@ -103,9 +104,9 @@ void Robot::init()
     if (config.contains("camera"))
     {
         QJsonObject camera = config["camera"].toObject();
-
         hikVisionCamera.camera = camera;
         hikVisionCamera.loginInfo.sDeviceAddress = camera["video_ip"].toString();
+        hikVisionCamera.loginInfo.sUserName = camera["video_username"].toString();
         hikVisionCamera.loginInfo.sPassword = camera["video_password"].toString();
 
         ui->comboBox_robot_type->setCurrentIndex(config["robotType"].toInt(0));
@@ -147,6 +148,10 @@ void Robot::init()
     ui->doubleSpinBox_vision_default_PTZPOS_wPanPos->setValue(config["vision_default_PTZPOS_wPanPos"].toDouble(vision_default_PTZPOS_wPanPos));
     ui->doubleSpinBox_vision_default_PTZPOS_wTiltPos->setValue(config["vision_default_PTZPOS_wTiltPos"].toDouble(vision_default_PTZPOS_wTiltPos));
 
+    gPathCameraPicture = config["fileSavaPath_picture"].toString("/");
+    ui->lineEdit_vision_fileSavaPath_picture->setText(gPathCameraPicture);
+    gPathCameraVideo = config["fileSavaPath_video"].toString("/");
+    ui->lineEdit_vision_fileSavaPath_video->setText(gPathCameraVideo);
 
     /*#1-2 机器人报表初始化*/
     connect(inspection.ui->toolButton_point_position_get, &QToolButton::clicked, this, [=]()
@@ -193,11 +198,18 @@ void Robot::init()
 
     QMenu *toolMenu = new QMenu(this);
     // QMenu menu(this);
+    toolMenu->addAction("Test1", this, [this](){
+        qDebug() << "showContextMenu(const QPoint &pos)" << this->isFullScreen();
+        hikVisionCamera.eventVideoSava(QDateTime::currentDateTime().toString("yyyy-MM-dd_hhmmss")+"_test.mp4");
+    });
+    toolMenu->addAction("Test2", this, [this](){
+        qDebug() << "showContextMenu(const QPoint &pos)" << this->isFullScreen();
+        hikVisionCamera.eventHeartBeat();
+    });
     toolMenu->addAction("Test", this, [this](){
         qDebug() << "showContextMenu(const QPoint &pos)" << this->isFullScreen();
         test();
     });
-
     ui->toolButton_widget_cameraChannel_isShow->setMenu(toolMenu);
     //qDebug() << "void Robot::init()" << config;
 }
@@ -815,6 +827,28 @@ void Robot::showRobotAlarmInChart(const QDateTime &begin, const QDateTime &end)
     series->attachAxis(axisY);
 }
 
+void Robot::updataCameraConfig()
+{
+    QJsonObject camera = config["camera"].toObject();
+    switch (getRobotType())
+    {
+    case RobotType_default:
+        //break;
+    case RobotType_HikVision_Camera:
+        hikVisionCamera.camera = camera;
+        hikVisionCamera.updataCameraConfig();
+        break;
+    case RobotType_SelfCamera_launchdigital_thermal:
+    {
+        // 自研发云台没有显示角度的功能，使用海康接口方法，显示在画面中
+        break;
+    }
+    default:
+        break;
+    }
+
+}
+
 void Robot::updateRobotNameShow(const QString &name)
 {
 
@@ -890,10 +924,11 @@ void Robot::on_toolButton_robto_config_save_clicked()
     hikVisionCamera.camera = camera;
 
     ui->widgetSetting->close();
-    // 更新名称
+
     // init()
     name = config["name"].toString();
-    updateRobotNameShow(name);
+    updateRobotNameShow(name);// 更新名称
+    updataCameraConfig();// 摄像机
 
     ui->label_channel01_video_name->setText(camera["video_name"].toString());
     ui->label_channel02_thermal_name->setText(camera["thermal_name"].toString());
@@ -1123,5 +1158,63 @@ void Robot::on_comboBox_alarm_time_activated(int index)
     }
     qDebug()<<"on_comboBox_alarm_time_activated"<<startDateTime<< endDateTime;
     showRobotAlarmInChart(startDateTime,endDateTime);
+}
+
+
+void Robot::on_toolButton_vision_fileSavaPath_picture_get_clicked()
+{
+    // 打开文件夹选择对话框
+    QString selectedDirPath = QFileDialog::getExistingDirectory(
+        this, // 父窗口
+        tr("Select Directory"), // 对话框标题
+        QDir::homePath(), // 默认打开的目录
+        QFileDialog::ShowDirsOnly // 仅显示文件夹
+        );
+
+    if (!selectedDirPath.isEmpty()) {
+        // 获取选择的文件夹路径
+        qDebug() << "Selected directory path:" << selectedDirPath;
+        // 将路径保存到成员变量或其他地方
+        ui->lineEdit_vision_fileSavaPath_picture->setText(selectedDirPath);
+    }
+}
+
+
+void Robot::on_toolButton_vision_fileSavaPath_picture_set_clicked()
+{
+    QString filepath = ui->lineEdit_vision_fileSavaPath_picture->text();
+    if(filepath != config["fileSavaPath_picture"].toString()){
+        gPathCameraPicture = filepath;
+        config["fileSavaPath_picture"] = gPathCameraPicture;
+    }
+}
+
+
+void Robot::on_toolButton_vision_fileSavaPath_video_get_clicked()
+{
+    // 打开文件夹选择对话框
+    QString selectedDirPath = QFileDialog::getExistingDirectory(
+        this, // 父窗口
+        tr("Select Directory"), // 对话框标题
+        QDir::homePath(), // 默认打开的目录
+        QFileDialog::ShowDirsOnly // 仅显示文件夹
+        );
+
+    if (!selectedDirPath.isEmpty()) {
+        // 获取选择的文件夹路径
+        qDebug() << "Selected directory path:" << selectedDirPath;
+        // 将路径保存到成员变量或其他地方
+         ui->lineEdit_vision_fileSavaPath_video->setText(selectedDirPath);
+    }
+}
+
+
+void Robot::on_toolButton_vision_fileSavaPath_video_set_clicked()
+{
+    QString filepath = ui->lineEdit_vision_fileSavaPath_video->text();
+    if(filepath != config["fileSavaPath_video"].toString()){
+        gPathCameraVideo = filepath;
+        config["fileSavaPath_video"]  = gPathCameraVideo;
+    }
 }
 

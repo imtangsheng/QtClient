@@ -1141,6 +1141,16 @@
            <string>sub</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>201</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>202</string>
+          </property>
+         </item>
         </widget>
        </item>
        <item row="0" column="1">
@@ -2021,6 +2031,104 @@ QSlider::sub-page:horizontal {
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget" native="true">
+      <layout class="QVBoxLayout" name="verticalLayout_9">
+       <property name="spacing">
+        <number>0</number>
+       </property>
+       <property name="leftMargin">
+        <number>0</number>
+       </property>
+       <property name="rightMargin">
+        <number>0</number>
+       </property>
+       <property name="bottomMargin">
+        <number>0</number>
+       </property>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,10,0">
+         <item>
+          <widget class="QToolButton" name="toolButton_vision_fileSavaPath_picture_get">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>图片抓拍地址</string>
+           </property>
+           <property name="text">
+            <string>图片抓拍地址</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vision_fileSavaPath_picture">
+           <property name="styleSheet">
+            <string notr="true">border: 2px solid #263238;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_vision_fileSavaPath_picture_set">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>设置</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0,10,0">
+         <item>
+          <widget class="QToolButton" name="toolButton_vision_fileSavaPath_video_get">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="toolTip">
+            <string>特殊事件视频地址</string>
+           </property>
+           <property name="text">
+            <string>事件视频地址</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="lineEdit_vision_fileSavaPath_video">
+           <property name="styleSheet">
+            <string notr="true">border: 2px solid #263238;</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="toolButton_vision_fileSavaPath_video_set">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="text">
+            <string>设置</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </item>
     <item>
      <spacer name="verticalSpacer">
