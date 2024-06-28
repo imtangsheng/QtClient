@@ -54,10 +54,6 @@ Robot::Robot(QWidget *parent) : QWidget(parent),
 {
     ui->setupUi(this);
     //    inspection.setParent(this);
-
-
-    //ui->label_inspection_current_task_point_current_action_progress_value->setText(QString("%1 %").arg(100));
-
     gSql = SQLite::instance();
     QSqlError error;
     error = gSql->init_EventCenter();
@@ -223,6 +219,19 @@ void Robot::start()
 
     inspection.start();
     hikVisionCamera.start();
+    // 更新角度
+    switch (getRobotType())
+    {
+    case RobotType_default:
+        //break;
+    case RobotType_HikVision_Camera:
+        break;
+    case RobotType_SelfCamera_launchdigital_thermal:
+    {
+        break;}
+    default:
+        break;
+    }
 }
 
 void Robot::clientOnlineEvent()

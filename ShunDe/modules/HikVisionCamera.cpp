@@ -219,7 +219,7 @@ void CALLBACK cbMessageCallback(LONG lCommand, NET_DVR_ALARMER *pAlarmer, char *
             eventHik.status = "";
             gSql->add_EventCenter(eventHik);
             if(gCamera.contains(alarm_ip)){
-                QString filename_video = struAbsTime.toString("yyyyMMddhhmmss") + ".mp4";
+                QString filename_video = struAbsTime.toString("yyyy_MM_dd_hhmmss") + ".mp4";
                 // 检查文件夹是否存在
                 QDir dir(gPathCameraVideo);
                 if (!dir.exists()) {
@@ -340,6 +340,7 @@ HikVisionCamera::~HikVisionCamera()
     qDebug()<<"HikVisionCamera::~HikVisionCamera() 0 ";
     delete ui;
     qDebug()<<"HikVisionCamera::~HikVisionCamera()";
+    cleanup_HCNetSDK();
 }
 
 void HikVisionCamera::init()
@@ -365,7 +366,7 @@ void HikVisionCamera::start()
 
 void HikVisionCamera::quit()
 {
-    cleanup_HCNetSDK();
+
     qDebug()<<"HikVisionCamera::quit()";
 }
 
