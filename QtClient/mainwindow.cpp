@@ -15,6 +15,7 @@
 #include "ui/SubMain.h"
 
 #include "modules/sqlite.h"
+#include "modules/httpserver.h"
 
 #define VARNAME(var) #var
 
@@ -34,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    connect(ui->statusBar,&QStatusBar::clearMessage,this,&MainWindow::clearMessage);
     SUB_MAIN = new SubMain;
     gSql = SQLite::instance(nullptr,"test.db");
+    gHttpServer = HttpServer::instance(this);
     _Awake();
 
 }
@@ -190,7 +192,8 @@ void MainWindow::_Start()
         ui->tableView_events->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
         ui->tableView_events->horizontalHeader()->setSectionResizeMode(5,QHeaderView::Stretch);//details 5
     }
-
+    /*http服务事件中心显示操作记录*/
+    gHttpServer->route_add_sql();
     test();
 }
 
