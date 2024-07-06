@@ -93,6 +93,11 @@ void HomeWindow::quit()
     AppJson["HomeWindow"] = config;
 
     deleteLater();
+    // 如果服务器已经在监听，先停止它
+    if (server.isListening()) {
+        server.close();
+    }
+
     qDebug() << "void HomeWindow::quit()";
 }
 
@@ -130,12 +135,15 @@ void HomeWindow::RelayoutCameraWidget()
 
 bool HomeWindow::addNewRobotDevice(int id)
 {
+    qDebug()<<"addNewRobotDevice(int id);"<<QThread::currentThread();
     if(DeviceMap.contains(id)){
         return false;
     }
     DeviceMap[id].id = id;
     if(!DeviceMap[id].robot){
         DeviceMap[id].robot = new Robot(this);
+        //线程与主线程不同，会导致chart的报错和初始化失败，程序奔溃
+        DeviceMap[id].robot->moveToThread(QThread::currentThread());
     }
     DeviceMap[id].robot->id = id;
     DeviceMap[id].robot->init(); // 配置读取，摄像头数据 通道号等
@@ -161,10 +169,17 @@ bool HomeWindow::addNewRobotDevice(int id)
 bool HomeWindow::startTcpServerListen(const QString &ipAddress, const quint16 &port)
 {
     qDebug() << "启动服务器：" << ipAddress << port;
+    // 如果服务器已经在监听，先停止它
+    if (server.isListening()) {
+        server.close();
+    }
     if (!server.listen(QHostAddress(ipAddress), port)){
         qWarning() << "无法启动服务器：" << server.errorString();
         return false;
     }
+    connect(this,&HomeWindow::signalsAddNewRobotDevice,this,&HomeWindow::addNewRobotDevice);
+    connect(this,&HomeWindow::signalsProcessNewConnection,this,&HomeWindow::ProcessNewConnection,Qt::QueuedConnection);
+
     qDebug() << "服务器已启动，监听地址：" << ipAddress << "，端口号：" << port;
     // 处理新的客户端连接
     QObject::connect(&server, &QTcpServer::newConnection, this, [=](){
@@ -172,20 +187,28 @@ bool HomeWindow::startTcpServerListen(const QString &ipAddress, const quint16 &p
         QTcpSocket *clientSocket = server.nextPendingConnection();
         // 处理客户端连接
         qDebug() << "新的客户端连接：" << clientSocket->peerAddress().toString() << ":" << clientSocket->peerPort();
-        // 接收一次数据
-        future = QtConcurrent::run(&HomeWindow::ProcessNewConnection,this,clientSocket);
-
         // 客户端断开连接
-        QObject::connect(clientSocket, &QTcpSocket::disconnected, [clientSocket]() {
-            qDebug() << "客户端断开连接startTcpServerListen：" << clientSocket->peerAddress().toString() << ":" << clientSocket->peerPort();
+        QObject::connect(clientSocket, &QTcpSocket::disconnected,this, [=]() {
+            qDebug() << "客户端断开连接 disconnected ：";
+            qDebug() << clientSocket->peerAddress().toString() << ":" << clientSocket->peerPort();
             clientSocket->deleteLater();
-        }); });
+        });
+        // 接收一次数据
+        //QSocketNotifier: Socket notifiers cannot be enabled or disabled from another thread
+        //incomingConnection 方法是实现自定义 TCP 服务器行为的关键点之一。通过重写这个方法，你可以精确控制服务器如何处理每一个新的客户端连接。
+        //需要自己单独实现tcp服务器，客户端的多端处理，后续考虑要自己扩展
+        future = QtConcurrent::run(&HomeWindow::ProcessNewConnection,this,clientSocket);
+        //ProcessNewConnection(clientSocket);//会阻塞主线程
+        //emit signalsProcessNewConnection(clientSocket);
+ });
     return true;
 }
 
 int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
 {
-    qDebug() << "HomeWindow::ProcessNewConnection(QTcpSocket *" << socket;
+    qDebug() << "HomeWindow::ProcessNewConnection(QTcpSocket *:" << socket->thread()<<"thread"<<QThread::currentThread();
+    //socket->moveToThread(QThread::currentThread());//父类不同不可行
+    // **不发数据，迅速断开连接会奔溃**
     // 接收一次数据 第一次等待10s接收信息
     if (socket->waitForReadyRead(10000)){
         QByteArray headerData = socket->readAll();
@@ -195,7 +218,8 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
             int clientId = (int)headerData.at(2) << 8 | (int)headerData.at(3);
             qDebug() << "新的客户端连接：currenId" << clientId;
             //自动添加新设备，初始化，如果已经存在，只需要更新连接socket
-            addNewRobotDevice(clientId);
+            //addNewRobotDevice(clientId);
+            emit signalsAddNewRobotDevice(clientId);
             DeviceMap[clientId].ipAddress = socket->peerAddress().toString() + ":" + socket->peerPort();
             DeviceMap[clientId].isOnline = true;
             DeviceMap[clientId].robot->client = socket;
@@ -219,26 +243,19 @@ int HomeWindow::ProcessNewConnection(QTcpSocket *socket)
                 }
 
             }); // 接收机器人客户端发送的数据
-
-            QObject::connect(socket, &QTcpSocket::disconnected,this, [=]() {
-                DeviceMap[clientId].isOnline = false;
-                DeviceMap[clientId].robot->clientOfflineEvent();
-                socket->deleteLater();
-            });
         }else{ //机器人未知数据
             qDebug() << "未知客户端连接：" << socket->peerAddress().toString() << ":" << socket->peerPort();
             // 主动断开未知设备的连接
-//            socket->disconnectFromHost();
-//            socket->deleteLater();
+            socket->disconnectFromHost();
+            socket->deleteLater();
         }
     }else{
      //客户端断开连接
-//        QObject::connect(socket, &QTcpSocket::disconnected, [socket]() {
-//            qDebug() << "客户端断开连接：" << socket->peerAddress().toString() << ":" << socket->peerPort();
-//            socket->disconnectFromHost();
-//            socket->deleteLater();
-//        });
+        qDebug() << "waitForReadyRead 10s 客户端连接超时为发消息";
+        socket->disconnectFromHost();
+        socket->deleteLater();
     }
+    qDebug() << "HomeWindow::ProcessNewConnection(QTcpSocket *:end";
     return 0;
 }
 
@@ -844,4 +861,3 @@ void HomeWindow::on_toolButton_camera_preview_cancel_clicked()
         cameraWidgets.at(currentItemCameraWidget)->player.stop();
     }
 }
-

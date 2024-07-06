@@ -229,10 +229,11 @@ public:
     QBarCategoryAxis* axisX;
     QValueAxis* axisY;
     QBarSeries* series;
-    void init_chartView();
+
     void showRobotAlarmInChart(const QDateTime& begin,const QDateTime& end);
 
 public slots:
+    void init_chartView();
     void updataCameraConfig();
 
 private:

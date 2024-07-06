@@ -186,8 +186,8 @@ void Robot::init()
     connect(&inspection,&Inspection::run_action_operation,this,&Robot::run_action_operation);
 
     /*#1-3 机器人报警图表初始化*/
-    init_chartView();
-
+    //init_chartView();
+    QMetaObject::invokeMethod(this,"init_chartView",Qt::QueuedConnection);
 
     /*#机器人内实例的-组合与聚合-启用*/
     start();
@@ -232,6 +232,7 @@ void Robot::start()
     default:
         break;
     }
+
 }
 
 void Robot::clientOnlineEvent()
@@ -763,6 +764,8 @@ QPoint Robot::getPicturePosFromPose(const int32_t &pose)
 //    chart3 = std::make_unique<QChart>();
 void Robot::init_chartView()
 {
+    qDebug()<<"void Robot::init_chartView()";
+    //QTextDocument 类型报与主线程不同，软件奔溃
     chart.reset(new QChart());
     chart->setContentsMargins(-9,-9,-9,-9);
     chart->setBackgroundRoundness(0);
@@ -774,15 +777,15 @@ void Robot::init_chartView()
     axisY = new QValueAxis();
     axisY->setTitleText("报警次数");
     axisY->setRange(0, 10); // 给Y轴留出一些空间
+
+    chart->addSeries(series);//Series not in the chart. Please addSeries to chart first.
+
     chart->addAxis(axisY,Qt::AlignLeft);
     series->attachAxis(axisY);
 
     axisX = new QBarCategoryAxis();
     chart->addAxis(axisX,Qt::AlignBottom);
     series->attachAxis(axisX);
-
-    chart->addSeries(series);
-
     chart->legend()->setVisible(true);
     chart->legend()->setAlignment(Qt::AlignBottom);
     chart->setTheme(QChart::ChartThemeBlueCerulean);

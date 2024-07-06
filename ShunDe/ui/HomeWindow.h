@@ -26,13 +26,16 @@ public:
 
     QTcpServer server;
     int SelectedId = -1;
-
-    bool addNewRobotDevice(int id);
-
     QFuture<int> future;
     bool startTcpServerListen(const QString &ipAddress = "0.0.0.0", const quint16 &port = 12345);
-    int ProcessNewConnection(QTcpSocket *socket);
 
+
+signals:
+    void signalsAddNewRobotDevice(int id);
+    void signalsProcessNewConnection(QTcpSocket *socket);
+public slots:
+    bool addNewRobotDevice(int id);
+    int ProcessNewConnection(QTcpSocket *socket);
 private:
     void showEvent(QShowEvent *event) override;
 
