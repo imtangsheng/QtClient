@@ -65,23 +65,15 @@ SQLite::~SQLite()
     qDebug() << "SQLite::~SQLite()";
 }
 
-#include <QCoreApplication>
-
 SQLite *SQLite::instance(QWidget *parent,const QString& db_filename)
 {
-    //qDebug() << "SQLite::instance(QWidget *parent)";
-    //同线程可以，插件不可以共享
-//    if(instance == nullptr){
-//        SQLite* var = qobject_cast<SQLite*>(qApp->property("sql_instance").value<QObject*>());
-//        if(var){
-//            qDebug() << "SQLite::getInstance(QWidget *parent)获取之前已经存在的实例"<<var;
-//            instance = var;
-//        }else{
-//            qDebug() << "SQLite::getInstance(QWidget *parent) 新建实例"<<var;
-//            instance = new SQLite(parent);
-//            qApp->setProperty("sql_instance",QVariant::fromValue(instance));
-//        }
-//    }
+/*
+ * 单例模式的实现：在每个DLL库和EXE中都会有自己的内存空间，代码实现，在实现单例模式时是存在各自的实现的
+ * 解决方法1：声明一个共有的dll，然后在这个dll的定义中实例化，注意不要在头文件中初始化
+ * 解决方法2：因为dll和exe存在独立的内存空间，可使用共享内存的方法来解决
+ * 解决方法3：通过信号与槽机制来进行数据的进程间通信交换数据，在插件机制中实现通信
+ * 本单例模式实现使用共享内存的方式实现，可按需加载实现单例模式
+*/
 
     if(m_instance == nullptr){
         static QSharedMemory sql_instance("sql_instance");
@@ -101,7 +93,8 @@ SQLite *SQLite::instance(QWidget *parent,const QString& db_filename)
             }
         }
     }
-    qDebug() << "SQLite::instance(QWidget *parent)"<<m_instance;
+    qDebug() << "SQLite::instance(QWidget *parent)"<<m_instance<<"QThread::currentThread:"<<QThread::currentThread();
+
     return m_instance;
 }
 
