@@ -2,6 +2,8 @@
 #include <QLocale>
 #include <QTranslator>
 #include <QCommandLineParser>
+#include <QSystemSemaphore>
+#include <QSharedMemory>
 #include "mainwindow.h"
 #include "public/AppSystem.h"
 #include <QDir>
@@ -25,6 +27,22 @@ int main(int argc, char *argv[])
     }
 
     QApplication app(argc, argv);
+    // 确保只运行一次
+    QSystemSemaphore sema("RobotStudioClient",1,QSystemSemaphore::Open);
+    sema.acquire();// 在临界区操作共享内存   SharedMemory
+
+    QSharedMemory mem("DcRobotSystemObject");// 全局对象名
+    if (!mem.create(1))// 如果全局对象已存在则退出
+    {
+        QMessageBox::information(0,"提示","软件已开启!!");
+
+        sema.release();// 如果是 Unix 系统，会自动释放。
+
+        return 0;
+    }
+
+    sema.release();// 临界区
+
     QCommandLineParser parser;
     parser.setApplicationDescription("My Application");
     parser.addHelpOption();
