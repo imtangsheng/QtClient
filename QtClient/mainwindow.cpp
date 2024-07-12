@@ -42,7 +42,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::showUI()
 {
-    qDebug() << "MainWindow::show() 当前登录用户："<<CurrentUser;
+    qDebug() << "MainWindow::show() 当前登录用户："<<CurrentUser<<"屏幕缩放因素："<<devicePixelRatio();
     showMessage("当前登录用户：" +CurrentUser);
 
     init();
@@ -344,12 +344,12 @@ void MainWindow::addTabWidget(int window)
     QIcon icon;
     QString name;
     switch (window) {
-//    case TabWindow_DataView:{
+    case 0:{
 //        DataView *ui_DataView = new DataView(SUB_MAIN);
 //        addWidget = ui_DataView->getDataView();
 //        icon = QIcon(":/asset/Home/DataView.svg");
 //        name = tr("数据图表");
-//        break;}
+        break;}
     default:
         qWarning()<<"window 没有定义对应的ui"<<window;
         return;

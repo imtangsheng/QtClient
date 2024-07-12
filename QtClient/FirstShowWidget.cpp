@@ -12,16 +12,17 @@ FirstShowWidget::FirstShowWidget(QWidget *parent) :
 
 FirstShowWidget::~FirstShowWidget()
 {
-    delete ui;
     qDebug()<<"FirstShowWidget::~FirstShowWidget()";
+    delete ui;
+    qDebug()<<"FirstShowWidget::~FirstShowWidget() end";
 }
 
 void FirstShowWidget::init()
 {
     setWindowFlags( Qt::FramelessWindowHint);
     AppSettings.beginGroup("FirstShowWidget");
-    username = AppSettings.value("username", "").toString();
-    password =  AppSettings.value("password", "").toString();
+    username = AppSettings.value("username", "admin").toString();
+    password =  AppSettings.value("password", "123456").toString();
     isAutoLogin = AppSettings.value("isAutoLogin", false).toBool();
     isSavaPassword = AppSettings.value("isSavaPassword", false).toBool();
     AppSettings.endGroup();
@@ -50,7 +51,7 @@ bool FirstShowWidget::start()
         qDebug()<<"username error"<<username<<ui->lineEdit_username->text();
         QMessageBox::warning(this, "警告", "username error");
         return false;
-    }else if("12345" != ui->lineEdit_password->text()){
+    }else if("123456" != ui->lineEdit_password->text()){
         qDebug()<<"password error"<<password << ui->lineEdit_password->text();
         QMessageBox::warning(this, "警告", "password error");
         return false;
@@ -93,7 +94,7 @@ void FirstShowWidget::on_pushButton_login_clicked()
 {
     if(start()){
         emit loginSuccess(); //加载需要时间
-        setAttribute(Qt::WA_DeleteOnClose);//close(); //先关闭再发信号，不然点击后会等待发送信号的时间才会触发
+        //setAttribute(Qt::WA_DeleteOnClose);//close(); //先关闭再发信号，不然点击后会等待发送信号的时间才会触发
         close(); //先关闭再发信号，不然点击后会等待发送信号的时间才会触发
 //        deleteLater(); //会主动释放，但是不能直接调用，需要先show，其他退出导致程序奔溃，。只能用于小部件
 //        destroy(); //不会主动释放

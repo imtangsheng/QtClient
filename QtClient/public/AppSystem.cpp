@@ -1,7 +1,6 @@
 #include "AppSystem.h"
 
 QString PATH_EXE_CONFIG = "config.json";
-QString PATH_APP_SETTINGS = "./config/config.ini";
 QString PATH_LOG = "log/";
 QString CurrentUser = "None";
 
@@ -52,14 +51,14 @@ bool getExeConfigJson()
         qErrnoWarning("Config file not found");
         //        qFatal("Config file not found"); // 软件会崩溃
         file.close();
-        return -1;
+        return false;
     }
     AppJson = QJsonDocument::fromJson(file.readAll()).object();
     file.close();
     if(AppJson.isEmpty()) {
         qErrnoWarning("Config file is not valid JSON");
 //        QMessageBox::critical(nullptr, "Error", "Config file is not valid JSON");
-        return -1;
+        return false;
     }
     return true;
 
