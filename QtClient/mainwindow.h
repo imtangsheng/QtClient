@@ -22,10 +22,10 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
-    void _Awake();//初始化运行一次
-    void init();
+    void Awake_();//初始化运行一次
+    void init_();
     void test();
-    void _Start();//
+    void Start_();//
 //    void _Update();//
 //    void _FixedUpdate();//
 //    void _LateUpdata();//
@@ -51,7 +51,7 @@ protected:
     void paintEvent(QPaintEvent *event) override;
     void changeEvent(QEvent *event) override;
 //    void geometryChanged(const QRect &newGeometry, const QRect &oldGeometry) override;
-    const int borderSize = 5; //调整窗口大小内边距
+    const int borderSize = 6; //调整窗口大小内边距 修改为 6px
     bool nativeEvent(const QByteArray &eventType,void *message, qintptr *result) override; //qt5使用loog
 
 private slots:

@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent)
     SUB_MAIN = new SubMain;
     gSql = SQLite::instance(nullptr,"test.db");
     gHttpServer = HttpServer::instance(this);
-    _Awake();
+    Awake_();
 
 }
 
@@ -45,8 +45,8 @@ void MainWindow::showUI()
     qDebug() << "MainWindow::show() 当前登录用户："<<CurrentUser<<"屏幕缩放因素："<<devicePixelRatio();
     showMessage("当前登录用户：" +CurrentUser);
 
-    init();
-    _Start();
+    init_();
+    Start_();
 
     ui->dateTimeEdit_events_time_begin->setDateTime(QDateTime::currentDateTime().date().startOfDay());
     ui->dateTimeEdit_events_time_end->setDateTime(QDateTime::currentDateTime().date().endOfDay());
@@ -87,8 +87,9 @@ Qt::Window | Qt::CustomizeWindowHint
 Qt::FramelessWindowHint 无边框和标题，【只有右下角可以缩放】，【不能拖动】，不能双击放大
 Qt::Window | Qt::FramelessWindowHint
 Qt::WindowMinimizeButtonHint 可以任务栏最大最小化
+Qt::CustomizeWindowHint 会有顶部白线（有一个 6px 的非工作区）The top border is not transparent
 */
-void MainWindow::_Awake()
+void MainWindow::Awake_()
 {
     // 定义文件路径
     QString faviconFilePath = "favicon.png";
@@ -98,16 +99,17 @@ void MainWindow::_Awake()
         setWindowIcon(QIcon(faviconFilePath));
     }
 
-    //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);//可以任务栏图标点击最小化,但是不可以触发调节大小
-    //setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint);
-    // 启用窗口可调整大小
-//    setWindowFlags(Qt::WindowMinimizeButtonHint | Qt::FramelessWindowHint);
-    //setWindowFlags(windowFlags() | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
-//    setWindowFlags( Qt::FramelessWindowHint);//可以调节大小,但是不可以触发任务栏图标点击最小化
-    setWindowFlags(windowFlags() | Qt::CustomizeWindowHint);//不知道为啥会没有顶部白线，有nativeEvent 处理后
+    //setWindowFlags(windowFlags() | Qt::FramelessWindowHint);//不可以调节大小,但是可以触发任务栏图标点击最小化
+    //setWindowFlags(Qt::FramelessWindowHint);//可以调节大小,但是不可以触发任务栏图标点击最小化
+    //setWindowFlags(Qt::Window | Qt::FramelessWindowHint);//可以调节大小,不可以触发任务栏图标点击最小化
+
+    //在 nativeEvent 中，我们处理了 WM_NCCALCSIZE 消息以阻止默认的非客户区计算。同时，我们处理了 WM_NCHITTEST 消息来实现自定义的窗口拖动和调整大小行为。这个方法会完全移除默认的窗口边框和标题栏
+    setWindowFlags(windowFlags() | Qt::CustomizeWindowHint);
+
+    //setAttribute(Qt::WA_TranslucentBackground);//标题透明
 
     ui->toolButton_WidgetStatus_isStaysOnTopHint->setVisible(false);
-//    ui->toolButton_WidgetStatus_isStaysOnTopHint->setParent(ui->WidgetStatus); //无用，还是会不显示
+    //ui->toolButton_WidgetStatus_isStaysOnTopHint->setParent(ui->WidgetStatus); //无用，还是会不显示
     ui->WidgetStatus->setVisible(false);
 
     /* MainWindow::ui->tabWidget_mainWindow 初始化加载 */
@@ -117,7 +119,7 @@ void MainWindow::_Awake()
 
 }
 
-void MainWindow::init()
+void MainWindow::init_()
 {
     qDebug() << "MainWindow::init()";
     if(pluginLoad()){
@@ -132,7 +134,7 @@ void MainWindow::init()
     qDebug() << "MainWindow::init() end";
 }
 
-void MainWindow::_Start()
+void MainWindow::Start_()
 {
     qDebug() << "MainWindow::_Start() 使用版本号：" << AppJson["version"];
     AppSettings.beginGroup("MainWindow");
@@ -239,10 +241,6 @@ void MainWindow::changeEvent(QEvent *event)
     QMainWindow::changeEvent(event);
 }
 
-#ifdef Q_OS_WIN
-#include "windows.h"
-#include "windowsx.h"
-#endif
 bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr *result)
 {
     //qDebug() << "MainWindow::nativeEvent(const QByteArray &"<<eventType<<message<<*result;
@@ -267,7 +265,8 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr
             // 判断鼠标位置是否在窗口边界
             const int width = this->width();
             const int height = this->height();
-            const QPoint localPos = mapFromGlobal(QPoint(GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam)));//#include "windowsx.h"
+            //const QPoint localPos = mapFromGlobal(QPoint(GET_X_LPARAM(msg->lParam), GET_Y_LPARAM(msg->lParam)));//#include "windowsx.h"
+            const QPoint localPos = mapFromGlobal(QCursor::pos());//修复在分辨率下的缩放大小的像素坐标错误
             if (localPos.x() < borderSize && localPos.y() < borderSize) {*result = HTTOPLEFT;}
             else if (localPos.x() > width - borderSize && localPos.y() < borderSize) {*result = HTTOPRIGHT;}
             else if (localPos.x() < borderSize && localPos.y() > height - borderSize) {*result = HTBOTTOMLEFT;}
@@ -277,7 +276,7 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr
             else if (localPos.y() < borderSize) {*result = HTTOP;}
             else if (localPos.y() > height - borderSize) {*result = HTBOTTOM;}
 
-            //qDebug()<<TIMEMS<<"*result:"<<*result;
+            qDebug()<<TIMEMS<<"*result:"<<*result<<"this->width()"<<this->width()<<"this->height()"<<this->height()<<"localPos:"<<localPos;
             if (*result != 0) {return true;}
 
         }/*else if (msg->message == WM_LBUTTONDOWN) {
@@ -340,7 +339,7 @@ void MainWindow::jump_ShowMainTabWidget(int index, QString name)
 void MainWindow::addTabWidget(int window)
 {
     QJsonObject tabJson = jsonMainConfig["TabWindow"].toObject();
-    QWidget * addWidget;
+    QWidget * addWidget = nullptr;
     QIcon icon;
     QString name;
     switch (window) {

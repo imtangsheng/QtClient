@@ -69,6 +69,19 @@ public:
     ~MapAtomicEnumValue() = default;
 };
 
+/**全局变量**/
+#include <QJsonObject>
+extern QJsonObject AppJson;
+/*ini文件读取配置，Qt自带系统方法，指定存储在本地或者系统注册表等地方*/
+#include <QSettings>
+extern QSettings AppSettings;
+
+#include<QString>
+extern QString CurrentUser;
+inline QString i2s(int num) {
+    return QString::number(num);
+}
+
 /*json文件读取软件相关配置*/
 #include <QJsonDocument>
 bool getExeConfigJson();
@@ -87,5 +100,6 @@ void logToFile(QtMsgType type, const QMessageLogContext &context, const QString 
 extern QString PATH_EXE_CONFIG;
 extern QString PATH_APP_SETTINGS;
 extern QString PATH_LOG;
+
 
 #endif // APPSYSTEM_H
