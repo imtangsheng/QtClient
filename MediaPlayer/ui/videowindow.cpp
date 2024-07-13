@@ -22,7 +22,7 @@ VideoWindow::~VideoWindow()
     qDebug() << "VideoWindow::~VideoWindow()释放";
 }
 /*
-第一次显示VideoWindow::showEvent(QShowEvent * 0x722f1fec40 "VideoWindow" QList("VideoWindow/AppJson", "VideoWindow/geometry", "VideoWindow/isFloating")
+第一次显示VideoWindow::showEvent(QShowEvent * 0x722f1fec40 "VideoWindow" QList("VideoWindow/MediaPlayerJson", "VideoWindow/geometry", "VideoWindow/isFloating")
 VideoWindow::mediaStatusChanged(QMediaPlayer::MediaStatus status) QMediaPlayer::LoadingMedia
 VideoWindow::sourceChanged(const QUrl & QUrl("rtsp://admin@192.168.1.99:554/Streaming/Channels/2")
 TitleBar::showEvent(QShowEvent  QShowEvent(Show, 0x722f1feff0)
@@ -97,20 +97,20 @@ void VideoWindow::init()
     ui->dateEdit_videofiles->calendarWidget()->setDateTextFormat(QDate(),QTextCharFormat());
 
     /*[end]处理设置文件，配置读取初始化*/
-    AppSettings.beginGroup(objectName());
+    MediaPlayerSettings.beginGroup(objectName());
 
-    if (AppSettings.value("isFloating", false).toBool())
+    if (MediaPlayerSettings.value("isFloating", false).toBool())
     {
         ui->WidgetMore->setFloating(true);
     }
-    const auto geometry = AppSettings.value("geometry", QByteArray()).toByteArray(); // QByteArray 类型
+    const auto geometry = MediaPlayerSettings.value("geometry", QByteArray()).toByteArray(); // QByteArray 类型
     if (!geometry.isEmpty())
     {
         ui->WidgetMore->restoreGeometry(geometry);
     }
-    AppJson = AppSettings.value("AppJson", QJsonObject()).toJsonObject();
-    playHistoryJson = AppSettings.value("PlayHistory", QJsonObject()).toJsonObject();
-    AppSettings.endGroup();
+    MediaPlayerJson = MediaPlayerSettings.value("AppJson", QJsonObject()).toJsonObject();
+    playHistoryJson = MediaPlayerSettings.value("PlayHistory", QJsonObject()).toJsonObject();
+    MediaPlayerSettings.endGroup();
 
     if(playHistoryJson.contains("currentFilePath")){
         // 检查文件路径是否存在
@@ -132,7 +132,7 @@ void VideoWindow::startShow()
     /*[1]视频播放列表配置初始化读取*/
     //    ui->tableWidget_playerList->resizeColumnsToContents();
     //    playerListUpdate();
-    QJsonObject playerList = AppJson["playerList"].toObject();
+    QJsonObject playerList = MediaPlayerJson["playerList"].toObject();
     ui->comboBox_playerPath->clear();
     ui->comboBox_updatePlayerList->clear();
 
@@ -146,32 +146,32 @@ void VideoWindow::startShow()
 
     /*[2]视频播放配置初始化读取*/
     //    AppJson["playPageStep"]
-    if (AppJson.contains("playPageStep"))
+    if (MediaPlayerJson.contains("playPageStep"))
     {
-        ui->lineEdit_playPageStep->setText(i2s(AppJson["playPageStep"].toInt(10*1000) / 1000));
+        ui->lineEdit_playPageStep->setText(i2s(MediaPlayerJson["playPageStep"].toInt(10*1000) / 1000));
     }
     ui->lineEdit_playPageStep->setValidator(new QIntValidator(ui->lineEdit_playPageStep));
 
-    ui->checkBox_autoPlay->setChecked(AppJson["AutoPlay"].toBool(false));
+    ui->checkBox_autoPlay->setChecked(MediaPlayerJson["AutoPlay"].toBool(false));
 
-    if (AppJson.contains("playSource"))
+    if (MediaPlayerJson.contains("playSource"))
     {
-        ui->lineEdit_playSource->setText(AppJson["playSource"].toString());
-        player->setSource(QUrl(AppJson["playSource"].toString()));
-        if (AppJson["AutoPlay"].toBool(false))
+        ui->lineEdit_playSource->setText(MediaPlayerJson["playSource"].toString());
+        player->setSource(QUrl(MediaPlayerJson["playSource"].toString()));
+        if (MediaPlayerJson["AutoPlay"].toBool(false))
         {
             player->play();
         }
     }
 
-    if (AppJson.contains("fileExtensions"))
+    if (MediaPlayerJson.contains("fileExtensions"))
     {
-        ui->lineEdit_fileExtensions->setText(AppJson["fileExtensions"].toString(".mp4|.MP4"));
+        ui->lineEdit_fileExtensions->setText(MediaPlayerJson["fileExtensions"].toString(".mp4|.MP4"));
     }
 
-    if (AppJson.contains("volume"))
+    if (MediaPlayerJson.contains("volume"))
     {
-        ui->horizontalSlider_volume->setValue(AppJson["volume"].toInt(100));
+        ui->horizontalSlider_volume->setValue(MediaPlayerJson["volume"].toInt(100));
     }
 
     ui->toolButton_listNext->setVisible(false);
@@ -182,12 +182,12 @@ void VideoWindow::startShow()
 
 void VideoWindow::quit()
 {
-    AppSettings.beginGroup(objectName());
-    AppSettings.setValue("isFloating", ui->WidgetMore->isFloating());
-    AppSettings.setValue("geometry", ui->WidgetMore->saveGeometry());
-    AppSettings.setValue("AppJson", AppJson);
-    AppSettings.setValue("PlayHistory", playHistoryJson);
-    AppSettings.endGroup();
+    MediaPlayerSettings.beginGroup(objectName());
+    MediaPlayerSettings.setValue("isFloating", ui->WidgetMore->isFloating());
+    MediaPlayerSettings.setValue("geometry", ui->WidgetMore->saveGeometry());
+    MediaPlayerSettings.setValue("AppJson", MediaPlayerJson);
+    MediaPlayerSettings.setValue("PlayHistory", playHistoryJson);
+    MediaPlayerSettings.endGroup();
     ui->video->quit();
     ui->WidgetMore->close();
     qDebug() << "VideoWindow::quit()";
@@ -226,7 +226,7 @@ bool VideoWindow::startPlay(const QString &file)
         player->setSource(QUrl::fromLocalFile(currentPlaySource));
     }
     ui->lineEdit_playSource->setText(currentPlaySource);
-    if (AppJson["AutoPlay"].toBool(false))
+    if (MediaPlayerJson["AutoPlay"].toBool(false))
     {
         player->play();
     }
@@ -384,7 +384,7 @@ bool VideoWindow::PlayExecuteCmd(int command)
 
 void VideoWindow::showEvent(QShowEvent *event)
 {
-    qDebug() << "第一次显示VideoWindow::showEvent(QShowEvent *" << event << objectName() << AppSettings.allKeys();
+    qDebug() << "第一次显示VideoWindow::showEvent(QShowEvent *" << event << objectName() << MediaPlayerSettings.allKeys();
     startShow();
 }
 
@@ -529,7 +529,7 @@ void VideoWindow::errorOccurred(QMediaPlayer::Error error, const QString &errorS
 void VideoWindow::playerList_update()
 {
     qDebug() << "VideoWindow::playerListUpdate()";
-    QJsonObject playerList = AppJson["playerList"].toObject();
+    QJsonObject playerList = MediaPlayerJson["playerList"].toObject();
     //    disconnect(ui->comboBox_playList)
     ui->comboBox_updatePlayerList->clear();
     foreach (QString key, playerList.keys())
@@ -660,26 +660,26 @@ void VideoWindow::on_toolButton_microphoneMute_clicked()
 void VideoWindow::on_horizontalSlider_volume_valueChanged(int value)
 {
     player->audioOutput()->setVolume(value);
-    AppJson["volume"] = value;
+    MediaPlayerJson["volume"] = value;
 }
 
 void VideoWindow::on_toolButton_fastBback_clicked()
 {
-    if (player->position() < AppJson["playPageStep"].toInteger(10 * 1000))
+    if (player->position() < MediaPlayerJson["playPageStep"].toInteger(10 * 1000))
     {
         player->setPosition(0);
     }
     else
     {
-        player->setPosition(player->position() - AppJson["playPageStep"].toInteger(10 * 1000));
+        player->setPosition(player->position() - MediaPlayerJson["playPageStep"].toInteger(10 * 1000));
     }
 }
 
 void VideoWindow::on_toolButton_fastForward_clicked()
 {
-    if (player->position() < (player->duration() - AppJson["playPageStep"].toInteger(10 * 1000)))
+    if (player->position() < (player->duration() - MediaPlayerJson["playPageStep"].toInteger(10 * 1000)))
     {
-        player->setPosition(player->position() + AppJson["playPageStep"].toInteger(10 * 1000));
+        player->setPosition(player->position() + MediaPlayerJson["playPageStep"].toInteger(10 * 1000));
     }
 }
 
@@ -710,7 +710,7 @@ void VideoWindow::on_toolButton_openFiles_clicked()
 void VideoWindow::on_comboBox_playerPath_currentTextChanged(const QString &arg1)
 {
     qDebug() << "void VideoWindow::on_comboBox_playerPath_currentTextChanged(const QString &" << arg1;
-    ui->lineEdit_playerPath->setText(AppJson["playerList"].toObject()[arg1].toString());
+    ui->lineEdit_playerPath->setText(MediaPlayerJson["playerList"].toObject()[arg1].toString());
 }
 
 void VideoWindow::on_pushButton_setEditPlayerPath_clicked()
@@ -730,7 +730,7 @@ void VideoWindow::on_pushButton_setEditPlayerPath_clicked()
 
 void VideoWindow::on_pushButton_playerPath_update_clicked()
 {
-    QJsonObject playerList = AppJson["playerList"].toObject();
+    QJsonObject playerList = MediaPlayerJson["playerList"].toObject();
     QString key = ui->comboBox_playerPath->currentText();
     if (!playerList.contains(key))
     {
@@ -740,13 +740,13 @@ void VideoWindow::on_pushButton_playerPath_update_clicked()
         return;
     }
     playerList.insert(key, ui->lineEdit_playerPath->text());
-    AppJson["playerList"] = playerList;
+    MediaPlayerJson["playerList"] = playerList;
     playerList_update();
 }
 
 void VideoWindow::on_pushButton_playerPath_add_clicked()
 {
-    QJsonObject playerList = AppJson["playerList"].toObject();
+    QJsonObject playerList = MediaPlayerJson["playerList"].toObject();
     QString key = ui->comboBox_playerPath->currentText();
     if (playerList.contains(key))
     {
@@ -763,13 +763,13 @@ void VideoWindow::on_pushButton_playerPath_add_clicked()
         return;
     }
     playerList.insert(key, ui->lineEdit_playerPath->text());
-    AppJson["playerList"] = playerList;
+    MediaPlayerJson["playerList"] = playerList;
     playerList_update();
 }
 
 void VideoWindow::on_pushButton_playerPath_delete_clicked()
 {
-    QJsonObject playerList = AppJson["playerList"].toObject();
+    QJsonObject playerList = MediaPlayerJson["playerList"].toObject();
     QString key = ui->comboBox_playerPath->currentText();
     if (!playerList.contains(key))
     {
@@ -780,30 +780,30 @@ void VideoWindow::on_pushButton_playerPath_delete_clicked()
     }
     playerList.remove(key);
     ui->comboBox_playerPath->removeItem(ui->comboBox_playerPath->currentIndex());
-    AppJson["playerList"] = playerList;
+    MediaPlayerJson["playerList"] = playerList;
     playerList_update();
 }
 
 void VideoWindow::on_pushButton_setPlayPageStep_clicked()
 {
-    AppJson["playPageStep"] = ui->lineEdit_playPageStep->text().toInt() * 1000;
+    MediaPlayerJson["playPageStep"] = ui->lineEdit_playPageStep->text().toInt() * 1000;
 }
 
 void VideoWindow::on_pushButton_setPlaySource_clicked()
 {
-    AppJson["playSource"] = ui->lineEdit_playSource->text();
-    player->setSource(QUrl(AppJson["playSource"].toString()));
+    MediaPlayerJson["playSource"] = ui->lineEdit_playSource->text();
+    player->setSource(QUrl(MediaPlayerJson["playSource"].toString()));
 }
 
 void VideoWindow::on_checkBox_autoPlay_stateChanged(int arg1)
 {
-    if (arg1 == Qt::Checked){AppJson["AutoPlay"] = true;}
-    else{AppJson["AutoPlay"] = false;}
+    if (arg1 == Qt::Checked){MediaPlayerJson["AutoPlay"] = true;}
+    else{MediaPlayerJson["AutoPlay"] = false;}
 }
 
 void VideoWindow::on_pushButton_setFileExtensions_clicked()
 {
-    AppJson["fileExtensions"] = ui->lineEdit_fileExtensions->text();
+    MediaPlayerJson["fileExtensions"] = ui->lineEdit_fileExtensions->text();
 }
 
 void VideoWindow::on_tableWidget_playerList_itemDoubleClicked(QTableWidgetItem *item)
