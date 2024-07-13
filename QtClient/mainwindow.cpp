@@ -9,15 +9,11 @@
 #include "public/AppSystem.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
-#define TIMEMS QTime::currentTime().toString("hh:mm:ss zzz")
-
 #include "ui/SubMain.h"
-
 #include "modules/sqlite.h"
 #include "modules/httpserver.h"
 
-#define VARNAME(var) #var
+#define TIMEMS QTime::currentTime().toString("hh:mm:ss zzz")
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
@@ -25,7 +21,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     ui_TitleBar = new TitleBar(this);
     connect(ui_TitleBar,&TitleBar::posChange,this,&MainWindow::geometryChanged);
-//    ui_header = ui_WidgetHeader->getUi();
+
     setMenuWidget(ui_TitleBar);
 //    ui->statusBar->addWidget();
 //    addDockWidget(Qt::BottomDockWidgetArea,ui->WidgetStatus);
@@ -34,7 +30,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    connect(ui->statusBar,&QStatusBar::showMessage,this,&MainWindow::showMessage);
 //    connect(ui->statusBar,&QStatusBar::clearMessage,this,&MainWindow::clearMessage);
     SUB_MAIN = new SubMain;
-    gSql = SQLite::instance(nullptr,"test.db");
+    gSql = SQLite::instance(nullptr,"data.db");
     gHttpServer = HttpServer::instance(this);
     Awake_();
 
@@ -44,7 +40,6 @@ void MainWindow::showUI()
 {
     qDebug() << "MainWindow::show() 当前登录用户："<<CurrentUser<<"屏幕缩放因素："<<devicePixelRatio();
     showMessage("当前登录用户：" +CurrentUser);
-
     init_();
     Start_();
 
@@ -57,7 +52,6 @@ void MainWindow::showUI()
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     qDebug() << "MainWindow::closeEvent(QCloseEvent *event)" << event;
-    //    qApp->quit(); //重载主程序点击退出事件，软件退出
     AppSettings.beginGroup("MainWindow");
     AppSettings.setValue("geometry", saveGeometry());
     AppSettings.setValue("jsonSettingsVariable",jsonMainConfig);
@@ -71,8 +65,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 MainWindow::~MainWindow()
 {
     delete ui;
-    //    qApp->quit();
-    qDebug() << "MainWindow::~MainWindow() delete this";
+    qDebug() << "MainWindow::~MainWindow()";
 }
 
 /*
@@ -127,16 +120,13 @@ void MainWindow::init_()
         foreach (PluginInterface* plugin, pluginList) {
             plugin->Start();
             ui->layout_tabMain->addWidget(plugin->getWidgetByName(HomeMenu_WidgetName));
-
         }
 //        ui->tab_main->layout()->addItem(ui->verticalSpacer_tabMain);
     }
-    qDebug() << "MainWindow::init() end";
 }
 
 void MainWindow::Start_()
 {
-    qDebug() << "MainWindow::_Start() 使用版本号：" << AppJson["version"];
     AppSettings.beginGroup("MainWindow");
     const auto geometry = AppSettings.value("geometry", QByteArray()).toByteArray(); // QByteArray 类型
     if (geometry.isEmpty())
@@ -276,7 +266,7 @@ bool MainWindow::nativeEvent(const QByteArray &eventType, void *message, qintptr
             else if (localPos.y() < borderSize) {*result = HTTOP;}
             else if (localPos.y() > height - borderSize) {*result = HTBOTTOM;}
 
-            qDebug()<<TIMEMS<<"*result:"<<*result<<"this->width()"<<this->width()<<"this->height()"<<this->height()<<"localPos:"<<localPos;
+            //qDebug()<<TIMEMS<<"*result:"<<*result<<"this->width()"<<this->width()<<"this->height()"<<this->height()<<"localPos:"<<localPos;
             if (*result != 0) {return true;}
 
         }/*else if (msg->message == WM_LBUTTONDOWN) {
@@ -322,19 +312,6 @@ void MainWindow::jump_ShowMainTabWidget(int index, QString name)
         ui->tabWidget_mainWindow->setCurrentIndex(ui->tabWidget_mainWindow->count() - 1);
     }
 }
-
-//void MainWindow::on_Button_dataView_clicked()
-//{
-//    qDebug() << "on_pushButton_dataview_clicked";
-//    QWidget* existingTab = ui->tabWidget_mainWindow->findChild<QWidget*>(TabWindowMap()[TabWindow_DataView]);
-//    if(existingTab){
-//        ui->tabWidget_mainWindow->setCurrentWidget(existingTab);
-//    }else{
-//        addTabWidget(TabWindow_DataView);
-//        ui->tabWidget_mainWindow->setCurrentIndex(ui->tabWidget_mainWindow->count() - 1);
-//    }
-//}
-
 
 void MainWindow::addTabWidget(int window)
 {

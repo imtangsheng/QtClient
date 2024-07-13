@@ -20,8 +20,8 @@
    <string>客户端软件</string>
   </property>
   <property name="windowIcon">
-   <iconset>
-    <normaloff>:/asset/logo.ico</normaloff>:/asset/logo.ico</iconset>
+   <iconset resource="resource.qrc">
+    <normaloff>:/asset/favicon.ico</normaloff>:/asset/favicon.ico</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
@@ -447,7 +447,9 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="resource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>pushButton_cancle</sender>
