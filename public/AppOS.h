@@ -66,4 +66,17 @@ typedef signed long long INT64;
 #define CALLBACK
 #endif // windows
 
+/**全局变量**/
+#include <QJsonObject>
+extern QJsonObject AppJson;
+/*ini文件读取配置，Qt自带系统方法，指定存储在本地或者系统注册表等地方*/
+#include <QSettings>
+extern QSettings AppSettings;
+
+#include<QString>
+extern QString CurrentUser;
+inline QString i2s(int num) {
+    return QString::number(num);
+}
+
 #endif // APPOS_H
