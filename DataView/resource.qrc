@@ -12,5 +12,7 @@
         <file>asset/mianWidget/ZoomReset.svg</file>
         <file>asset/titler/DataView.svg</file>
         <file>asset/mianWidget/OpenFiles.svg</file>
+        <file>asset/DataView/Add.svg</file>
+        <file>asset/DataView/Sub.svg</file>
     </qresource>
 </RCC>

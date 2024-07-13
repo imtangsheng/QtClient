@@ -11,8 +11,46 @@
 #include <QValueAxis>
 #include <QFileSystemModel>
 #include <QStringListModel>
+#include <QScatterSeries>
 
 #include "modules/FilesUtil.h"
+
+struct struLineSeries
+{
+    QDateTime time;        // 时间
+    QLineSeries *current;     // 电流
+    QLineSeries *voltage;     // 电压
+    QLineSeries *pressure;    // 压强
+    QScatterSeries *scatter;//绘制散点图，用于显示超过阈值的点
+    QLineSeries *temperature; // 温度
+    struLineSeries() {
+        time = QDateTime::currentDateTime();
+
+        current = new QLineSeries();
+        current->setName("电流数据曲线(安培)");
+        current->setColor(Qt::green);
+
+        voltage = new QLineSeries();
+        voltage->setName("电压数据曲线(伏特)");
+        voltage->setColor(Qt::cyan);
+
+        pressure = new QLineSeries();
+        pressure->setName("气压数据曲线(兆帕MPa)");
+        pressure->setColor(Qt::blue);
+
+        temperature = new QLineSeries();
+        temperature->setName("温度数据曲线(摄氏度)");
+        temperature->setColor(Qt::yellow);
+
+        scatter = new QScatterSeries();
+        scatter->setName("阈值");
+        scatter->setVisible(true);
+        scatter->setPointLabelsFormat("@yPoint");
+        scatter->setPointLabelsVisible();
+        scatter->setMarkerSize(5);
+        scatter->setColor(Qt::red);
+    }
+};
 namespace Ui {
 class SnowBeerWindow;
 }
@@ -27,10 +65,18 @@ public:
 
     void init();
     void quit();
+    void test();
     void parseData(const QString &line);
     bool parseDataFromFile(const QString filePath);
 
     void downloadFilesListFromNetworkLinks(QStringList linksFilesList);
+
+    double max_current;     // 电流
+    double max_voltage;     // 电压
+    double max_pressure;    // 压强
+    double max_temperature; // 温度
+    struLineSeries line;
+    bool setLineSeries(QDateTime time,double current,double voltage,double pressure,double temperature);
 
 public slots:
     void on_lineEdit_rootPath_editingFinished();

@@ -26,7 +26,6 @@ file(GLOB UI ./ui/*.ui)
 set(PUBLIC
     ../public/PluginInterface.h
     ../public/AppOS.h
-
     ../public/modules/FilesUtil.h ../public/modules/FilesUtil.cpp ../public/modules/FilesUtil.ui
 )
 

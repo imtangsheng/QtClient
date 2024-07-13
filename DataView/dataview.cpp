@@ -1,8 +1,8 @@
 #include "dataview.h"
 #include "AppOS.h"
 
-QSettings AppSettings("config/DataView.ini",QSettings::IniFormat);
-QJsonObject AppJson;
+QSettings DataViewSettings("config/DataView.ini",QSettings::IniFormat);
+QJsonObject DataViewJson;
 
 DataView::DataView(QObject *parent) : QObject(parent)
 {
@@ -29,7 +29,7 @@ void DataView::quit()
 {
     snowBeerWindow->quit();
     widgets->quit();
-    AppSettings.sync();
+    DataViewSettings.sync();
 
     qDebug()<<"DataView::quit()";
 

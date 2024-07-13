@@ -13,6 +13,7 @@
 #include <QJsonArray>
 
 QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d{3})*.*");
+#include <QLegendMarker>
 #include <QRandomGenerator>
 
 #include "AppOS.h"
@@ -37,9 +38,15 @@ SnowBeerWindow::~SnowBeerWindow()
 void SnowBeerWindow::init()
 {
     qDebug()<<"SnowBeerWindow::init()";
-    AppSettings.beginGroup(objectName());
-    AppJson = AppSettings.value("AppJson",QJsonObject()).toJsonObject();
-    AppSettings.endGroup();
+    DataViewSettings.beginGroup(objectName());
+    DataViewJson = DataViewSettings.value("AppJson",QJsonObject()).toJsonObject();
+    DataViewSettings.endGroup();
+
+
+    max_current = DataViewJson["max_current"].toDouble(2.0);     // 电流
+    max_voltage = DataViewJson["max_voltage"].toDouble(5.0);     // 电压
+    max_pressure = DataViewJson["max_pressure"].toDouble(1.5);    // 压强
+    max_temperature = DataViewJson["max_temperature"].toDouble(50.0); // 温度
 
     init_chartView();
     init_filesView();
@@ -49,9 +56,25 @@ void SnowBeerWindow::init()
 void SnowBeerWindow::quit()
 {
     qDebug()<<"SnowBeerWindow::quit()";
-    AppSettings.beginGroup(objectName());
-    AppSettings.setValue("AppJson",AppJson);
-    AppSettings.endGroup();
+    DataViewSettings.beginGroup(objectName());
+    DataViewSettings.setValue("AppJson",MediaPlayerJson);
+    DataViewSettings.endGroup();
+}
+
+void SnowBeerWindow::test()
+{
+
+    /**添加测试数据**/
+    QDateTime currentTime = QDateTime::currentDateTime();
+    QRandomGenerator gen;  // 创建随机数生成器
+    for(int i=0;i<10;++i){
+        //        series->append(i,20);
+        currentTime = currentTime.addSecs(100);
+        setLineSeries(currentTime,gen.bounded(2),gen.bounded(5),gen.bounded(3),gen.bounded(80));
+    }
+
+
+
 }
 
 void SnowBeerWindow::downloadFilesListFromNetworkLinks(QStringList linksFilesList)
@@ -63,8 +86,8 @@ void SnowBeerWindow::downloadFilesListFromNetworkLinks(QStringList linksFilesLis
         qDebug()<<"downloadFilesListFromNetworkLinks(QStringList:"<< link;
         // 定义一个正则表达式模式，用于匹配网络下载链接 Qt::CaseSensitive区分大小写
         FilesUtil *fileItem = new FilesUtil();
-        if(fileItem->startDownloadFileFromLink(AppJson["pathSnowBeerWindowNetwork"].toString() + link,\
-                                                                                                     AppJson["pathSnowBeerWindow"].toString() +link)){
+        if(fileItem->startDownloadFileFromLink(DataViewJson["pathSnowBeerWindowNetwork"].toString() + link,\
+                                                                                                     DataViewJson["pathSnowBeerWindow"].toString() +link)){
             ui->verticalLayout_download->addWidget(fileItem->getLayoutDownloadFile());
         }
 
@@ -76,6 +99,23 @@ void SnowBeerWindow::downloadFilesListFromNetworkLinks(QStringList linksFilesLis
 //    SUB_MAIN->setWindowTitle("下载");
 //    SUB_MAIN->setCentralWidget(SUB_MAIN->ui->widget_download);
 //    SUB_MAIN->show();
+}
+
+bool SnowBeerWindow::setLineSeries(QDateTime time, double current, double voltage, double pressure, double temperature)
+{
+    line.current->append(time.toMSecsSinceEpoch(),current);
+    if(current>max_current) line.scatter->append(time.toMSecsSinceEpoch(),current);
+
+    line.voltage->append(time.toMSecsSinceEpoch(),voltage);
+    if(voltage>max_voltage) line.scatter->append(time.toMSecsSinceEpoch(),voltage);
+
+    line.pressure->append(time.toMSecsSinceEpoch(),pressure);
+    if(pressure>max_pressure) line.scatter->append(time.toMSecsSinceEpoch(),pressure);
+
+    line.temperature->append(time.toMSecsSinceEpoch(),temperature);
+    if(temperature>max_temperature) line.scatter->append(time.toMSecsSinceEpoch(),temperature);
+
+    return true;
 }
 
 void SnowBeerWindow::init_chartView()
@@ -128,6 +168,7 @@ void SnowBeerWindow::init_chartView()
     m_chart->addSeries(m_lineSeries_voltage);
     m_chart->addSeries(m_lineSeries_pressure);
     m_chart->addSeries(m_lineSeries_temperature);
+
     m_chart->addAxis(m_axisTime, Qt::AlignBottom);
     m_chart->addAxis(m_axisY, Qt::AlignLeft);
 
@@ -140,24 +181,55 @@ void SnowBeerWindow::init_chartView()
     m_lineSeries_temperature->attachAxis(m_axisTime);
     m_lineSeries_temperature->attachAxis(m_axisY);
 
+    //#1-1 先添加折线图
+    m_chart->addSeries(line.current);
+    m_chart->addSeries(line.voltage);
+    m_chart->addSeries(line.pressure);
+    m_chart->addSeries(line.temperature);
+    m_chart->addSeries(line.scatter);
+    //#1-2 再绑定坐标轴（顺序不能乱，否则不显示）
+    line.current->attachAxis(m_axisTime);
+    line.current->attachAxis(m_axisY);
+    line.voltage->attachAxis(m_axisTime);
+    line.voltage->attachAxis(m_axisY);
+    line.pressure->attachAxis(m_axisTime);
+    line.pressure->attachAxis(m_axisY);
+    line.temperature->attachAxis(m_axisTime);
+    line.temperature->attachAxis(m_axisY);
+    line.scatter->attachAxis(m_axisTime);
+    line.scatter->attachAxis(m_axisY);
+    //#1-3 其他处理，阈值不显示
+    for(QLegendMarker *marker:m_chart->legend()->markers(line.scatter)){
+        marker->setVisible(false);
+    }
+    line.current->setVisible(ui->checkBox_current->checkState()== Qt::Checked);
+    line.voltage->setVisible(ui->checkBox_voltage->checkState()== Qt::Checked);
+    line.pressure->setVisible(ui->checkBox_pressure->checkState()== Qt::Checked);
+    line.temperature->setVisible(ui->checkBox_temperature->checkState()== Qt::Checked);
+
+    //#2-0 设置默认轴范围
     m_axisTime->setRange(
         QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(0).x()),
         QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(m_lineSeries_temperature->count() -1 ).x()));
     m_axisY->setRange(0.0,50.0);
-    //在QChartView中显示 设置外边距为 负数，减少空白
+    //#2-1 在QChartView中显示 设置外边距为 负数，减少空白
     m_chart->setContentsMargins(-9,-9,-9,-9);
-//    m_chart->setMargins(QMargins(-6,-6,-6,-6));
     m_chart->setBackgroundRoundness(0);
-
-    m_chartView = new QChartView(m_chart);
+    //#2-2 在QChartView中显示 设置可以鼠标操作
+    // QChartView::NoRubberBand	0x0	未指定缩放区域，因此未启用缩放。
+    // QChartView::VerticalRubberBand	0x1	橡皮筋水平锁定到图表的大小，可以垂直拉动以指定缩放区域。
+    // QChartView::HorizontalRubberBand	0x2	橡皮筋垂直锁定为图表大小，可以水平拉动以指定缩放区域。
+    // QChartView::RectangleRubberBand	0x3	橡皮筋固定在点击的点上，可以垂直和水平拉动。
+//    m_chartView = new QChartView(m_chart);
 //    m_chartView->setContentsMargins(0,0,0,0);
 //    m_chartView->setFrameShape(QFrame::NoFrame);
 //    m_chartView->setFrameShadow(QFrame::Plain);
-    //    m_chartView->setRubberBand(QChartView::RectangleRubberBand); //水平方向缩   chart->zoomIn()
-//    m_chartView->setRubberBand(QChartView::HorizontalRubberBand);
+//    m_chartView->setRubberBand(QChartView::RectangleRubberBand); //水平方向缩   chart->zoomIn()
 //    m_chartView->setStyleSheet("border: none;");
-//    ui->horizontalLayout_SnowBeerWindow->(m_chartView);
     ui->widget->setChart(m_chart);
+    ui->widget->setRubberBand(QChartView::RectangleRubberBand);
+    //#3-1 在QChartView中显示在布局中界面中
+    m_chartView = ui->widget;
 //    ui->horizontalLayout_SnowBeerWindow->addWidget(m_chartView);
 //    ui->gridLayout_chartView->addWidget(m_chartView);
 }
@@ -180,7 +252,7 @@ void SnowBeerWindow::init_filesView()
     ui->treeView_files->setModel(m_fileSystemModel);
     ui->treeView_files->setWindowTitle("Directories");
     // 设置文件浏览视图的根目录
-    ui->lineEdit_rootPath->setText(AppJson["pathSnowBeerWindow"].toString());
+    ui->lineEdit_rootPath->setText(DataViewJson["pathSnowBeerWindow"].toString());
 
 //    m_fileModel_SnowBeerWindow->setRootPath(m_fileModel_SnowBeerWindow->myComputer().toString());
     m_fileSystemModel->setRootPath(ui->lineEdit_rootPath->text());
@@ -192,7 +264,7 @@ void SnowBeerWindow::init_filesView()
 
     // 设置网络浏览视图的根目录
     ui->listView_filesNetwork->setWindowTitle("Directories Network");
-    ui->lineEdit_rootPath_filesNetwork->setText(AppJson["pathSnowBeerWindowNetwork"].toString());
+    ui->lineEdit_rootPath_filesNetwork->setText(DataViewJson["pathSnowBeerWindowNetwork"].toString());
 //    m_networkFileModel->setRootPath(ui->lineEdit_rootPath_filesNetwork->text());
 //    m_networkFileModel->setRootUrl(ui->lineEdit_rootPath_filesNetwork->text());
 
@@ -434,33 +506,21 @@ void SnowBeerWindow::on_pushButton_zoomReset_clicked()
     m_chart->zoomReset();
 }
 
-#include <QProcess>
 void SnowBeerWindow::on_pushButton_test_clicked()
 {
     qDebug()<<"test()";
-    // 打开文件位置
-    #ifdef Q_OS_WIN
-        QProcess::startDetached("explorer.exe", {"/select,",  QDir::toNativeSeparators(QDir::currentPath() + "/CJCS.TXT")});
-    #elif Q_OS_MAC
-        QProcess::execute("osascript", {"-e", QString("tell application \"Finder\" to reveal POSIX file \"%1\" activating").arg(currentFilePath)});
-    #elif Q_OS_LINUX
-        QString cmd = "xdg-open \"" + QFileInfo(currentFilePath).path() + "\" --select " + QFileInfo(currentFilePath).fileName();
-        QProcess::startDetached(cmd);
-    #else
-        QProcess::startDetached("explorer.exe /select," + QDir::toNativeSeparators(currentFilePath));
-    #endif
-//    test();
+    test();
 }
 
 void SnowBeerWindow::on_lineEdit_rootPath_editingFinished()
 {
     qDebug()<<"on_lineEdit_rootPath_editingFinished()";
-        qDebug()<<ui->lineEdit_rootPath->text()<<AppJson["pathSnowBeerWindow"].toString();
+        qDebug()<<ui->lineEdit_rootPath->text()<<DataViewJson["pathSnowBeerWindow"].toString();
     if(!QDir(ui->lineEdit_rootPath->text()).exists()){
         // 路径不存在
         QMessageBox::warning(this, "路径验证", "文件路径不存在!");
     }
-    AppJson["pathSnowBeerWindow"] = ui->lineEdit_rootPath->text();
+    DataViewJson["pathSnowBeerWindow"] = ui->lineEdit_rootPath->text();
     ui->treeView_files->setRootIndex(m_fileSystemModel->index(ui->lineEdit_rootPath->text()));
 }
 
@@ -542,15 +602,15 @@ void SnowBeerWindow::on_lineEdit_rootPath_filesNetwork_editingFinished()
 
 void SnowBeerWindow::on_pushButton_updateLocalFiles_clicked()
 {
-    qDebug()<<"on_pushButton_updateNetworkFiles_clicked():"<<AppJson["pathSnowBeerWindow"].toString();
+    qDebug()<<"on_pushButton_updateNetworkFiles_clicked():"<<DataViewJson["pathSnowBeerWindow"].toString();
 
 //    qDebug()<<QRegularExpression(".*(" + fileExtensions.join("|") + ")");
-    filesListLocal = m_filesUtil->getFilesListLocalPath(AppJson["pathSnowBeerWindow"].toString());
+    filesListLocal = m_filesUtil->getFilesListLocalPath(DataViewJson["pathSnowBeerWindow"].toString());
     qDebug()<<"filesListLocal:"<<filesListLocal;
     //使用规则表达式，区分大小，字符匹配
     filesListLocal = filesListLocal.filter(QRegularExpression(".*(" + fileExtensions.join("|") + ")"));
     qDebug()<<"filesListLocal:"<<filesListLocal;
-    m_filesListModelNetwork->setStringList(filesListLocal.replaceInStrings(AppJson["pathSnowBeerWindow"].toString(),""));
+    m_filesListModelNetwork->setStringList(filesListLocal.replaceInStrings(DataViewJson["pathSnowBeerWindow"].toString(),""));
 }
 
 
@@ -589,7 +649,7 @@ void SnowBeerWindow::on_listView_filesNetwork_clicked(const QModelIndex &index)
 {
     qDebug()<<"on_listView_filesNetwork_clicked(QModelIndex index)"<<index<<index.row();
     qDebug()<<index.data(Qt::DisplayRole).toString();
-    m_currentFilePathDir = AppJson["pathSnowBeerWindow"].toString() + index.data(Qt::DisplayRole).toString();
+    m_currentFilePathDir = DataViewJson["pathSnowBeerWindow"].toString() + index.data(Qt::DisplayRole).toString();
 }
 
 
@@ -597,7 +657,7 @@ void SnowBeerWindow::on_listView_filesNetwork_doubleClicked(const QModelIndex &i
 {
     qDebug()<<"on_listView_filesNetwork_doubleClicked(QModelIndex index)"<<index<<index.row();
     qDebug()<<index.data(Qt::DisplayRole).toString();
-    m_currentFilePathDir = AppJson["pathSnowBeerWindow"].toString() + index.data(Qt::DisplayRole).toString();
+    m_currentFilePathDir = DataViewJson["pathSnowBeerWindow"].toString() + index.data(Qt::DisplayRole).toString();
 }
 
 
@@ -610,7 +670,7 @@ void SnowBeerWindow::on_pushButton_downloadedFiles_clicked()
             filesListDownloaded.append(element);
         }
     }
-    m_filesListModelNetwork->setStringList(filesListDownloaded.replaceInStrings(AppJson["pathSnowBeerWindow"].toString(),""));
+    m_filesListModelNetwork->setStringList(filesListDownloaded.replaceInStrings(DataViewJson["pathSnowBeerWindow"].toString(),""));
 
 }
 
