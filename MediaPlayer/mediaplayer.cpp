@@ -1,8 +1,8 @@
 #include "mediaplayer.h"
 #include "AppOS.h"
 
-QSettings MediaPlayerSettings("config/MediaPlayer.ini", QSettings::IniFormat);
-QJsonObject MediaPlayerJson;
+QSettings AppSettings("config/MediaPlayer.ini", QSettings::IniFormat);
+QJsonObject AppJson;
 
 MediaPlayer::MediaPlayer(QObject *parent) : QObject(parent)
 {
@@ -68,7 +68,7 @@ void MediaPlayer::quit()
     qDebug() << "MediaPlayer::quit()";
     widgets->quit(); // 先保存，再删除，
     videoWindow->quit();
-    MediaPlayerSettings.sync(); // 未保存的写入永久存储，并加载在此期间由其他应用程序的更改的任何设置。通常会在析构和事件循环中调用。
+    AppSettings.sync(); // 未保存的写入永久存储，并加载在此期间由其他应用程序的更改的任何设置。通常会在析构和事件循环中调用。
 }
 
 void MediaPlayer::jumpTabWidget()
