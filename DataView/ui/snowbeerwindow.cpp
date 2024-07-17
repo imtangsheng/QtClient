@@ -1,8 +1,4 @@
-#include "snowbeerwindow.h"
-#include "ui_snowbeerwindow.h"
 #include<QTimer>
-#include <QRegularExpression>
-#include <QRegularExpressionMatch>
 #include <QFile>
 #include <QTextStream>
 #include <QFileSystemModel>
@@ -11,19 +7,208 @@
 #include <QStringListModel>
 #include <QJsonDocument>
 #include <QJsonArray>
-
-QRegularExpression REGEX_DATA("^(\\d{4}-\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}).*time:(\\d+\\.\\d+)S.*I:([-+]?\\d+\\.\\d+)A.*V:([-+]?\\d+\\.\\d+)V.*P:([-+]?\\d+\\.\\d+)MPa.*C:([-+]?\\d+\\.\\d{3})*.*");
-#include <QLegendMarker>
 #include <QRandomGenerator>
 
-#include "AppOS.h"
+#include "snowbeerwindow.h"
+#include "ui_snowbeerwindow.h"
+
+void ChartLine::autoRangesAxisTime()
+{
+    QDateTime min = QDateTime::currentDateTime(); // 初始化为当前时间
+    QDateTime max = QDateTime::fromMSecsSinceEpoch(0); // 初始化为Unix纪元开始时间
+    for (int i = 0; i < Line_Count; ++i) {
+        LineEnum lineType = static_cast<LineEnum>(i);
+        if(series[lineType].isShow && series[lineType].line->count() > 0){
+            // 检查每条线的第一个点
+            QDateTime firstPoint = QDateTime::fromMSecsSinceEpoch(series[lineType].line->at(0).x());
+            if (firstPoint < min) {
+                min = firstPoint;
+            }
+            // 检查每条线的最后一个点
+            QDateTime lastPoint = QDateTime::fromMSecsSinceEpoch(series[lineType].line->at(series[lineType].line->count() - 1).x());
+            if (lastPoint > max) {
+                max = lastPoint;
+            }
+
+        }
+    }
+    // 添加一些边距（例如，在两端各添加5%的时间范围）
+    qint64 timeRange = max.toMSecsSinceEpoch() - min.toMSecsSinceEpoch();
+    qint64 margin = timeRange * 0.05;
+    min = min.addMSecs(-margin);
+    max = max.addMSecs(margin);
+
+    // 设置轴的范围
+    axisTime->setRange(min, max);
+}
+
+void ChartLine::autoRangesAxisY()
+{
+    qreal minY = 0;
+    qreal maxY = 50;
+    // 遍历所有线条
+    for (int i = 0; i < Line_Count; ++i) {
+        LineEnum lineType = static_cast<LineEnum>(i);
+        if (series[lineType].isShow && series[lineType].line->count() > 0) {
+            // 遍历该线条的所有点
+            for (const QPointF& point : series[lineType].line->points()) {
+                qreal y = point.y();
+                if (y < minY) minY = y;
+                if (y > maxY) maxY = y;
+            }
+        }
+    }
+
+    // 添加一些边距（例如，在上下各添加10%的数值范围）
+    qreal range = maxY - minY;
+    qreal margin = range * 0.1;
+    minY -= margin;
+    maxY += margin;
+    // 设置Y轴的范围
+    axisY->setRange(minY, maxY);
+
+    // 应用 nice numbers
+    axisY->applyNiceNumbers();
+}
+
+void ChartLine::initChart()
+{
+    chart->setTitle("数据曲线图示");
+    //创建X和Y轴
+    axisTime->setTitleText("X轴时间");
+    axisTime->setFormat("hh:mm:ss");
+    axisY->setTitleText("Y轴数值");
+
+    chart->addAxis(axisTime, Qt::AlignBottom);
+    chart->addAxis(axisY, Qt::AlignLeft);
+
+    for (int i = 0; i < Line_Count; ++i) {
+        LineEnum lineType = static_cast<LineEnum>(i);
+        chart->addSeries(series[lineType].line);
+        chart->addSeries(series[lineType].scatter);
+        series[lineType].line->attachAxis(axisTime);
+        series[lineType].line->attachAxis(axisY);
+        series[lineType].scatter->attachAxis(axisTime);
+        series[lineType].scatter->attachAxis(axisY);
+        // 图例不显示
+        // for(QLegendMarker *marker:chart->legend()->markers(series[lineType].point)){
+        //     marker->setVisible(false);
+        // }
+    }
+
+    //在QChartView中显示 设置外边距为 负数，减少空白
+    chart->setContentsMargins(-9,-9,-9,-9);
+    chart->setBackgroundRoundness(0);
+}
+
+//数据示例：2024-02-29 00:12:12 Thursday, time:1709136732.687300S, I:0.000000A, V:3.302259V, P:0.000000MPa, C:17.672727℃, cjkg:0, hxkg:0
+// 预先计算需要 chopped 的长度 QString 不是一个字面量类型，它的 size() 方法不是 constexpr 的。编译时不能能够计算出值
+//编码：sizeof 操作的是原始字节，而 QString::size() 计算的是 Unicode 字符数。
+// sizeof 在编译时计算，QString::size() 在运行时计算。
+#include <string_view>
+constexpr int Chop_time = static_cast<int>(std::string_view("S").length());//既可以在编译时计算，又能正确处理 Unicode 字符。
+constexpr int Chop_current = static_cast<int>(std::string_view("A").length());//既可以在编译时计算，又能正确处理 Unicode 字符。
+constexpr int Chop_voltage = static_cast<int>(std::string_view("V").length());
+constexpr int Chop_pressure = static_cast<int>(std::string_view("MPa").length());
+constexpr int Chop_temperature = static_cast<int>(std::string_view("℃").length());//const int Chop_temperature = QString("℃").size();
+Result ChartLine::readDataFromFile(const QString filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return Result(false, "无法打开文件: " + file.errorString());
+    }
+
+    QTextStream in(&file);
+    QString line;
+    qint64 lineCount = 0;
+
+    // 使用 lambda 函数来处理每个数据点
+    auto processDataPoint = [this](qint64 xPosPoint, const QString& strValue, int chopLength, int lineType, qint64 lineCount) {
+        bool ok;
+        double doubleValue = strValue.split(':')[1].chopped(chopLength).trimmed().toDouble(&ok);
+        if (ok) {
+            //qDebug() << lineCount << strValue <<"--"<< xPosPoint<< doubleValue;
+            series[lineType].addPoint(xPosPoint, doubleValue);
+        } else {
+            qDebug() << QString("行 %1 数据格式错误: %2").arg(lineCount).arg(strValue);
+        }
+    };
+
+    while (!in.atEnd()) {
+        line = in.readLine();
+        lineCount++;
+        // 每读取1000行更新一次进度
+        if (lineCount % 1000 == 0) {
+            emit progressUpdated(lineCount);
+        }
+        // 使用逗号分割数据
+        QStringList parts = line.split(',');
+
+        if (parts.size() >= 6) {
+            // 解析时间戳
+            bool ok;
+            double doubleTime = parts[1].split(':')[1].chopped(Chop_time).trimmed().toDouble(&ok);
+            if(!ok){
+                qDebug() << QString("行 %1 数据格式错误: %2").arg(lineCount).arg(parts[0]);
+                continue;
+            }
+            //qDebug() << lineCount << parts[1] <<"--"<< doubleTime;
+            QDateTime timestamp = QDateTime::fromSecsSinceEpoch(doubleTime, Qt::UTC);
+            // QDateTime timestamp = QDateTime::fromString(parts[0].trimmed(), "yyyy-MM-dd hh:mm:ss dddd");
+            // if (!timestamp.isValid()) {
+            //     qDebug() << QString("行 %1 数据格式错误: %2").arg(lineCount).arg(parts[0]);
+            //     continue;
+            // }
+
+            qint64 xPosPoint = timestamp.toMSecsSinceEpoch();
+            // 处理各种数据点
+            if(series[Line_current].isShow)
+            processDataPoint(xPosPoint, parts[2], Chop_current, Line_current, lineCount);
+            if(series[Line_voltage].isShow)
+            processDataPoint(xPosPoint, parts[3], Chop_voltage, Line_voltage, lineCount);
+            if(series[Line_pressure].isShow)
+            processDataPoint(xPosPoint, parts[4], Chop_pressure, Line_pressure, lineCount);
+            if(series[Line_temperature].isShow)
+            processDataPoint(xPosPoint, parts[5], Chop_temperature, Line_temperature, lineCount);
+        } else {
+            qDebug() << "解析失败，数据格式不正确。错误行号:" << lineCount << "内容:" << line;
+        }
+    }
+
+    file.close();
+    emit readingFinished();
+    return Result(true, QString("成功读取 %1 行数据").arg(lineCount));
+}
+
+void ChartLine::run()
+{
+
+    QDateTime startTime = QDateTime::currentDateTime();
+    qDebug() <<startTime << " -文件：" <<filePath<< QThread::currentThread();
+
+    for (int i = 0; i < Line_Count; ++i) {
+        series[static_cast<LineEnum>(i)].clear();
+    }
+
+    Result result = readDataFromFile(filePath);
+    qDebug() <<result<< result.message;
+    if(result){
+        for (int i = 0; i < Line_Count; ++i) {
+            series[static_cast<LineEnum>(i)].update();
+            qDebug() <<"解析i"<< i<< series[static_cast<LineEnum>(i)].line->count();
+        }
+        autoRangesAxisTime();//自动调整时间轴
+    }
+    qDebug() << "解析时间Run：" << startTime.msecsTo(QDateTime::currentDateTime()) << "毫秒"<<"线程:"<<QThread::currentThread();
+}
+
+
 
 SnowBeerWindow::SnowBeerWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::SnowBeerWindow)
 {
     ui->setupUi(this);
-
     init();
 }
 
@@ -42,15 +227,28 @@ void SnowBeerWindow::init()
     AppJson = AppSettings.value("AppJson",QJsonObject()).toJsonObject();
     AppSettings.endGroup();
 
+    ui->doubleSpinBox_Max_current->setValue( AppJson["current_max"].toDouble(2.0));
+    ui->doubleSpinBox_Max_voltage->setValue(AppJson["voltage_max"].toDouble(5.0));
+    ui->doubleSpinBox_Max_pressure->setValue( AppJson["pressure_max"].toDouble(1.5));
+    ui->doubleSpinBox_Max_temperature->setValue(AppJson["temperature_max"].toDouble(50.0));
 
-    max_current = AppJson["max_current"].toDouble(2.0);     // 电流
-    max_voltage = AppJson["max_voltage"].toDouble(5.0);     // 电压
-    max_pressure = AppJson["max_pressure"].toDouble(1.5);    // 压强
-    max_temperature = AppJson["max_temperature"].toDouble(50.0); // 温度
+    init_lines_chartView(lines);
 
-    init_chartView();
+    ui->checkBox_current->setCheckState(lines.series[Line_current].isShow ? Qt::Checked : Qt::Unchecked);
+    ui->checkBox_voltage->setCheckState(lines.series[Line_voltage].isShow ? Qt::Checked : Qt::Unchecked);
+    ui->checkBox_pressure->setCheckState(lines.series[Line_pressure].isShow ? Qt::Checked : Qt::Unchecked);
+    ui->checkBox_temperature->setCheckState(lines.series[Line_temperature].isShow ? Qt::Checked : Qt::Unchecked);
+
+    ui->widget->setChart(lines.chart);
+    // 在QChartView中显示 设置可以鼠标操作
+    // QChartView::NoRubberBand	0x0	未指定缩放区域，因此未启用缩放。
+    // QChartView::VerticalRubberBand	0x1	橡皮筋水平锁定到图表的大小，可以垂直拉动以指定缩放区域。
+    // QChartView::HorizontalRubberBand	0x2	橡皮筋垂直锁定为图表大小，可以水平拉动以指定缩放区域。
+    // QChartView::RectangleRubberBand	0x3	橡皮筋固定在点击的点上，可以垂直和水平拉动。
+    ui->widget->setRubberBand(QChartView::RectangleRubberBand);
     init_filesView();
 
+    test();
 }
 
 void SnowBeerWindow::quit()
@@ -63,18 +261,28 @@ void SnowBeerWindow::quit()
 
 void SnowBeerWindow::test()
 {
-
     /**添加测试数据**/
-    QDateTime currentTime = QDateTime::currentDateTime();
+    QDateTime currentTime(QDate(2024, 2, 29), QTime(0, 0, 0));
+    for (int i = 0; i < Line_Count; ++i) {
+        lines.series[static_cast<LineEnum>(i)].clear();
+    }
     QRandomGenerator gen;  // 创建随机数生成器
-    for(int i=0;i<10;++i){
+    for(int i=0;i<1000;++i){
         //        series->append(i,20);
-        currentTime = currentTime.addSecs(100);
-        setLineSeries(currentTime,gen.bounded(2),gen.bounded(5),gen.bounded(3),gen.bounded(80));
+        currentTime = currentTime.addSecs(10);
+        lines.series[Line_current].addPoint(currentTime.toMSecsSinceEpoch(),1 + gen.bounded(2.0));
+        lines.series[Line_voltage].addPoint(currentTime.toMSecsSinceEpoch(),3+ gen.bounded(2.0));
+        lines.series[Line_pressure].addPoint(currentTime.toMSecsSinceEpoch(),1+gen.bounded(2.0));
+        lines.series[Line_temperature].addPoint(currentTime.toMSecsSinceEpoch(),45+gen.bounded(10.0));
+        // for (int i = 0; i < Line_Count; ++i) {
+        //     lines.addData(static_cast<LineEnum>(i),currentTime,gen.bounded(50.0));
+        // }
+    }
+    for (int i = 0; i < Line_Count; ++i) {
+        lines.series[static_cast<LineEnum>(i)].update();
     }
 
-
-
+    lines.autoRangesAxisTime();
 }
 
 void SnowBeerWindow::downloadFilesListFromNetworkLinks(QStringList linksFilesList)
@@ -101,138 +309,60 @@ void SnowBeerWindow::downloadFilesListFromNetworkLinks(QStringList linksFilesLis
 //    SUB_MAIN->show();
 }
 
-bool SnowBeerWindow::setLineSeries(QDateTime time, double current, double voltage, double pressure, double temperature)
+void SnowBeerWindow::init_lines_chartView(ChartLine &lineChart)
 {
-    line.current->append(time.toMSecsSinceEpoch(),current);
-    if(current>max_current) line.scatter->append(time.toMSecsSinceEpoch(),current);
+    // 电流
+    lineChart.series[Line_current].line->setName(AppJson["current_name"].toString("电流数据曲线(安培)"));
+    lineChart.series[Line_current].setShow(AppJson["current_isShow"].toBool(true));
+    lineChart.series[Line_current].max = AppJson["current_max"].toDouble(2.0);
+    lineChart.series[Line_current].setColor(AppJson["current_color"].toInt(Qt::green));
 
-    line.voltage->append(time.toMSecsSinceEpoch(),voltage);
-    if(voltage>max_voltage) line.scatter->append(time.toMSecsSinceEpoch(),voltage);
+    // 电压
+    lineChart.series[Line_voltage].line->setName(AppJson["voltage_name"].toString("电压数据曲线(伏特)"));
+    lineChart.series[Line_voltage].setShow(AppJson["voltage_isShow"].toBool(true));
+    lineChart.series[Line_voltage].max = AppJson["voltage_max"].toDouble(5.0);
+    lineChart.series[Line_voltage].setColor(AppJson["voltage_color"].toInt(Qt::cyan));
 
-    line.pressure->append(time.toMSecsSinceEpoch(),pressure);
-    if(pressure>max_pressure) line.scatter->append(time.toMSecsSinceEpoch(),pressure);
+    // 压强
+    lineChart.series[Line_pressure].line->setName(AppJson["pressure_name"].toString("气压数据曲线(兆帕MPa)"));
+    lineChart.series[Line_pressure].setShow(AppJson["pressure_isShow"].toBool(true));
+    lineChart.series[Line_pressure].max = AppJson["pressure_max"].toDouble(1.5);
+    lineChart.series[Line_pressure].setColor(AppJson["pressure_color"].toInt(Qt::blue));
 
-    line.temperature->append(time.toMSecsSinceEpoch(),temperature);
-    if(temperature>max_temperature) line.scatter->append(time.toMSecsSinceEpoch(),temperature);
+    // 温度
+    lineChart.series[Line_temperature].line->setName(AppJson["temperature_name"].toString("温度数据曲线(摄氏度)"));
+    lineChart.series[Line_temperature].setShow(AppJson["temperature_isShow"].toBool(true));
+    lineChart.series[Line_temperature].max = AppJson["temperature_max"].toDouble(50.0);
+    lineChart.series[Line_temperature].setColor(AppJson["temperature_color"].toInt(Qt::yellow));
 
-    return true;
+    // 使用 QComboBox 进行颜色选择
+    //     你可以创建一个带有预定义颜色的下拉框。
+
+    //             cpp
+    //                 复制
+    //                     QComboBox* createColorComboBox()
+    // {
+    //     QComboBox* comboBox = new QComboBox();
+    //     QStringList colorNames = QColor::colorNames();
+
+    //     for (const QString& colorName : colorNames) {
+    //         QPixmap pixmap(20, 20);
+    //         pixmap.fill(QColor(colorName));
+    //         comboBox->addItem(QIcon(pixmap), colorName, QColor(colorName));
+    //     }
+
+    //     return comboBox;
+    // }
+
+    // // 使用
+    // QComboBox* colorCombo = createColorComboBox();
+    // connect(colorCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+    //         [this, lineType](int index) {
+    //             QColor color = colorCombo->itemData(index).value<QColor>();
+    //             series[lineType].line->setColor(color);
+    //         });
 }
 
-void SnowBeerWindow::init_chartView()
-{
-    m_chart = new QChart();
-    m_chart->setTitle("数据曲线图示");
-    // 创建X轴和Y轴
-//    QDateTimeAxis *m_axisTime = new QDateTimeAxis();
-    m_axisTime = new QDateTimeAxis();
-    m_axisTime->setTitleText("X轴时间");
-//    m_axisTime->setFormat("hh:mm:ss"); // 设置时间格式
-    m_axisTime->setFormat("yyyy-MM-dd hh:mm:ss");
-    m_axisY = new QValueAxis();
-    m_axisY->setTitleText("Y轴数值");
-
-    m_lineSeries_current = new QLineSeries();
-    m_lineSeries_current->setName("电流数据曲线(安培)");
-    m_lineSeries_current->setColor(Qt::green);
-    m_lineSeries_current->setVisible(ui->checkBox_current->checkState()== Qt::Checked);
-    qDebug()<<"checkState"<<ui->checkBox_current->checkState()<<(ui->checkBox_current->checkState()== Qt::Checked);
-
-    m_lineSeries_voltage = new QLineSeries();
-    m_lineSeries_voltage->setName("电压数据曲线(伏特)");
-    m_lineSeries_voltage->setColor("#ffaa00");
-    m_lineSeries_voltage->setVisible(ui->checkBox_voltage->checkState()== Qt::Checked);
-
-    m_lineSeries_pressure = new QLineSeries();
-    m_lineSeries_pressure->setName("气压数据曲线(兆帕MPa)");
-    m_lineSeries_pressure->setColor(Qt::blue);
-    m_lineSeries_pressure->setVisible(ui->checkBox_pressure->checkState()== Qt::Checked);
-
-    m_lineSeries_temperature = new QLineSeries();
-    m_lineSeries_temperature->setName("温度数据曲线(摄氏度)");
-    m_lineSeries_temperature->setColor(Qt::red);
-    m_lineSeries_temperature->setVisible(ui->checkBox_temperature->checkState()== Qt::Checked);
-
-    /**添加测试数据**/
-    QDateTime currentTime = QDateTime::currentDateTime();
-    for(int i=0;i<100;i++){
-        //        series->append(i,20);
-        currentTime = currentTime.addSecs(1);
-        m_lineSeries_current->append(currentTime.toMSecsSinceEpoch(), 0.0);
-        m_lineSeries_voltage->append(currentTime.toMSecsSinceEpoch(),5.0);
-        m_lineSeries_pressure->append(currentTime.toMSecsSinceEpoch(),QRandomGenerator::global()->bounded(10, 20));
-        m_lineSeries_temperature->append(currentTime.toMSecsSinceEpoch(),QRandomGenerator::global()->bounded(0, 40));
-//        qDebug()<<i<<currentTime;
-    }
-    /**添加测试数据end**/
-    m_chart->addSeries(m_lineSeries_current);
-    m_chart->addSeries(m_lineSeries_voltage);
-    m_chart->addSeries(m_lineSeries_pressure);
-    m_chart->addSeries(m_lineSeries_temperature);
-
-    m_chart->addAxis(m_axisTime, Qt::AlignBottom);
-    m_chart->addAxis(m_axisY, Qt::AlignLeft);
-
-    m_lineSeries_current->attachAxis(m_axisTime);
-    m_lineSeries_current->attachAxis(m_axisY);
-    m_lineSeries_voltage->attachAxis(m_axisTime);
-    m_lineSeries_voltage->attachAxis(m_axisY);
-    m_lineSeries_pressure->attachAxis(m_axisTime);
-    m_lineSeries_pressure->attachAxis(m_axisY);
-    m_lineSeries_temperature->attachAxis(m_axisTime);
-    m_lineSeries_temperature->attachAxis(m_axisY);
-
-    //#1-1 先添加折线图
-    m_chart->addSeries(line.current);
-    m_chart->addSeries(line.voltage);
-    m_chart->addSeries(line.pressure);
-    m_chart->addSeries(line.temperature);
-    m_chart->addSeries(line.scatter);
-    //#1-2 再绑定坐标轴（顺序不能乱，否则不显示）
-    line.current->attachAxis(m_axisTime);
-    line.current->attachAxis(m_axisY);
-    line.voltage->attachAxis(m_axisTime);
-    line.voltage->attachAxis(m_axisY);
-    line.pressure->attachAxis(m_axisTime);
-    line.pressure->attachAxis(m_axisY);
-    line.temperature->attachAxis(m_axisTime);
-    line.temperature->attachAxis(m_axisY);
-    line.scatter->attachAxis(m_axisTime);
-    line.scatter->attachAxis(m_axisY);
-    //#1-3 其他处理，阈值不显示
-    for(QLegendMarker *marker:m_chart->legend()->markers(line.scatter)){
-        marker->setVisible(false);
-    }
-    line.current->setVisible(ui->checkBox_current->checkState()== Qt::Checked);
-    line.voltage->setVisible(ui->checkBox_voltage->checkState()== Qt::Checked);
-    line.pressure->setVisible(ui->checkBox_pressure->checkState()== Qt::Checked);
-    line.temperature->setVisible(ui->checkBox_temperature->checkState()== Qt::Checked);
-
-    //#2-0 设置默认轴范围
-    m_axisTime->setRange(
-        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(0).x()),
-        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(m_lineSeries_temperature->count() -1 ).x()));
-    m_axisY->setRange(0.0,50.0);
-    //#2-1 在QChartView中显示 设置外边距为 负数，减少空白
-    m_chart->setContentsMargins(-9,-9,-9,-9);
-    m_chart->setBackgroundRoundness(0);
-    //#2-2 在QChartView中显示 设置可以鼠标操作
-    // QChartView::NoRubberBand	0x0	未指定缩放区域，因此未启用缩放。
-    // QChartView::VerticalRubberBand	0x1	橡皮筋水平锁定到图表的大小，可以垂直拉动以指定缩放区域。
-    // QChartView::HorizontalRubberBand	0x2	橡皮筋垂直锁定为图表大小，可以水平拉动以指定缩放区域。
-    // QChartView::RectangleRubberBand	0x3	橡皮筋固定在点击的点上，可以垂直和水平拉动。
-//    m_chartView = new QChartView(m_chart);
-//    m_chartView->setContentsMargins(0,0,0,0);
-//    m_chartView->setFrameShape(QFrame::NoFrame);
-//    m_chartView->setFrameShadow(QFrame::Plain);
-//    m_chartView->setRubberBand(QChartView::RectangleRubberBand); //水平方向缩   chart->zoomIn()
-//    m_chartView->setStyleSheet("border: none;");
-    ui->widget->setChart(m_chart);
-    ui->widget->setRubberBand(QChartView::RectangleRubberBand);
-    //#3-1 在QChartView中显示在布局中界面中
-    m_chartView = ui->widget;
-//    ui->horizontalLayout_SnowBeerWindow->addWidget(m_chartView);
-//    ui->gridLayout_chartView->addWidget(m_chartView);
-}
 
 void SnowBeerWindow::init_filesView()
 {
@@ -291,62 +421,6 @@ void SnowBeerWindow::init_filesView()
     m_filesUtil->getLayoutDownloadFile()->setVisible(false);
 }
 
-bool SnowBeerWindow::parseDataFromFile(const QString filePath)
-{
-    qDebug() << "parseDataFromFile文件：" <<filePath;
-    QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, "无法打开文件", "文件:"+filePath+"读取失败，报错："+ file.errorString());
-        qDebug() << "无法打开文件：" <<filePath<< file.errorString();
-        return false;
-    }
-
-    QTextStream in(&file);
-    //    QList<DataPoint> dataPoints;
-    QDateTime startTime = QDateTime::currentDateTime();
-
-    m_lineSeries_current->clear();
-    m_lineSeries_voltage->clear();
-    m_lineSeries_pressure->clear();
-    m_lineSeries_temperature->clear();
-
-    while (!in.atEnd()) {
-        QDateTime startTimeLine = QDateTime::currentDateTime();
-        QString line = in.readLine();
-        QRegularExpressionMatch match = REGEX_DATA.match(line);
-        if (match.hasMatch()) {
-            m_dataTime_lineSeries = QDateTime::fromString(match.captured(1), "yyyy-MM-dd hh:mm:ss");
-            m_lineSeries_current->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(3).toDouble());
-            m_lineSeries_voltage->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(4).toDouble());
-            m_lineSeries_pressure->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(5).toDouble());
-            m_lineSeries_temperature->append(m_dataTime_lineSeries.toMSecsSinceEpoch(),match.captured(6).toDouble());
-            //            qDebug() << "日期和时间：" << m_dataTime_lineSeries.toString("yyyy-MM-dd hh:mm:ss");
-            //            qDebug() << "电流：" << match.captured(3).toDouble() << "安培";
-            //            qDebug() << "电压：" << match.captured(4).toDouble() << "伏特";
-            //            qDebug() << "压力：" << match.captured(5).toDouble() << "兆帕（MPa）";
-            //            qDebug() << "温度：" << match.captured(6).toDouble() << "摄氏度";
-            //            qDebug() << "------------------------";
-        }else {
-            qDebug()<<"解析失败match.hasMatch() 错误行号:"<<in.pos()<<"-第"<<line<<"行;";
-        }
-        qDebug() << "解析时间行：" << startTimeLine.msecsTo(QDateTime::currentDateTime())<< "毫秒";
-    }
-    file.close();
-    QDateTime endTime = QDateTime::currentDateTime();
-    qint64 elapsedTime = startTime.secsTo(endTime);
-    qDebug() << "解析时间：" << elapsedTime << "秒";
-    // 创建图表和曲线
-    // 创建图表视图并显示
-    m_axisTime->setRange(
-        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(0).x()),
-        QDateTime::fromMSecsSinceEpoch(m_lineSeries_temperature->at(m_lineSeries_temperature->count() -1 ).x()));
-    m_axisY->setRange(-20,50);
-    m_chartView->update();
-
-    return true;
-
-}
-
 void SnowBeerWindow::fileModelSelection(QModelIndex index)
 {
     qDebug()<<"fileModelSelection(QModelIndex index)"<<index;
@@ -359,41 +433,30 @@ void SnowBeerWindow::fileBrowserDoubleClicked(QModelIndex index)
     qDebug()<<"fileBrowserDoubleClicked(QModelIndex index)"<<index;
     qDebug()<<index.data(QFileSystemModel::FilePathRole).toString();
     m_currentFilePathDir = index.data(QFileSystemModel::FilePathRole).toString();
-    // 提示窗口
-    QMessageBox msgBox(this);
-    msgBox.setText("等待数据解析完成");
-    if(!parseDataFromFile(m_currentFilePathDir)){
-        // 路径不存在
-        QMessageBox::warning(this, "数据解析", "数据解析失败文件路径不存在!");
-        msgBox.exec();
-        return;
-    }
-    // 3秒后自动关闭
-//    QTimer::singleShot(3000, &msgBox, &QMessageBox::close);
-    msgBox.exec();
-//    ui->tabWidget->setCurrentWidget(ui->tab_view);
-//    QTabBar *tabBar = ui->tabWidget->tabBar();
-//    ui->tabWidget->setMaximumWidth(200);
+    //开启线程的数据解析
+    lines.filePath = m_currentFilePathDir;
+    lines.start();
 }
 
 void SnowBeerWindow::on_checkBox_current_stateChanged(int arg1)
 {
     qDebug()<<"on_checkBox_current_stateChanged int:"<< arg1;
-    m_lineSeries_current->setVisible(arg1);
-
+    lines.series[Line_current].setShow(arg1);
+    AppJson["current_isShow"] = arg1 == Qt::Checked ? true: false ;
 }
 
 void SnowBeerWindow::on_checkBox_voltage_stateChanged(int arg1)
 {
+    AppJson["voltage_isShow"] = arg1 == Qt::Checked ? true: false ;
     switch (arg1) {
     case Qt::Checked:
-        m_lineSeries_voltage->setVisible(true);
+        lines.series[Line_voltage].setShow(true);
         break;
     case Qt::PartiallyChecked:
 
         break;
     case Qt::Unchecked:
-        m_lineSeries_voltage->setVisible(false);
+        lines.series[Line_voltage].setShow(false);
         break;
     default:
         qDebug()<<"error: on_checkBox_*_stateChanged int:"<< arg1;
@@ -404,13 +467,15 @@ void SnowBeerWindow::on_checkBox_voltage_stateChanged(int arg1)
 
 void SnowBeerWindow::on_checkBox_pressure_stateChanged(int arg1)
 {
-    m_lineSeries_pressure->setVisible(arg1);
+    lines.series[Line_pressure].setShow(arg1);
+    AppJson["pressure_isShow"] = arg1 == Qt::Checked ? true: false ;
 }
 
 
 void SnowBeerWindow::on_checkBox_temperature_stateChanged(int arg1)
 {
-    m_lineSeries_temperature->setVisible(arg1);
+    lines.series[Line_temperature].setShow(arg1);
+    AppJson["temperature_isShow"] = arg1 == Qt::Checked ? true: false ;
 }
 
 
@@ -433,10 +498,10 @@ void SnowBeerWindow::on_themeComboBox_currentIndexChanged(int index)
         // ...
     } else if (theme == "黑色主题") {
         // 设置黑色主题的样式或设置
-        m_chart->setTheme(QChart::ChartThemeDark);
+        lines.chart->setTheme(QChart::ChartThemeDark);
     } else if (theme == "浅色主题") {
         // 设置浅色主题的样式或设置
-        m_chart->setTheme(QChart::ChartThemeLight);
+        lines.chart->setTheme(QChart::ChartThemeLight);
     }
 }
 
@@ -448,7 +513,7 @@ void SnowBeerWindow::on_animatedComboBox_currentIndexChanged(int index)
     //QChart::GridAxisAnimations	0x1	在图表中启用网格轴动画。
     //QChart::SeriesAnimations	0x2	在图表中启用系列动画。
     //QChart::AllAnimations	0x3	图表中启用了所有动画类型。
-    m_chart->setAnimationOptions(QChart::AnimationOptions(index));
+    lines.chart->setAnimationOptions(QChart::AnimationOptions(index));
 }
 
 void SnowBeerWindow::on_legendComboBox_currentIndexChanged(int index)
@@ -462,7 +527,7 @@ void SnowBeerWindow::on_legendComboBox_currentIndexChanged(int index)
     switch (index) {
     //
     case 0:
-        m_chart->legend()->hide();
+        lines.chart->legend()->hide();
         return;
         break;
     case 1:
@@ -481,37 +546,46 @@ void SnowBeerWindow::on_legendComboBox_currentIndexChanged(int index)
         return;
         break;
     }
-    m_chart->legend()->setAlignment(alignment);
-    m_chart->legend()->show();
+    lines.chart->legend()->setAlignment(alignment);
+    lines.chart->legend()->show();
 
 }
 
 void SnowBeerWindow::on_antialiasCheckBox_stateChanged(int arg1)
 {
     qDebug()<<"on_antialiasComboBox_currentIndexChanged int:"<< arg1;
-//    m_chart->setRenderHint(QPainter::Antialiasing,  arg1);
-    m_chartView->setRenderHint(QPainter::Antialiasing,arg1);
+//    lines.chart->setRenderHint(QPainter::Antialiasing,  arg1);
+    ui->widget->setRenderHint(QPainter::Antialiasing,arg1);
 }
 
 void SnowBeerWindow::on_pushButton_zoomOut_clicked()
 {
-    m_chart->zoomOut();
+    lines.chart->zoomOut();
 }
 
 void SnowBeerWindow::on_pushButton_zoomIn_clicked()
 {
-    m_chart->zoomIn();
+    lines.chart->zoomIn();
 }
 
 void SnowBeerWindow::on_pushButton_zoomReset_clicked()
 {
-    m_chart->zoomReset();
+    lines.chart->zoomReset();
 }
+
 
 void SnowBeerWindow::on_pushButton_test_clicked()
 {
-    qDebug()<<"test()";
-    test();
+    qDebug()<<"test()"<<QThread::currentThread();
+    QDateTime startTime = QDateTime::currentDateTime();
+    //const QString filePath = "E:/works/debug/QtClient/CJCS100.txt";
+    lines.filePath = "E:/works/debug/QtClient/CJCS100.txt";
+    // lines.parseDataFromFile(lines.filePath);
+    // 设置线程池的最大线程数
+    lines.start();
+    // lines.chart->update();
+    // ui->widget->update();
+    qDebug() << "解析时间Test：" << startTime.msecsTo(QDateTime::currentDateTime()) << "毫秒"<<"线程:"<<QThread::currentThread();
 }
 
 void SnowBeerWindow::on_lineEdit_rootPath_editingFinished()
@@ -578,7 +652,7 @@ void SnowBeerWindow::on_pushButton_axisYsetRange_clicked()
     qDebug()<<"on_pushButton_axisYsetRange_clicked():";
     qDebug()<<ui->doubleSpinBox_axisYRangeMin->value();
     qDebug()<<ui->doubleSpinBox_axisYRangeMax->value();
-    m_axisY->setRange(ui->doubleSpinBox_axisYRangeMin->value(),ui->doubleSpinBox_axisYRangeMax->value());
+    lines.axisY->setRange(ui->doubleSpinBox_axisYRangeMin->value(),ui->doubleSpinBox_axisYRangeMax->value());
 }
 
 void SnowBeerWindow::on_pushButton_updateNetworkFiles_clicked()
@@ -599,7 +673,7 @@ void SnowBeerWindow::on_pushButton_updateNetworkFiles_clicked()
 
 void SnowBeerWindow::on_lineEdit_rootPath_filesNetwork_editingFinished()
 {
-
+    qDebug()<<"SnowBeerWindow::on_lineEdit_rootPath_filesNetwork_editingFinished()";
 }
 
 void SnowBeerWindow::on_pushButton_updateLocalFiles_clicked()
@@ -627,23 +701,11 @@ void SnowBeerWindow::on_pushButton_parseData_clicked()
         // 3秒后自动关闭
         QTimer::singleShot(3000, &msgBox, &QMessageBox::close);
 //        msgBox.exec();
+    }else {
+        //开启线程的数据解析
+        lines.filePath = m_currentFilePathDir;
+        lines.start();
     }
-    QDateTime startTime = QDateTime::currentDateTime();
-
-    if(!parseDataFromFile(m_currentFilePathDir)){
-        // 路径不存在
-        return;
-    }
-
-    QDateTime endTime = QDateTime::currentDateTime();
-    qint64 elapsedTime = startTime.secsTo(endTime);
-    qDebug() << "解析时间：" << elapsedTime << "秒";
-    // 提示窗口
-    QMessageBox msgBox(this);
-    msgBox.setText("数据解析完成花费时间：" + QString::number(elapsedTime) + "秒");
-//     3秒后自动关闭
-    QTimer::singleShot(3000, &msgBox, &QMessageBox::close);
-    msgBox.exec();
 }
 
 
@@ -699,5 +761,56 @@ void SnowBeerWindow::on_pushButton_downloadFilesFronLinks_clicked()
         return;
     }
     downloadFilesListFromNetworkLinks(filesListNotDownloaded);
+}
+
+
+void SnowBeerWindow::on_pushButton_getFilePath_comparison_clicked()
+{
+     //QStringList fileExtensions
+    QString title= "选择对比的文件";
+    QString directory = QDir::homePath();
+    // 构建文件过滤器字符串
+    // 正确构建文件过滤器字符串
+    QString filter = "支持的文件类型 (";
+    for (const QString& ext : fileExtensions) {
+        filter += "*" + ext + " ";
+    }
+    filter = filter.trimmed() + ")";
+
+    // 添加所有文件选项
+    filter += ";;All Files (*)";
+    // QFileDialog dialog(this, title, directory, filter);
+    // dialog.setAcceptMode(QFileDialog::AcceptOpen);
+    // dialog.setFileMode(QFileDialog::ExistingFile);
+
+    QString filePath = QFileDialog::getOpenFileName(this, title, directory, filter);
+    if (!filePath.isEmpty()) {
+        ui->lineEdit_filePath_comparison->setText(filePath);
+    }
+
+}
+
+
+void SnowBeerWindow::on_pushButton_setMax_current_clicked()
+{
+    AppJson["current_max"] = ui->doubleSpinBox_Max_current->value();
+}
+
+
+void SnowBeerWindow::on_pushButton_setMax_voltage_clicked()
+{
+    AppJson["voltage_max"] = ui->doubleSpinBox_Max_voltage->value();
+}
+
+
+void SnowBeerWindow::on_pushButton_setMax_pressure_clicked()
+{
+    AppJson["pressure_max"] = ui->doubleSpinBox_Max_pressure->value();
+}
+
+
+void SnowBeerWindow::on_pushButton_setMax_temperature_clicked()
+{
+    AppJson["temperature_max"] = ui->doubleSpinBox_Max_temperature->value();
 }
 
