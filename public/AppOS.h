@@ -5,6 +5,7 @@
  * @details
  * Author: Tang
  * Created: 2024-03
+ * Version: 0.0.3
  */
 
 #ifndef APPOS_H
@@ -66,17 +67,37 @@ typedef signed long long INT64;
 #define CALLBACK
 #endif // windows
 
-/**全局变量**/
-#include <QJsonObject>
-extern QJsonObject AppJson;
+/** App的全局变量的声明 extern
+ * 可以被多个头文件包含而不会链接错误
+ * QString 是一个类，不是基本类型。全局或静态 QString 对象的初始化可能会在 main() 函数执行之前发生，
+ * 这时 Qt 的一些基础设施可能还没有设置好。这可能导致一些奇怪的行为或崩溃。
+ * 1. extern 改为使用 inline，并定义
+ * 2.使用指针，在 main() 函数或 app 初始化后 赋值
+ * 3.不在包含定义的 .cpp 文件中初始化，在 main.cpp 等使用的地方定义
+**/
+
 /*ini文件读取配置，Qt自带系统方法，指定存储在本地或者系统注册表等地方*/
 #include <QSettings>
 extern QSettings AppSettings;
+/**全局变量 exe或者dll的本地配置ini文件的json格式存储的配置信息**/
+#include <QJsonObject>
+extern QJsonObject AppJson;
 
+/**int的数字转字符到GUI中显示**/
 #include<QString>
 extern QString CurrentUser;
 inline QString i2s(int num) {
     return QString::number(num);
 }
+
+/**定义一个结构体来包含更详细的结果信息**/
+struct Result
+{
+    bool success;
+    QString message;
+
+    Result(bool s = false, const QString& msg =""):success(s),message(msg) {}
+    operator bool() const {return success;}//重载了 bool 操作符，使其可以像之前的 bool 返回值一样使用例如：if (result)
+};
 
 #endif // APPOS_H
