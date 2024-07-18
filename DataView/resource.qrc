@@ -14,5 +14,6 @@
         <file>asset/mianWidget/OpenFiles.svg</file>
         <file>asset/DataView/Add.svg</file>
         <file>asset/DataView/Sub.svg</file>
+        <file>asset/DataView/date_calendar.svg</file>
     </qresource>
 </RCC>

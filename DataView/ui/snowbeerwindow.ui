@@ -6,14 +6,37 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>968</width>
-    <height>664</height>
+    <width>1212</width>
+    <height>564</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>数据分析</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">QDoubleSpinBox::up-button {
+subcontrol-origin: border;
+subcontrol-position: right;
+width: 16px;
+height: 16px;
+border-image: url(:/asset/DataView/Add.svg);
+border-width: 1px;
+}
+
+QDoubleSpinBox::down-button {
+subcontrol-origin: border;
+subcontrol-position: left;
+width: 16px;
+height: 16px;
+border-image: url(:/asset/DataView/Sub.svg);
+border-width: 1px;
+}
+</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
+   </property>
    <layout class="QVBoxLayout" name="verticalLayout_4">
     <property name="spacing">
      <number>0</number>
@@ -66,10 +89,6 @@
          <item>
           <property name="text">
            <string>浅色主题</string>
-          </property>
-          <property name="icon">
-           <iconset theme="zoom-in">
-            <normaloff>.</normaloff>.</iconset>
           </property>
          </item>
          <item>
@@ -193,6 +212,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QLabel" name="label_tips">
+         <property name="text">
+          <string>数据解析完成！</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <spacer name="horizontalSpacer">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -216,6 +242,12 @@
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="doubleSpinBox_axisYRangeMin">
+           <property name="minimumSize">
+            <size>
+             <width>72</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(144, 164, 174);</string>
            </property>
@@ -230,6 +262,12 @@
          </item>
          <item>
           <widget class="QDoubleSpinBox" name="doubleSpinBox_axisYRangeMax">
+           <property name="minimumSize">
+            <size>
+             <width>72</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="styleSheet">
             <string notr="true">background-color: rgb(144, 164, 174);</string>
            </property>
@@ -245,6 +283,13 @@
           <widget class="QPushButton" name="pushButton_axisYsetRange">
            <property name="text">
             <string>确定</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_test">
+           <property name="text">
+            <string>test</string>
            </property>
           </widget>
          </item>
@@ -405,6 +450,13 @@
            </property>
           </widget>
          </item>
+         <item>
+          <widget class="QPushButton" name="pushButton_axisX_autoRange_reset">
+           <property name="text">
+            <string>时间轴重置</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </item>
@@ -413,6 +465,9 @@
    </layout>
   </widget>
   <widget class="QDockWidget" name="dockWidget">
+   <property name="styleSheet">
+    <string notr="true">color: rgb(255, 255, 255);</string>
+   </property>
    <property name="allowedAreas">
     <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
    </property>
@@ -465,6 +520,9 @@
        <property name="autoFillBackground">
         <bool>false</bool>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="currentIndex">
         <number>0</number>
        </property>
@@ -479,7 +537,7 @@
         <attribute name="title">
          <string>数据</string>
         </attribute>
-        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,10,0,0">
+        <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0,0,0,10,0,0">
          <property name="leftMargin">
           <number>0</number>
          </property>
@@ -502,7 +560,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_rootPath_filesNetwork">
+            <widget class="QLineEdit" name="lineEdit_network_url">
              <property name="toolTip">
               <string>示例：http://192.168.1.15:8071/</string>
              </property>
@@ -510,7 +568,32 @@
               <string/>
              </property>
              <property name="placeholderText">
-              <string>需要先设置本地根路径，同步网络路径</string>
+              <string>设置同步的网络路径</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_network_url_save">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>42</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>保存</string>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
+             <property name="default">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -519,28 +602,46 @@
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
-            <widget class="QPushButton" name="pushButton_updateNetworkFiles">
+            <widget class="QLabel" name="label_5">
+             <property name="text">
+              <string>文件列表更新：</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_network_updateFilesList">
              <property name="text">
               <string>网络文件</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_updateLocalFiles">
+            <widget class="QPushButton" name="pushButton_localFiles_updateFilesList">
              <property name="text">
               <string>本地文件</string>
              </property>
             </widget>
            </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_17">
            <item>
-            <widget class="QPushButton" name="pushButton_downloadedFiles">
+            <widget class="QLabel" name="label_6">
+             <property name="text">
+              <string>网络文件筛选：</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_network_downloadedFiles">
              <property name="text">
               <string>已下载</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_notDownloadedFiles">
+            <widget class="QPushButton" name="pushButton_network_notDownloadedFiles">
              <property name="text">
               <string>未下载</string>
              </property>
@@ -549,30 +650,51 @@
           </layout>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
+          <layout class="QHBoxLayout" name="horizontalLayout_18">
            <item>
-            <widget class="QPushButton" name="pushButton_downloadNetworkFile">
+            <widget class="QLabel" name="label_14">
              <property name="text">
-              <string>下载</string>
+              <string>网络文件下载：</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_parseData">
-             <property name="text">
-              <string>解析本地</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="pushButton_downloadFilesFronLinks">
+            <widget class="QPushButton" name="pushButton_network_download_allFiles_FromLinks">
              <property name="text">
               <string>一键下载</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="pushButton_fileDelete">
+            <widget class="QPushButton" name="pushButton_network_download_networkFile">
+             <property name="text">
+              <string>下载</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>本地文件操作：</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_localFiles_parseData_byFile">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 255, 255);</string>
+             </property>
+             <property name="text">
+              <string>解析</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_localFiles_fileDelete">
              <property name="text">
               <string>删除</string>
              </property>
@@ -581,14 +703,7 @@
           </layout>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_test">
-           <property name="text">
-            <string>test</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QListView" name="listView_filesNetwork">
+          <widget class="QListView" name="listView_network_filesList">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -648,12 +763,12 @@
            <item>
             <widget class="QLabel" name="label_4">
              <property name="text">
-              <string>网络路径：</string>
+              <string>本地路径：</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_rootPath">
+            <widget class="QLineEdit" name="lineEdit_localFiles_dir">
              <property name="toolTip">
               <string>示例：G:/data/</string>
              </property>
@@ -661,14 +776,39 @@
               <string/>
              </property>
              <property name="placeholderText">
-              <string>需要先设置本地根路径，同步网络路径</string>
+              <string>设置本地根路径</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="pushButton_localFiles_dir_save">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>42</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="text">
+              <string>保存</string>
+             </property>
+             <property name="autoDefault">
+              <bool>false</bool>
+             </property>
+             <property name="default">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
           </layout>
          </item>
          <item>
-          <widget class="QTreeView" name="treeView_files"/>
+          <widget class="QTreeView" name="treeView_localFiles_files"/>
          </item>
         </layout>
        </widget>
@@ -678,10 +818,10 @@
           <normaloff>:/asset/mianWidget/Tools.svg</normaloff>:/asset/mianWidget/Tools.svg</iconset>
         </attribute>
         <attribute name="title">
-         <string>设置</string>
+         <string>通用</string>
         </attribute>
-        <layout class="QFormLayout" name="formLayout">
-         <property name="verticalSpacing">
+        <layout class="QVBoxLayout" name="verticalLayout_5">
+         <property name="spacing">
           <number>0</number>
          </property>
          <property name="leftMargin">
@@ -696,6 +836,618 @@
          <property name="bottomMargin">
           <number>0</number>
          </property>
+         <item>
+          <widget class="QGroupBox" name="horizontalGroupBox_2">
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QGroupBox {
+	border:none;
+}</string>
+           </property>
+           <property name="title">
+            <string>阈值设置:</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_7">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>24</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>12</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,10,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_8">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>电流：</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_Max_current">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(144, 164, 174);</string>
+                </property>
+                <property name="singleStep">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>50.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_setMax_current">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>42</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>设置</string>
+                </property>
+                <property name="autoDefault">
+                 <bool>false</bool>
+                </property>
+                <property name="default">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,10,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_7">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>电压：</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_Max_voltage">
+                <property name="minimumSize">
+                 <size>
+                  <width>72</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(144, 164, 174);</string>
+                </property>
+                <property name="singleStep">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>50.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_setMax_voltage">
+                <property name="maximumSize">
+                 <size>
+                  <width>42</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>设置</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="0,10,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_10">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>气压：</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_Max_pressure">
+                <property name="minimumSize">
+                 <size>
+                  <width>72</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(144, 164, 174);</string>
+                </property>
+                <property name="singleStep">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>50.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_setMax_pressure">
+                <property name="maximumSize">
+                 <size>
+                  <width>42</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>设置</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_11" stretch="0,10,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_9">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>温度：</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_Max_temperature">
+                <property name="minimumSize">
+                 <size>
+                  <width>72</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="styleSheet">
+                 <string notr="true">background-color: rgb(144, 164, 174);</string>
+                </property>
+                <property name="singleStep">
+                 <double>1.000000000000000</double>
+                </property>
+                <property name="value">
+                 <double>50.000000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_setMax_temperature">
+                <property name="maximumSize">
+                 <size>
+                  <width>42</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>设置</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <widget class="QGroupBox" name="horizontalGroupBox_3">
+           <property name="font">
+            <font>
+             <pointsize>12</pointsize>
+            </font>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QGroupBox {
+	border:none;
+}</string>
+           </property>
+           <property name="title">
+            <string>数据对比功能:</string>
+           </property>
+           <layout class="QVBoxLayout" name="verticalLayout_8">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>24</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
+             <number>12</number>
+            </property>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0,0,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_11">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>文件路径：</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QLineEdit" name="lineEdit_comparison_filePath">
+                <property name="toolTip">
+                 <string>示例：G:/data/</string>
+                </property>
+                <property name="text">
+                 <string/>
+                </property>
+                <property name="placeholderText">
+                 <string>设置文件路径</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_comparison_getFilePath">
+                <property name="sizePolicy">
+                 <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+                  <horstretch>0</horstretch>
+                  <verstretch>0</verstretch>
+                 </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>42</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="text">
+                 <string>设置</string>
+                </property>
+                <property name="autoDefault">
+                 <bool>false</bool>
+                </property>
+                <property name="default">
+                 <bool>false</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_10" stretch="0,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_12">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>数据对比方式：</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QComboBox" name="comboBox_comparison_type">
+                <item>
+                 <property name="text">
+                  <string>手动对齐时间偏移</string>
+                 </property>
+                </item>
+                <item>
+                 <property name="text">
+                  <string>自动对齐时间偏移</string>
+                 </property>
+                </item>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_13" stretch="0,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_13">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>X轴时间</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDateTimeEdit" name="dateTimeEdit_comparison_axisTime_origin">
+                <property name="styleSheet">
+                 <string notr="true">QDateTimeEdit::down-arrow {
+	border-image: url(:/asset/DataView/date_calendar.svg);
+}</string>
+                </property>
+                <property name="displayFormat">
+                 <string>yyyy/M/d H:mm:ss</string>
+                </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_15" stretch="0,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_15">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>数据开始时间</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QDateTimeEdit" name="dateTimeEdit_comparison_axisTime_origin2">
+                <property name="styleSheet">
+                 <string notr="true">QDateTimeEdit::down-arrow {
+	border-image: url(:/asset/DataView/date_calendar.svg);
+}</string>
+                </property>
+                <property name="displayFormat">
+                 <string>yyyy/M/d H:mm:ss</string>
+                </property>
+                <property name="calendarPopup">
+                 <bool>true</bool>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_14" stretch="0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QLabel" name="label_offsetTime_dateTimeEdit_comparison_axisTime">
+                <property name="minimumSize">
+                 <size>
+                  <width>0</width>
+                  <height>0</height>
+                 </size>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>16777215</width>
+                  <height>16777215</height>
+                 </size>
+                </property>
+                <property name="layoutDirection">
+                 <enum>Qt::LeftToRight</enum>
+                </property>
+                <property name="text">
+                 <string>时间偏移量</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+            <item>
+             <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0,0">
+              <property name="spacing">
+               <number>0</number>
+              </property>
+              <item>
+               <widget class="QPushButton" name="pushButton_comparison_axisTimeOffset_ok">
+                <property name="text">
+                 <string>确定时间偏移</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QPushButton" name="pushButton_comparison_start">
+                <property name="text">
+                 <string>开始对比</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer_3">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
         </layout>
        </widget>
       </widget>

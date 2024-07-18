@@ -1,3 +1,10 @@
+/**
+ * @details
+ * Author: Tang
+ * Created: 2024-03
+ * Version: 0.0.3
+ */
+
 #ifndef SNOWBEERWINDOW_H
 #define SNOWBEERWINDOW_H
 
@@ -13,6 +20,7 @@
 #include <QStringListModel>
 #include <QScatterSeries>
 #include <QThread>
+#include <QLegendMarker>
 #include "AppOS.h"
 #include "modules/FilesUtil.h"
 
@@ -51,13 +59,14 @@ struct struSeries
         //line->setPointsVisible(false);//设置数据点是否可见,默认不可见
         //line->setPointLabelsFormat("@yPoint");//设置点标签格式
         line->setOpacity(0.8);//设置线条透明度
-
-        scatter->setName("阈值");//设置线条名称（用于图例）
+        scatter->setName("");//设置线条名称（用于图例）
         scatter->setVisible(true);//设置线条是否可见
         scatter->setPointLabelsFormat("@yPoint");//设置点标签格式
         scatter->setPointLabelsVisible();//设置点标签是否可见
          // 设置高亮点的样式
-        scatter->setMarkerSize(6);
+        // scatter->setMarkerShape(QScatterSeries::MarkerShapeCircle);
+        // scatter->setMarkerSize(0);
+        // scatter->setOpacity(QAbstractSeries::SeriesTypeLine);// 这会禁用图例功
         scatter->setColor(Qt::red);//设置线条颜色
 
     }
@@ -79,6 +88,7 @@ struct struSeries
     }
 
     void addPoint(const qreal &xpos,const qreal &ypos) {
+        if(!isShow) return;
         //pointsLine.append(QPointF(xpos,ypos));
         pointsLine.emplace_back(xpos, ypos);
         if(max <= ypos){
@@ -107,26 +117,9 @@ class ChartLine : public QThread
 {
     Q_OBJECT //使用信号和槽机制的类所必需的
 public:
-    explicit ChartLine(QObject *parent = nullptr):QThread{nullptr},
-        chart(new QChart()), axisTime(new QDateTimeAxis()),axisY(new QValueAxis())
+    explicit ChartLine(QObject *parent = nullptr):QThread{nullptr}
     {
         series.resize(Line_Count);
-        initChart();
-
-        // connect(axisTime,  &QDateTimeAxis::minChanged, this, [=](qreal min) {
-        //     qDebug()<<"QDateTimeAxis::minChanged"<<min;
-        // });
-        // connect(axisTime,  &QDateTimeAxis::maxChanged, this, [=](qreal max) {
-        //     qDebug()<<"QDateTimeAxis::maxChanged"<<max;
-        // });
-
-        connect(axisY,  &QValueAxis::minChanged, this, [=](qreal min) {
-            qDebug()<<"axisY::minChanged"<<min;
-        });
-        // connect(axisY,  &QValueAxis::maxChanged, this, [=](qreal max) {
-        //     qDebug()<<"axisY::maxChanged"<<max;
-        // });
-
     };
     // 不需要显式的析构函数,父子对象机制之间存在冲突时,可能会奔溃
     // ~ChartLine() {
@@ -135,24 +128,47 @@ public:
         // delete axisY;
     // }
     seriesList series;
-    QChart *chart;
-    QDateTimeAxis *axisTime; // 时间轴
-    QValueAxis *axisY;
-    void autoRangesAxisTime();
-    void autoRangesAxisY();
-
-    void initChart();
     QString filePath;
+    qint64 lineCount = 0;
+    //QAtomicInt lineCount;
     Result readDataFromFile(const QString filePath);
 
-
+    virtual void addPoint(const LineEnum &lineType,const qreal &xpos,const qreal &ypos){
+        series[lineType].addPoint(xpos,ypos);
+    };
 signals:
-    void progressUpdated(int progress);
+    void progressUpdated(qint64 progress);
     void readingFinished();
 
 protected:
     void run() override;
 private:
+
+};
+
+class ComparionChartLine:public ChartLine {
+public:
+    int TypeComparion = 0;
+    bool isTypeComparion_1_first = true;
+    qreal offsetMs_xpos = 0;
+    void addPoint(const LineEnum &lineType,const qreal &xpos,const qreal &ypos) override {
+        switch (TypeComparion) {
+        case 0:
+            //按照设定偏移时间计算x轴的时间
+            series[lineType].addPoint(xpos+offsetMs_xpos,ypos);
+            break;
+        case 1:{
+            if(isTypeComparion_1_first){
+                offsetMs_xpos = offsetMs_xpos - xpos;
+                isTypeComparion_1_first = false;
+            }
+            //按类型自动比对，从第一个时间开始自动计算偏移量
+            series[lineType].addPoint(xpos+offsetMs_xpos,ypos);
+            break;}
+        default:
+            break;
+        }
+    };
 
 };
 
@@ -173,12 +189,33 @@ public:
     void test();
     void downloadFilesListFromNetworkLinks(QStringList linksFilesList);
 
+    QChart *chart;
+    QDateTimeAxis *axisTime; // 时间轴
+    QValueAxis *axisY;
+    void autoRangesAxisTime(const ChartLine &lineChart);
+    void autoRangesAxisY(const ChartLine &lineChart);
+    void initChart();
+
     ChartLine lines;//折线图
     // 展示在QChartView部件上
     void init_lines_chartView(ChartLine &lineChart);
 
+    Result comparsion_lines_by_file(const QString &filePath,const int &type = 0);
+
+    //隐藏所有名字为空的图例项 用于在设置数据线条可见时图例又会恢复可见属性
+    void chartHideEmptyLegendItems(QChart* chartHide=nullptr) {
+        if(chartHide == nullptr) chartHide = chart;
+        const auto allMarkers = chartHide->legend()->markers();
+        for (QLegendMarker* marker : allMarkers) {
+            if (marker->series() && marker->series()->name().isEmpty()) {
+                marker->setVisible(false);
+            }
+        }
+    };
 public slots:
-    void on_lineEdit_rootPath_editingFinished();
+    void parse_file_progress(qint64 progress);
+
+    void on_lineEdit_localFiles_dir_editingFinished();
 
 private slots:
     void on_pushButton_test_clicked();
@@ -205,31 +242,47 @@ private slots:
 
     void on_pushButton_zoomReset_clicked();
 
-    void on_pushButton_downloadNetworkFile_clicked();
+    void on_pushButton_axisX_autoRange_reset_clicked();
 
     void on_pushButton_axisYsetRange_clicked();
 
-    void on_pushButton_updateNetworkFiles_clicked();
+    void on_pushButton_setMax_current_clicked();
 
-    void on_lineEdit_rootPath_filesNetwork_editingFinished();
+    void on_pushButton_setMax_voltage_clicked();
 
-    void on_pushButton_updateLocalFiles_clicked();
+    void on_pushButton_setMax_pressure_clicked();
 
-    void on_pushButton_parseData_clicked();
+    void on_pushButton_setMax_temperature_clicked();
 
-    void on_listView_filesNetwork_clicked(const QModelIndex &index);
+    void on_pushButton_comparison_getFilePath_clicked();
 
-    void on_listView_filesNetwork_doubleClicked(const QModelIndex &index);
+    void on_pushButton_comparison_axisTimeOffset_ok_clicked();
 
-    void on_pushButton_downloadedFiles_clicked();
+    void on_pushButton_comparison_start_clicked();
 
-    void on_pushButton_notDownloadedFiles_clicked();
+    void on_pushButton_network_url_save_clicked();
 
-    void on_pushButton_downloadFilesFronLinks_clicked();
+    void on_pushButton_localFiles_dir_save_clicked();
 
-    void on_pushButton_fileDelete_clicked();
+    void on_pushButton_network_updateFilesList_clicked();
 
-    void on_pushButton_getFilePath_comparison_clicked();
+    void on_pushButton_localFiles_updateFilesList_clicked();
+
+    void on_pushButton_network_downloadedFiles_clicked();
+
+    void on_pushButton_network_notDownloadedFiles_clicked();
+
+    void on_pushButton_network_download_allFiles_FromLinks_clicked();
+
+    void on_pushButton_network_download_networkFile_clicked();
+
+    void on_pushButton_localFiles_parseData_byFile_clicked();
+
+    void on_pushButton_localFiles_fileDelete_clicked();
+
+    void on_listView_network_filesList_clicked(const QModelIndex &index);
+
+    void on_listView_network_filesList_doubleClicked(const QModelIndex &index);
 
 private:
     Ui::SnowBeerWindow *ui;
@@ -249,11 +302,6 @@ private:
     QStringList filesListNetwork;
     QStringList filesListDownloaded;
     QStringList filesListNotDownloaded;
-
-    double max_current;     // 电流
-    double max_voltage;     // 电压
-    double max_pressure;    // 压强
-    double max_temperature; // 温度
 };
 
 #endif // SNOWBEERWINDOW_H

@@ -2,7 +2,7 @@
     "Keys" : [ ],
     "ID":11,
     "Name":"DataView",
-    "Version":"0.2",
+    "Version":"0.3",
     "Description":"This is an example Qt plugin",
     "Author":"tang"
 }
