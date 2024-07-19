@@ -32,7 +32,12 @@ Result ChartLine::readDataFromFile(const QString filePath)
 
     QTextStream in(&file);
     QString line;
-    lineCount = 0;
+    qint64 lineCount = 0;
+    QTimer updateTimer;
+    connect(&updateTimer, &QTimer::timeout, this, [&](){
+        emit progressUpdated(lineCount);
+    });
+    updateTimer.start(updateInterval); // 每3秒更新一次
 
     // 使用 lambda 函数来处理每个数据点
     auto processDataPoint = [this](qint64 xPosPoint, const QString& strValue, int chopLength, LineEnum lineType, qint64 lineCount) {
@@ -50,13 +55,8 @@ Result ChartLine::readDataFromFile(const QString filePath)
     while (!in.atEnd()) {
         line = in.readLine();
         lineCount++;
-        // 每读取3000行更新一次进度 原来的1000行会导致奔溃，报 QList 超过范围，该值尽量设置大
-        if (lineCount % 3000 == 0) {
-            emit progressUpdated(lineCount);
-        }
         // 使用逗号分割数据
         QStringList parts = line.split(',');
-
         if (parts.size() >= 6) {
             // 解析时间戳
             bool ok;
@@ -89,6 +89,7 @@ Result ChartLine::readDataFromFile(const QString filePath)
     }
 
     file.close();
+    updateTimer.stop();
     emit readingFinished();
     return Result(true, QString("成功读取 %1 行数据").arg(lineCount));
 }
@@ -165,7 +166,7 @@ void SnowBeerWindow::init()
     ui->widget->setRubberBand(QChartView::RectangleRubberBand);
     init_filesView();
 
-    test();
+    //test();//测试
 }
 
 void SnowBeerWindow::quit()
@@ -198,7 +199,6 @@ void SnowBeerWindow::test()
     for (int i = 0; i < Line_Count; ++i) {
         lines.series[static_cast<LineEnum>(i)].update();
     }
-
     autoRangesAxisTime(lines);
 }
 
@@ -427,10 +427,12 @@ Result SnowBeerWindow::comparsion_lines_by_file(const QString &filePath, const i
 
 void SnowBeerWindow::parse_file_progress(qint64 progress)
 {
+    //错误 "ASSERT failure in QList::at: "index out of range"
     qDebug()<<"parse_file_progress(qint64 "<<progress;
     //每读取3000行更新一次进度 原来的1000行会导致奔溃，报 QList 超过范围，该值尽量设置大 145毫秒，可能信号发送过快
     if(ui->label_tips->isHidden())  ui->label_tips->show();
-    ui->label_tips->setText("数据解析进度至:" + i2s(progress));
+    QString strProgress = i2s(progress);
+    ui->label_tips->setText("数据解析进度至:" + strProgress);
 }
 
 

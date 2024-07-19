@@ -129,8 +129,7 @@ public:
     // }
     seriesList series;
     QString filePath;
-    qint64 lineCount = 0;
-    //QAtomicInt lineCount;
+    int updateInterval = 3000; // 更新进度频率 毫秒
     Result readDataFromFile(const QString filePath);
 
     virtual void addPoint(const LineEnum &lineType,const qreal &xpos,const qreal &ypos){
