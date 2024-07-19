@@ -166,6 +166,7 @@ void SnowBeerWindow::init()
     ui->widget->setRubberBand(QChartView::RectangleRubberBand);
     init_filesView();
 
+
     //test();//测试
 }
 
@@ -287,6 +288,14 @@ void SnowBeerWindow::initChart()
     //在QChartView中显示 设置外边距为 负数，减少空白
     chart->setContentsMargins(-9,-9,-9,-9);
     chart->setBackgroundRoundness(0);
+
+    // 获取当前日期
+    QDateTime currentDate = QDateTime::currentDateTime();
+    // 设置为当前月份的1号
+    QDateTime firstOfMonth = QDateTime(QDate(currentDate.date().year(), currentDate.date().month(), 1),QTime(0, 0, 0));
+    // 设置 dateTimeEdit 的值
+    ui->dateTimeEdit_comparison_axisTime_origin->setDateTime(firstOfMonth);
+    ui->dateTimeEdit_comparison_axisTime_origin2->setDateTime(firstOfMonth);
 }
 
 void SnowBeerWindow::init_lines_chartView(ChartLine &lineChart)

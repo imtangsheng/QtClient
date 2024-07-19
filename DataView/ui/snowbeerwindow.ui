@@ -212,6 +212,19 @@ border-width: 1px;
         </widget>
        </item>
        <item>
+        <spacer name="horizontalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
         <widget class="QLabel" name="label_tips">
          <property name="text">
           <string>数据解析完成！</string>
@@ -515,7 +528,7 @@ border-width: 1px;
         <bool>true</bool>
        </property>
        <property name="toolTip">
-        <string>设置和其他</string>
+        <string/>
        </property>
        <property name="autoFillBackground">
         <bool>false</bool>
@@ -524,7 +537,7 @@ border-width: 1px;
         <string notr="true"/>
        </property>
        <property name="currentIndex">
-        <number>0</number>
+        <number>1</number>
        </property>
        <property name="movable">
         <bool>true</bool>
@@ -554,6 +567,9 @@ border-width: 1px;
           <layout class="QHBoxLayout" name="horizontalLayout">
            <item>
             <widget class="QLabel" name="label_3">
+             <property name="toolTip">
+              <string>示例：http://192.168.1.15:8071/</string>
+             </property>
              <property name="text">
               <string>网络路径：</string>
              </property>
@@ -710,6 +726,12 @@ border-width: 1px;
              <height>36</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>单击选中，双击选择自动开始解析</string>
+           </property>
+           <property name="statusTip">
+            <string>单击选中，双击选择自动开始解析</string>
+           </property>
           </widget>
          </item>
          <item>
@@ -762,6 +784,9 @@ border-width: 1px;
           <layout class="QHBoxLayout" name="horizontalLayout_6">
            <item>
             <widget class="QLabel" name="label_4">
+             <property name="toolTip">
+              <string>保存路径，为空会自动打开选择文件夹</string>
+             </property>
              <property name="text">
               <string>本地路径：</string>
              </property>
@@ -794,6 +819,9 @@ border-width: 1px;
                <height>16777215</height>
               </size>
              </property>
+             <property name="toolTip">
+              <string>保存路径，为空会自动打开选择文件夹</string>
+             </property>
              <property name="text">
               <string>保存</string>
              </property>
@@ -808,7 +836,14 @@ border-width: 1px;
           </layout>
          </item>
          <item>
-          <widget class="QTreeView" name="treeView_localFiles_files"/>
+          <widget class="QTreeView" name="treeView_localFiles_files">
+           <property name="toolTip">
+            <string>单击选中，双击选择自动开始解析</string>
+           </property>
+           <property name="statusTip">
+            <string>单击选中，双击选择自动开始解析</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
