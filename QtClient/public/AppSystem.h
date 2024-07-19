@@ -87,6 +87,54 @@ void logToFile(QtMsgType type, const QMessageLogContext &context, const QString 
 extern QString PATH_EXE_CONFIG;
 extern QString PATH_APP_SETTINGS;
 extern QString PATH_LOG;
+/**系统的自定义配置的提示信息json文件**/
+inline const QString TipsPath = "tips.json";
 
+inline Result ReadJsonDataByFile(QJsonObject &jsonData, const QString &filePath)
+{
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return Result(false, "无法打开文件: " + file.errorString());
+    }
 
+    QByteArray jsonDataByteArray = file.readAll();
+    QJsonParseError parseError;
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonDataByteArray, &parseError);
+
+    if (parseError.error != QJsonParseError::NoError) {
+        return Result(false, "JSON解析错误: " + parseError.errorString());
+    }
+
+    if (!jsonDoc.isObject()) {
+        return Result(false, "JSON文档不是一个对象");
+    }
+
+    jsonData = jsonDoc.object();
+    return Result(true, "JSON数据读取成功");
+}
+
+inline Result SavaJsonDataToFile(QJsonObject &jsonData, const QString &filePath)
+{
+    QJsonDocument jsonDoc(jsonData);
+    QByteArray jsonDataByteArray = jsonDoc.toJson();
+
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
+        return Result(false, "无法打开文件: " + file.errorString());
+    }
+
+    qint64 bytesWritten = file.write(jsonDataByteArray);
+    if (bytesWritten != jsonDataByteArray.size()) {
+        file.close();
+        return Result(false, "文件写入失败");
+    }
+
+    if (!file.flush() || !file.waitForBytesWritten(-1)) {
+        file.close();
+        return Result(false, "文件写入失败");
+    }
+
+    file.close();
+    return Result(true, "JSON数据保存成功");
+}
 #endif // APPSYSTEM_H
